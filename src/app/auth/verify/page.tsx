@@ -38,11 +38,11 @@ function EmailVerifyContent() {
 
         if (data.user) {
           setStatus('success');
-          setMessage('Email verified successfully! Redirecting to your dashboard...');
+          setMessage('Email verified successfully! Redirecting to invoice generator...');
           
-          // Redirect to dashboard after a short delay
+          // Redirect to main invoice generator after a short delay
           setTimeout(() => {
-            router.push('/dashboard');
+            router.push('/');
           }, 2000);
         }
       } catch (err) {

@@ -39,7 +39,7 @@ export default function ResetPasswordPage() {
       } else {
         setSuccess(true);
         setTimeout(() => {
-          router.push('/dashboard');
+          router.push('/');
         }, 2000);
       }
     } catch (err) {
@@ -88,7 +88,7 @@ export default function ResetPasswordPage() {
             <div className="text-center mb-8">
               <h2 className="text-2xl font-bold text-white mb-3">Password Updated Successfully</h2>
               <p className="text-white/80 leading-relaxed">
-                Your password has been updated successfully. You will be redirected to your dashboard shortly.
+                Your password has been updated successfully. You will be redirected to the invoice generator shortly.
               </p>
             </div>
           </div>
