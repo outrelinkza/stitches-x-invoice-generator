@@ -4,13 +4,16 @@ import { useState, useEffect } from 'react';
 import SettingsSidebar from '@/components/SettingsSidebar';
 import FloatingCalculator from '@/components/FloatingCalculator';
 import { AuthGuard } from '@/components/AuthGuard';
-import { useUserProfile } from '@/contexts/UserProfileContext';
 import { supabase } from '@/lib/supabase';
 import NavHeader from '@/components/NavHeader';
 
 export default function Settings() {
   const [currentSection, setCurrentSection] = useState('company');
-  const { profile, settings, updateProfile, updateSettings } = useUserProfile();
+  // Note: UserProfile functionality temporarily disabled to prevent 406 errors
+  const profile = null;
+  const settings = null;
+  const updateProfile = async () => ({ success: false, error: 'Feature temporarily disabled' });
+  const updateSettings = async () => ({ success: false, error: 'Feature temporarily disabled' });
   
   // Invoice & Template Settings
   const [templateName, setTemplateName] = useState('Standard Template');

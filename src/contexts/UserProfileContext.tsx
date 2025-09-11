@@ -40,16 +40,31 @@ export const UserProfileProvider: React.FC<{ children: React.ReactNode }> = ({ c
     try {
       setLoading(true);
       
-      // Load user profile and settings in parallel
-      const [profileData, settingsData] = await Promise.all([
+      // Load user profile and settings in parallel with error handling
+      const [profileData, settingsData] = await Promise.allSettled([
         getUserProfile(user),
         getUserSettings(user.id)
       ]);
 
-      setProfile(profileData);
-      setSettings(settingsData);
+      // Handle profile data
+      if (profileData.status === 'fulfilled') {
+        setProfile(profileData.value);
+      } else {
+        console.warn('Failed to load profile data:', profileData.reason);
+        setProfile(null);
+      }
+
+      // Handle settings data
+      if (settingsData.status === 'fulfilled') {
+        setSettings(settingsData.value);
+      } else {
+        console.warn('Failed to load settings data:', settingsData.reason);
+        setSettings(null);
+      }
     } catch (error) {
       console.error('Error loading user data:', error);
+      setProfile(null);
+      setSettings(null);
     } finally {
       setLoading(false);
     }

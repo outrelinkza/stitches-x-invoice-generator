@@ -7,7 +7,6 @@ import { generateInvoicePDF, InvoiceData } from '@/utils/pdfGenerator';
 import { scanDocument, autoFillForm } from '@/utils/ocrScanner';
 import { createSubscription, createOneTimePayment, PRICING_PLANS } from '@/utils/paymentService';
 import { useAuth } from '@/contexts/AuthContext';
-import { useUserProfile } from '@/contexts/UserProfileContext';
 import { AuthModal } from '@/components/AuthModal';
 import { InvoiceService } from '@/utils/invoiceService';
 
@@ -18,7 +17,6 @@ export default function Home() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const { user, signOut } = useAuth();
-  const { profile } = useUserProfile();
   const router = useRouter();
   const [showTotals, setShowTotals] = useState(true);
   const [showResetModal, setShowResetModal] = useState(false);
@@ -491,15 +489,15 @@ export default function Home() {
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
                         <span className="text-white text-sm font-medium">
-                          {profile?.full_name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase()}
+                          {user.user_metadata?.full_name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase()}
                         </span>
                       </div>
                       <div className="flex flex-col">
                         <span className="text-white text-sm font-medium">
-                          {profile?.full_name || user.user_metadata?.full_name || 'User'}
+                          {user.user_metadata?.full_name || 'User'}
                         </span>
                         <span className="text-white/60 text-xs">
-                          {profile?.company_name || 'Personal Account'}
+                          Personal Account
                         </span>
                       </div>
                     </div>
