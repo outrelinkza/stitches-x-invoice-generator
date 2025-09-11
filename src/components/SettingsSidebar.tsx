@@ -1,5 +1,8 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
+import { User } from '@supabase/supabase-js';
 import Link from 'next/link';
 
 interface SettingsSidebarProps {
@@ -8,6 +11,38 @@ interface SettingsSidebarProps {
 }
 
 export default function SettingsSidebar({ currentSection, onSectionChange }: SettingsSidebarProps) {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const getUser = async () => {
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (error) {
+          console.error('Error getting user:', error);
+        } else {
+          setUser(user);
+        }
+      } catch (error) {
+        console.error('Error loading user:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getUser();
+  }, []);
+
+  const getUserInitials = (email: string) => {
+    return email.split('@')[0].slice(0, 2).toUpperCase();
+  };
+
+  const getUserDisplayName = (user: User) => {
+    return user.user_metadata?.full_name || 
+           user.user_metadata?.name || 
+           user.email?.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'User';
+  };
+
   const settingsCategories = [
     { id: 'company', icon: 'business', label: 'Company & Invoice' },
     { id: 'profile', icon: 'person', label: 'User Profile' },
@@ -45,15 +80,41 @@ export default function SettingsSidebar({ currentSection, onSectionChange }: Set
       </nav>
 
                   <div className="mt-auto">
-                    <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 transition-colors">
-                      <div className="flex items-center justify-center size-10 bg-white/20 rounded-full">
-                        <span className="text-white font-semibold text-sm">OM</span>
+                    {loading ? (
+                      <div className="flex items-center gap-3 p-2 rounded-lg">
+                        <div className="size-10 bg-white/20 rounded-full animate-pulse"></div>
+                        <div className="flex-1">
+                          <div className="h-4 bg-white/20 rounded animate-pulse mb-1"></div>
+                          <div className="h-3 bg-white/10 rounded animate-pulse w-3/4"></div>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-semibold text-sm text-white">Olivia Martin</p>
-                        <p className="text-xs text-white/60">olivia.martin@email.com</p>
+                    ) : user ? (
+                      <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 transition-colors">
+                        <div className="flex items-center justify-center size-10 bg-white/20 rounded-full">
+                          <span className="text-white font-semibold text-sm">
+                            {user.email ? getUserInitials(user.email) : 'U'}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="font-semibold text-sm text-white">
+                            {getUserDisplayName(user)}
+                          </p>
+                          <p className="text-xs text-white/60">
+                            {user.email || 'No email'}
+                          </p>
+                        </div>
                       </div>
-                    </div>
+                    ) : (
+                      <div className="flex items-center gap-3 p-2 rounded-lg">
+                        <div className="flex items-center justify-center size-10 bg-white/20 rounded-full">
+                          <span className="text-white font-semibold text-sm">?</span>
+                        </div>
+                        <div>
+                          <p className="font-semibold text-sm text-white">Not signed in</p>
+                          <p className="text-xs text-white/60">Please sign in</p>
+                        </div>
+                      </div>
+                    )}
                   </div>
     </aside>
   );
