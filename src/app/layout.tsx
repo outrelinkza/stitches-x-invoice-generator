@@ -5,8 +5,7 @@ import Script from "next/script";
 import AuroraBackground from "@/components/AuroraBackground";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { UserProfileProvider } from "@/contexts/UserProfileContext";
-import { Analytics } from "@vercel/analytics/react";
-import { SpeedInsights } from "@vercel/speed-insights/react";
+import VercelAnalytics from "@/components/VercelAnalytics";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -42,8 +41,6 @@ export default function RootLayout({
         className={`${inter.variable} ${notoSans.variable} min-h-screen text-gray-300 antialiased selection:bg-blue-600/40`}
         style={{ fontFamily: 'Inter, sans-serif' }}
       >
-        <Analytics />
-        <SpeedInsights />
         <AuroraBackground />
         <AuthProvider>
           <UserProfileProvider>
@@ -53,6 +50,7 @@ export default function RootLayout({
           </UserProfileProvider>
         </AuthProvider>
         <Script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer />
+        <VercelAnalytics />
       </body>
     </html>
   );
