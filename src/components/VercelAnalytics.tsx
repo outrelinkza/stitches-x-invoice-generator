@@ -1,13 +1,18 @@
 'use client';
 
-import { Analytics } from '@vercel/analytics/react';
-import { SpeedInsights } from '@vercel/speed-insights/react';
+import Script from 'next/script';
 
 export default function VercelAnalytics() {
   return (
     <>
-      <Analytics />
-      <SpeedInsights />
+      <Script
+        src="https://cdn.vercel-insights.com/v1/script.debug.js"
+        strategy="afterInteractive"
+      />
+      <Script
+        src="https://va.vercel-scripts.com/v1/script.debug.js"
+        strategy="afterInteractive"
+      />
     </>
   );
 }
