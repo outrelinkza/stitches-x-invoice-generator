@@ -638,9 +638,12 @@ export default function Home() {
                         input.onchange = async (e) => {
                           const file = (e.target as HTMLInputElement).files?.[0];
                           if (file) {
+                            console.log('File selected:', file.name, file.type, file.size);
                             try {
                               // Perform real OCR scanning
+                              console.log('Starting OCR scan...');
                               const result = await scanDocument(file);
+                              console.log('OCR result:', result);
                               
                               // Auto-fill form with extracted data
                               if (formRef.current) {
@@ -661,7 +664,17 @@ export default function Home() {
                               
                             } catch (error) {
                               console.error('OCR scanning failed:', error);
-                              // Error message is already shown in the scanDocument function
+                              // Show detailed error message
+                              const errorMsg = document.createElement('div');
+                              errorMsg.className = 'fixed top-20 right-4 bg-red-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
+                              errorMsg.innerHTML = `❌ OCR failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
+                              document.body.appendChild(errorMsg);
+                              
+                              setTimeout(() => {
+                                if (document.body.contains(errorMsg)) {
+                                  document.body.removeChild(errorMsg);
+                                }
+                              }, 5000);
                             }
                           }
                         };

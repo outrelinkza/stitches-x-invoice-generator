@@ -17,6 +17,24 @@ export interface OCRResult {
 
 export const scanDocument = async (file: File): Promise<OCRResult> => {
   try {
+    // Validate file
+    if (!file) {
+      throw new Error('No file provided');
+    }
+
+    // Check file size (limit to 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      throw new Error('File too large. Please use files smaller than 10MB.');
+    }
+
+    // Check file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'application/pdf'];
+    if (!allowedTypes.includes(file.type)) {
+      throw new Error('Unsupported file type. Please use JPG, PNG, GIF, BMP, WebP, or PDF files.');
+    }
+
+    console.log('Starting OCR for file:', file.name, 'Type:', file.type, 'Size:', file.size);
+
     // Show loading message
     const loadingMsg = document.createElement('div');
     loadingMsg.className = 'fixed top-20 right-4 bg-blue-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
@@ -29,6 +47,7 @@ export const scanDocument = async (file: File): Promise<OCRResult> => {
       'eng',
       {
         logger: m => {
+          console.log('Tesseract progress:', m);
           if (m.status === 'recognizing text') {
             loadingMsg.innerHTML = `🔍 Scanning document... ${Math.round(m.progress * 100)}%`;
           }
