@@ -4,7 +4,7 @@ import "./globals.css";
 import Script from "next/script";
 import AuroraBackground from "@/components/AuroraBackground";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { UserProfileProvider } from "@/contexts/UserProfileContext";
+// import { UserProfileProvider } from "@/contexts/UserProfileContext";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -42,11 +42,11 @@ export default function RootLayout({
       >
         <AuroraBackground />
         <AuthProvider>
-          <UserProfileProvider>
+          {/* <UserProfileProvider> */}
             <div className="relative z-10">
               {children}
             </div>
-          </UserProfileProvider>
+          {/* </UserProfileProvider> */}
         </AuthProvider>
         <Script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer />
       </body>

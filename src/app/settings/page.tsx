@@ -6,9 +6,9 @@ import FloatingCalculator from '@/components/FloatingCalculator';
 import { AuthGuard } from '@/components/AuthGuard';
 import { supabase } from '@/lib/supabase';
 import NavHeader from '@/components/NavHeader';
-import { useUserProfile } from '@/contexts/UserProfileContext';
+import { useUserProfile, UserProfileProvider } from '@/contexts/UserProfileContext';
 
-export default function Settings() {
+function SettingsContent() {
   const [currentSection, setCurrentSection] = useState('company');
   const { profile, settings, updateProfile, updateSettings } = useUserProfile();
   
@@ -732,5 +732,13 @@ export default function Settings() {
         )}
       </div>
     </AuthGuard>
+  );
+}
+
+export default function Settings() {
+  return (
+    <UserProfileProvider>
+      <SettingsContent />
+    </UserProfileProvider>
   );
 }
