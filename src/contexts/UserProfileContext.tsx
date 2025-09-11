@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { useAuth } from './AuthContext';
 import { getUserProfile, updateUserProfile, getUserSettings, updateUserSettings, UserProfile, UserSettings } from '@/utils/userService';
 
@@ -8,8 +8,8 @@ interface UserProfileContextType {
   profile: UserProfile | null;
   settings: UserSettings | null;
   loading: boolean;
-  updateProfile: (updates: Partial<UserProfile>) => Promise<{ success: boolean; error?: any }>;
-  updateSettings: (updates: Partial<UserSettings>) => Promise<{ success: boolean; error?: any }>;
+  updateProfile: (updates: Partial<UserProfile>) => Promise<{ success: boolean; error?: unknown }>;
+  updateSettings: (updates: Partial<UserSettings>) => Promise<{ success: boolean; error?: unknown }>;
   refreshProfile: () => Promise<void>;
 }
 
@@ -29,7 +29,7 @@ export const UserProfileProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [settings, setSettings] = useState<UserSettings | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const loadUserData = async () => {
+  const loadUserData = useCallback(async () => {
     if (!user) {
       setProfile(null);
       setSettings(null);
@@ -53,11 +53,11 @@ export const UserProfileProvider: React.FC<{ children: React.ReactNode }> = ({ c
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     loadUserData();
-  }, [user]);
+  }, [loadUserData]);
 
   const updateProfile = async (updates: Partial<UserProfile>) => {
     if (!user) {

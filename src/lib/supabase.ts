@@ -6,6 +6,14 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholde
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Database types
+export interface InvoiceItem {
+  id: string;
+  description: string;
+  quantity: number;
+  rate: number;
+  amount: number;
+}
+
 export interface User {
   id: string;
   email: string;
@@ -28,7 +36,7 @@ export interface Invoice {
   date: string;
   due_date: string;
   payment_terms: string;
-  items: any[];
+  items: InvoiceItem[];
   subtotal: number;
   tax_rate: number;
   tax_amount: number;

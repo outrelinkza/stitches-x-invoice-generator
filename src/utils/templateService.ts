@@ -5,7 +5,7 @@ export interface InvoiceTemplate {
   user_id: string;
   name: string;
   description?: string;
-  template_data: any;
+  template_data: Record<string, unknown>;
   is_default: boolean;
   is_public: boolean;
   created_at: string;

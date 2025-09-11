@@ -183,7 +183,7 @@ export const getUserInvoices = async (userId: string) => {
 };
 
 // Save invoice for user
-export const saveUserInvoice = async (userId: string, invoiceData: any) => {
+export const saveUserInvoice = async (userId: string, invoiceData: Record<string, unknown>) => {
   try {
     const { error } = await supabase
       .from('invoices')
@@ -218,7 +218,7 @@ export const saveUserInvoice = async (userId: string, invoiceData: any) => {
 };
 
 // Update user invoice
-export const updateUserInvoice = async (invoiceId: string, updates: any) => {
+export const updateUserInvoice = async (invoiceId: string, updates: Record<string, unknown>) => {
   try {
     const { error } = await supabase
       .from('invoices')

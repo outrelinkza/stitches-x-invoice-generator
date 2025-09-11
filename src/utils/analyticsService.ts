@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { supabase, Invoice } from '@/lib/supabase';
 
 export interface UserAnalytics {
   id: string;
@@ -35,7 +35,7 @@ export class AnalyticsService {
   }
 
   // Get recent invoices for dashboard
-  static async getRecentInvoices(limit: number = 5): Promise<any[]> {
+  static async getRecentInvoices(limit: number = 5): Promise<Invoice[]> {
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
@@ -57,7 +57,7 @@ export class AnalyticsService {
   }
 
   // Get invoices by status
-  static async getInvoicesByStatus(status: string): Promise<any[]> {
+  static async getInvoicesByStatus(status: string): Promise<Invoice[]> {
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
