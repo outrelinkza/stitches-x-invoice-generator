@@ -21,6 +21,7 @@ export default function SettingsSidebar({ currentSection, onSectionChange }: Set
         if (error) {
           console.error('Error getting user:', error);
         } else {
+          console.log('SettingsSidebar: User loaded:', user?.email);
           setUser(user);
         }
       } catch (error) {
@@ -34,7 +35,10 @@ export default function SettingsSidebar({ currentSection, onSectionChange }: Set
   }, []);
 
   const getUserInitials = (email: string) => {
-    return email.split('@')[0].slice(0, 2).toUpperCase();
+    console.log('Getting initials for email:', email);
+    const initials = email.split('@')[0].slice(0, 2).toUpperCase();
+    console.log('Generated initials:', initials);
+    return initials;
   };
 
   const getUserDisplayName = (user: User) => {
@@ -90,6 +94,7 @@ export default function SettingsSidebar({ currentSection, onSectionChange }: Set
                       </div>
                     ) : user ? (
                       <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 transition-colors">
+                        {console.log('SettingsSidebar: Rendering user avatar for:', user.email)}
                         <div className="flex items-center justify-center size-10 bg-white/20 rounded-full">
                           <span className="text-white font-semibold text-sm">
                             {user.email ? getUserInitials(user.email) : 'U'}
