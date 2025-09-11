@@ -126,12 +126,14 @@ export default function AuroraBackground() {
     }
 
     function resize() {
+      if (!canvas || !gl) return;
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
       gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
     }
 
     function main() {
+      if (!canvas || !gl) return;
       resize();
       const prog = createProgram(gl, vertexShaderSource, fragmentShaderSource);
       if (!prog) return;
@@ -141,12 +143,14 @@ export default function AuroraBackground() {
       const iResolutionLoc = gl.getUniformLocation(prog, 'iResolution');
       
       const posBuf = gl.createBuffer();
+      if (!posBuf) return;
       gl.bindBuffer(gl.ARRAY_BUFFER, posBuf);
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
         -1, -1, 1, -1, -1, 1, 1, 1
       ]), gl.STATIC_DRAW);
 
       function render(t = 0) {
+        if (!gl || !canvas) return;
         gl.useProgram(prog);
         gl.bindBuffer(gl.ARRAY_BUFFER, posBuf);
         gl.enableVertexAttribArray(positionLoc);

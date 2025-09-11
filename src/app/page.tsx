@@ -376,7 +376,7 @@ export default function Home() {
   };
 
   // AI Auto-Fill Suggestions
-  const getClientSuggestions = () => {
+  const getClientSuggestions = (): Array<{ name: string; address?: string; contact?: string }> => {
     if (typeof window === 'undefined') return [];
     const savedInvoices = JSON.parse(localStorage.getItem('savedInvoices') || '[]');
     const clients = savedInvoices
@@ -385,7 +385,7 @@ export default function Home() {
         address: invoice.clientAddress,
         contact: invoice.clientContact
       }))
-      .filter((client: { name?: string }) => client.name)
+      .filter((client: { name?: string }): client is { name: string; address?: string; contact?: string } => Boolean(client.name))
       .reduce((acc: Record<string, { name: string; address?: string; contact?: string }>, client: { name: string; address?: string; contact?: string }) => {
         if (!acc[client.name]) {
           acc[client.name] = client;
@@ -393,7 +393,7 @@ export default function Home() {
         return acc;
       }, {});
     
-    return Object.values(clients).slice(0, 5);
+    return Object.values(clients).slice(0, 5) as Array<{ name: string; address?: string; contact?: string }>;
   };
 
   // Smart Template Selection
@@ -428,7 +428,7 @@ export default function Home() {
   };
 
   // Calculate total with tax
-  const calculateTotal = (invoiceData: Record<string, unknown>) => {
+  const calculateTotal = (invoiceData: Record<string, string | number>) => {
     // Get current form values if no data provided
     if (!invoiceData || Object.keys(invoiceData).length === 0) {
       const subtotalInput = document.querySelector('input[name="subtotal"]') as HTMLInputElement;
@@ -439,8 +439,8 @@ export default function Home() {
       return (subtotal + taxAmount).toFixed(2);
     }
     
-    const subtotal = parseFloat(invoiceData.subtotal) || 0;
-    const taxRate = parseFloat(invoiceData.taxRate) || 0;
+    const subtotal = parseFloat(String(invoiceData.subtotal)) || 0;
+    const taxRate = parseFloat(String(invoiceData.taxRate)) || 0;
     const taxAmount = (subtotal * taxRate) / 100;
     return (subtotal + taxAmount).toFixed(2);
   };
@@ -685,7 +685,7 @@ export default function Home() {
                         list="clientNames"
                         onChange={(e) => {
                           // Auto-fill address and contact when client name is selected
-                          const selectedClient = getClientSuggestions().find((client: { name: string }) => 
+                          const selectedClient = getClientSuggestions().find(client => 
                             client.name.toLowerCase() === e.target.value.toLowerCase()
                           );
                           if (selectedClient && selectedClient.address && selectedClient.contact) {
@@ -697,7 +697,7 @@ export default function Home() {
                         }}
                       />
                       <datalist id="clientNames">
-                        {getClientSuggestions().map((client: { name: string; address?: string; contact?: string }, index) => (
+                        {getClientSuggestions().map((client, index) => (
                           <option key={index} value={client.name} />
                         ))}
                       </datalist>
@@ -1043,12 +1043,12 @@ export default function Home() {
                   onClick={() => {
                     // Get form data and filter out empty fields
                     const formData = new FormData(document.querySelector('form') as HTMLFormElement);
-                    const invoiceData: Record<string, unknown> = {};
+                    const invoiceData: Record<string, string> = {};
                     
                     // Only include non-empty fields
                     for (const [key, value] of formData.entries()) {
                       if (value && value.toString().trim() !== '') {
-                        invoiceData[key] = value;
+                        invoiceData[key] = value.toString();
                       }
                     }
                     
@@ -1150,12 +1150,12 @@ export default function Home() {
                   onClick={() => {
                     // Get form data and filter out empty fields
                     const formData = new FormData(document.querySelector('form') as HTMLFormElement);
-                    const invoiceData: Record<string, unknown> = {};
+                    const invoiceData: Record<string, string> = {};
                     
                     // Only include non-empty fields
                     for (const [key, value] of formData.entries()) {
                       if (value && value.toString().trim() !== '') {
-                        invoiceData[key] = value;
+                        invoiceData[key] = value.toString();
                       }
                     }
                     

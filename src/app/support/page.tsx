@@ -2,7 +2,7 @@
 
 export default function Support() {
   return (
-    <div className="relative flex size-full min-h-screen flex-col overflow-x-hidden" style={{'--primary-color': '#1380ec'}}>
+    <div className="relative flex size-full min-h-screen flex-col overflow-x-hidden" style={{'--primary-color': '#1380ec'} as React.CSSProperties}>
       {/* Header */}
       <header className="sticky top-0 z-20 w-full flex items-center justify-between whitespace-nowrap border-b border-solid border-gray-200/60 bg-white/60 px-10 py-3 backdrop-blur-sm">
         <div className="flex items-center gap-4 text-gray-900">

@@ -51,7 +51,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode }) =
       }
     } catch (error: unknown) {
       console.error('Auth error:', error);
-      setError(error.message || 'An error occurred. Please try again.');
+      setError((error as Error).message || 'An error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -174,7 +174,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode }) =
               try {
                 const { error } = await resetPassword(email);
                 if (error) {
-                  setError(error.message);
+                  setError((error as Error).message);
                 } else {
                   setError('');
                   // Show success message
