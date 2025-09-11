@@ -1,0 +1,25 @@
+0 verbose cli /opt/homebrew/Cellar/node/24.7.0/bin/node /opt/homebrew/bin/npm
+1 info using npm@11.5.1
+2 info using node@v24.7.0
+3 silly config load:file:/opt/homebrew/lib/node_modules/npm/npmrc
+4 silly config load:file:/Users/zahra/Stitches X Special/.npmrc
+5 error config prefix cannot be changed from project config: /Users/zahra/Stitches X Special/.npmrc.
+6 silly config load:file:/Users/zahra/.npmrc
+7 silly config load:file:/Users/zahra/Stitches X Special/etc/npmrc
+8 verbose title npm run build
+9 verbose argv "run" "build"
+10 verbose logfile logs-max:10 dir:/Users/zahra/Stitches X Special/.npm/_logs/2025-09-11T20_37_50_847Z-
+11 verbose logfile /Users/zahra/Stitches X Special/.npm/_logs/2025-09-11T20_37_50_847Z-debug-0.log
+12 silly logfile done cleaning log files
+13 http fetch GET 200 https://registry.npmjs.org/npm 263ms
+14 verbose cwd /Users/zahra/Stitches X Special
+15 verbose os Darwin 24.6.0
+16 verbose node v24.7.0
+17 verbose npm  v11.5.1
+18 notice
+18 notice New minor version of npm available! 11.5.1 -> 11.6.0
+18 notice Changelog: https://github.com/npm/cli/releases/tag/v11.6.0
+18 notice To update run: npm install -g npm@11.6.0
+18 notice  { force: true, Symbol(proc-log.meta): true }
+19 verbose exit 1
+20 verbose code 1

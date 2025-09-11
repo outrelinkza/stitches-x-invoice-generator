@@ -13,20 +13,8 @@ const nextConfig = {
   images: {
     domains: ['localhost'],
   },
-  // Removed experimental turbo config for better compatibility
-  // Vercel handles output automatically
-  // Handle potential build issues
-  webpack: (config, { isServer }) => {
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-        net: false,
-        tls: false,
-      };
-    }
-    return config;
-  },
+  // Fix workspace root detection
+  outputFileTracingRoot: __dirname,
 }
 
 module.exports = nextConfig
