@@ -49,7 +49,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode }) =
         // Close modal on successful sign in
         onClose();
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Auth error:', error);
       setError(error.message || 'An error occurred. Please try again.');
     } finally {

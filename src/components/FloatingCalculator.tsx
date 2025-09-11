@@ -7,7 +7,7 @@ export default function FloatingCalculator() {
   const [position, setPosition] = useState({ x: 20, y: 20 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const [results, setResults] = useState<{[key: string]: any}>({});
+  const [results, setResults] = useState<{[key: string]: number}>({});
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
