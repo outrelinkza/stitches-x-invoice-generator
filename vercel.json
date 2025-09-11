@@ -1,5 +1,5 @@
 {
-  "buildCommand": "ESLINT_NO_DEV_ERRORS=true npm run build",
+  "buildCommand": "npm run build",
   "outputDirectory": ".next",
   "installCommand": "npm install",
   "framework": "nextjs",
