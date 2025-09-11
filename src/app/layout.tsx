@@ -4,7 +4,6 @@ import "./globals.css";
 import Script from "next/script";
 import AuroraBackground from "@/components/AuroraBackground";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { UserProfileProvider } from "@/contexts/UserProfileContext";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
@@ -44,11 +43,9 @@ export default function RootLayout({
       >
         <AuroraBackground />
         <AuthProvider>
-          <UserProfileProvider>
-            <div className="relative z-10">
-              {children}
-            </div>
-          </UserProfileProvider>
+          <div className="relative z-10">
+            {children}
+          </div>
         </AuthProvider>
         <Script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer />
         <Analytics />

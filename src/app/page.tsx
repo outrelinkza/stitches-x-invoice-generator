@@ -6,7 +6,6 @@ import { generateInvoicePDF, InvoiceData } from '@/utils/pdfGenerator';
 import { scanDocument, autoFillForm } from '@/utils/ocrScanner';
 import { createSubscription, createOneTimePayment, PRICING_PLANS } from '@/utils/paymentService';
 import { useAuth } from '@/contexts/AuthContext';
-import { useUserProfile } from '@/contexts/UserProfileContext';
 import { AuthModal } from '@/components/AuthModal';
 import { InvoiceService } from '@/utils/invoiceService';
 
@@ -17,7 +16,6 @@ export default function Home() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const { user, signOut } = useAuth();
-  const { profile } = useUserProfile();
   const [showTotals, setShowTotals] = useState(true);
   const [showResetModal, setShowResetModal] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
