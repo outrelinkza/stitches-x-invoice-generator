@@ -24,11 +24,8 @@ export default function Settings() {
   const [companyEmail, setCompanyEmail] = useState('billing@yourcompany.com');
   const [companyPhone, setCompanyPhone] = useState('+1 (555) 123-4567');
 
-  // User Profile Settings
-  const [userName, setUserName] = useState('John Doe');
-  const [userEmail, setUserEmail] = useState('john@example.com');
-  const [userPhone, setUserPhone] = useState('+1 (555) 987-6543');
-  const [userTitle, setUserTitle] = useState('Freelancer');
+  // User Profile Settings (simplified)
+  const [userName, setUserName] = useState('');
 
   // Notification Settings
   const [emailNotifications, setEmailNotifications] = useState(true);
@@ -47,6 +44,11 @@ export default function Settings() {
   const [fontSize, setFontSize] = useState('medium');
   const [language, setLanguage] = useState('en');
   const [timezone, setTimezone] = useState('UTC-5');
+
+  // Feedback Settings
+  const [feedbackType, setFeedbackType] = useState('general');
+  const [feedbackMessage, setFeedbackMessage] = useState('');
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
 
   // Load current user and saved settings on component mount
   useEffect(() => {
@@ -83,10 +85,7 @@ export default function Settings() {
         setCompanyAddress(settings.companyAddress || '123 Business St, City, State 12345');
         setCompanyEmail(settings.companyEmail || 'billing@yourcompany.com');
         setCompanyPhone(settings.companyPhone || '+1 (555) 123-4567');
-        setUserName(settings.userName || user?.user_metadata?.full_name || 'User');
-        setUserEmail(settings.userEmail || user?.email || '');
-        setUserPhone(settings.userPhone || '+1 (555) 987-6543');
-        setUserTitle(settings.userTitle || 'Freelancer');
+        setUserName(settings.userName || user?.user_metadata?.full_name || '');
         setEmailNotifications(settings.emailNotifications !== undefined ? settings.emailNotifications : true);
         setInvoiceReminders(settings.invoiceReminders !== undefined ? settings.invoiceReminders : true);
         setPaymentAlerts(settings.paymentAlerts !== undefined ? settings.paymentAlerts : false);
@@ -118,9 +117,6 @@ export default function Settings() {
         currency,
         templateName,
         userName,
-        userEmail,
-        userPhone,
-        userTitle,
         emailNotifications,
         invoiceReminders,
         paymentAlerts,
@@ -263,6 +259,75 @@ export default function Settings() {
       const errorMsg = document.createElement('div');
       errorMsg.className = 'fixed top-20 right-4 bg-red-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
       errorMsg.innerHTML = '❌ Failed to delete data. Please try again.';
+      document.body.appendChild(errorMsg);
+      
+      setTimeout(() => {
+        if (document.body.contains(errorMsg)) {
+          document.body.removeChild(errorMsg);
+        }
+      }, 4000);
+    }
+  };
+
+  const handleFeedbackSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!feedbackMessage.trim()) {
+      alert('Please enter your feedback message');
+      return;
+    }
+
+    try {
+      // Show loading message
+      const loadingMsg = document.createElement('div');
+      loadingMsg.className = 'fixed top-20 right-4 bg-blue-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
+      loadingMsg.innerHTML = '📤 Submitting feedback...';
+      document.body.appendChild(loadingMsg);
+
+      // Submit feedback to API
+      const response = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: feedbackType,
+          message: feedbackMessage,
+          userEmail: user?.email,
+          userName: userName || user?.email?.split('@')[0],
+        }),
+      });
+
+      // Remove loading message
+      if (document.body.contains(loadingMsg)) {
+        document.body.removeChild(loadingMsg);
+      }
+
+      if (response.ok) {
+        setFeedbackSubmitted(true);
+        setFeedbackMessage('');
+        
+        // Show success message
+        const successMsg = document.createElement('div');
+        successMsg.className = 'fixed top-20 right-4 bg-green-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
+        successMsg.innerHTML = '✅ Feedback submitted successfully!';
+        document.body.appendChild(successMsg);
+        
+        setTimeout(() => {
+          if (document.body.contains(successMsg)) {
+            document.body.removeChild(successMsg);
+          }
+        }, 3000);
+      } else {
+        throw new Error('Failed to submit feedback');
+      }
+    } catch (error) {
+      console.error('Feedback submission error:', error);
+      
+      // Show error message
+      const errorMsg = document.createElement('div');
+      errorMsg.className = 'fixed top-20 right-4 bg-red-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
+      errorMsg.innerHTML = '❌ Failed to submit feedback. Please try again.';
       document.body.appendChild(errorMsg);
       
       setTimeout(() => {
@@ -436,32 +501,20 @@ export default function Settings() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-6">
                   <div>
-                    <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="user-name">Full Name</label>
+                    <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="user-name">Display Name</label>
                     <input
                       className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-white/10 text-white placeholder-white/60"
                       id="user-name"
                       type="text"
                       value={userName}
                       onChange={(e) => setUserName(e.target.value)}
-                      placeholder="Enter your full name"
+                      placeholder="Enter your display name"
                     />
+                    <p className="text-xs text-white/50 mt-1">This is how your name will appear on invoices</p>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="user-title">Job Title</label>
-                    <input
-                      className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-white/10 text-white placeholder-white/60"
-                      id="user-title"
-                      type="text"
-                      value={userTitle}
-                      onChange={(e) => setUserTitle(e.target.value)}
-                      placeholder="e.g., Freelancer, Designer, Consultant"
-                    />
-                  </div>
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="user-email">Email Address</label>
                     <input
@@ -472,17 +525,6 @@ export default function Settings() {
                       disabled
                     />
                     <p className="text-xs text-white/50 mt-1">Email cannot be changed. Contact support if needed.</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="user-phone">Phone Number</label>
-                    <input
-                      className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-white/10 text-white placeholder-white/60"
-                      id="user-phone"
-                      type="tel"
-                      value={userPhone}
-                      onChange={(e) => setUserPhone(e.target.value)}
-                      placeholder="+1 (555) 123-4567"
-                    />
                   </div>
                 </div>
 
@@ -647,6 +689,98 @@ export default function Settings() {
                         </button>
                       </div>
                     </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'feedback':
+        return (
+          <div className="glass-effect rounded-2xl shadow-sm border border-white/20 p-6 animate-enter" style={{animationDelay: '300ms'}}>
+            <h2 className="text-2xl font-semibold leading-tight tracking-tight text-white mb-6">Feedback & Support</h2>
+            
+            {feedbackSubmitted ? (
+              <div className="text-center py-8">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-white mb-2">Thank You!</h3>
+                <p className="text-white/70 mb-6">Your feedback has been submitted successfully. We appreciate your input!</p>
+                <button
+                  onClick={() => setFeedbackSubmitted(false)}
+                  className="px-4 py-2 bg-[var(--primary-color)] text-white rounded-lg hover:bg-[var(--primary-color)]/80 transition-colors"
+                >
+                  Submit Another Feedback
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleFeedbackSubmit} className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="feedback-type">Feedback Type</label>
+                  <select
+                    className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-white/10 text-white"
+                    id="feedback-type"
+                    value={feedbackType}
+                    onChange={(e) => setFeedbackType(e.target.value)}
+                  >
+                    <option value="general" className="bg-slate-800 text-white">General Feedback</option>
+                    <option value="bug" className="bg-slate-800 text-white">Bug Report</option>
+                    <option value="feature" className="bg-slate-800 text-white">Feature Request</option>
+                    <option value="improvement" className="bg-slate-800 text-white">Improvement Suggestion</option>
+                    <option value="support" className="bg-slate-800 text-white">Support Request</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="feedback-message">Your Message</label>
+                  <textarea
+                    className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-white/10 text-white placeholder-white/60"
+                    id="feedback-message"
+                    rows={6}
+                    value={feedbackMessage}
+                    onChange={(e) => setFeedbackMessage(e.target.value)}
+                    placeholder="Please describe your feedback, bug report, or feature request in detail..."
+                    required
+                  />
+                  <p className="text-xs text-white/50 mt-1">Be as specific as possible to help us understand your needs</p>
+                </div>
+
+                <div className="flex justify-end gap-3 pt-4">
+                  <button 
+                    type="button"
+                    className="px-5 py-2 border border-white/20 text-sm font-medium text-white/70 rounded-lg hover:bg-white/10 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="submit"
+                    className="px-5 py-2 bg-[var(--primary-color)] text-white text-sm font-medium rounded-lg hover:bg-[var(--primary-color)]/80 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary-color)]"
+                  >
+                    Submit Feedback
+                  </button>
+                </div>
+              </form>
+            )}
+
+            <div className="mt-8 pt-6 border-t border-white/10">
+              <h3 className="text-lg font-medium text-white mb-4">Other Ways to Get Help</h3>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3 p-3 bg-white/5 rounded-lg">
+                  <span className="material-symbols-outlined text-white/70">email</span>
+                  <div>
+                    <p className="text-white font-medium">Email Support</p>
+                    <p className="text-white/60 text-sm">stitchesx.service@gmail.com</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 p-3 bg-white/5 rounded-lg">
+                  <span className="material-symbols-outlined text-white/70">help</span>
+                  <div>
+                    <p className="text-white font-medium">Documentation</p>
+                    <p className="text-white/60 text-sm">Check our help center for guides and tutorials</p>
                   </div>
                 </div>
               </div>
