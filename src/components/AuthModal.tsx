@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface AuthModalProps {
@@ -18,6 +19,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode }) =
   const [error, setError] = useState('');
   const [isResetting, setIsResetting] = useState(false);
   const { signIn, signUp, resetPassword } = useAuth();
+  const router = useRouter();
 
   // Update isSignUp when mode prop changes
   React.useEffect(() => {
@@ -46,8 +48,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode }) =
         }, 5000);
       } else {
         await signIn(email, password);
-        // Close modal on successful sign in
+        // Close modal and redirect to dashboard on successful sign in
         onClose();
+        router.push('/dashboard');
       }
     } catch (error: unknown) {
       console.error('Auth error:', error);

@@ -1,11 +1,13 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import FloatingCalculator from '@/components/FloatingCalculator';
 import { generateInvoicePDF, InvoiceData } from '@/utils/pdfGenerator';
 import { scanDocument, autoFillForm } from '@/utils/ocrScanner';
 import { createSubscription, createOneTimePayment, PRICING_PLANS } from '@/utils/paymentService';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserProfile } from '@/contexts/UserProfileContext';
 import { AuthModal } from '@/components/AuthModal';
 import { InvoiceService } from '@/utils/invoiceService';
 
@@ -16,6 +18,8 @@ export default function Home() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const { user, signOut } = useAuth();
+  const { profile } = useUserProfile();
+  const router = useRouter();
   const [showTotals, setShowTotals] = useState(true);
   const [showResetModal, setShowResetModal] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -26,6 +30,13 @@ export default function Home() {
   const [selectedTemplate, setSelectedTemplate] = useState('standard');
   const logoInputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
+
+  // Redirect authenticated users to dashboard
+  useEffect(() => {
+    if (user && user.email_confirmed_at) {
+      router.push('/dashboard');
+    }
+  }, [user, router]);
 
   // Load selected template on component mount
   useEffect(() => {
@@ -480,15 +491,15 @@ export default function Home() {
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
                         <span className="text-white text-sm font-medium">
-                          {user?.user_metadata?.full_name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'U'}
+                          {profile?.full_name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase()}
                         </span>
                       </div>
                       <div className="flex flex-col">
                         <span className="text-white text-sm font-medium">
-                          {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'}
+                          {profile?.full_name || user.user_metadata?.full_name || 'User'}
                         </span>
                         <span className="text-white/60 text-xs">
-                          {user?.user_metadata?.company_name || 'Personal Account'}
+                          {profile?.company_name || 'Personal Account'}
                         </span>
                       </div>
                     </div>
@@ -636,23 +647,19 @@ export default function Home() {
                         input.onchange = async (e) => {
                           const file = (e.target as HTMLInputElement).files?.[0];
                           if (file) {
-                            console.log('File selected:', file.name, file.type, file.size);
                             try {
                               // Perform real OCR scanning
-                              console.log('Starting OCR scan...');
                               const result = await scanDocument(file);
-                              console.log('OCR result:', result);
                               
                               // Auto-fill form with extracted data
                               if (formRef.current) {
                                 autoFillForm(result.extractedData, formRef);
                               }
                               
-                              // Show success message with confidence and extracted data count
-                              const extractedCount = Object.keys(result.extractedData).filter(key => result.extractedData[key as keyof typeof result.extractedData]).length;
+                              // Show success message with confidence
                               const successMsg = document.createElement('div');
                               successMsg.className = 'fixed top-20 right-4 bg-green-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
-                              successMsg.innerHTML = `Document scanned successfully! Confidence: ${Math.round(result.confidence)}% | Extracted ${extractedCount} fields`;
+                              successMsg.innerHTML = `✅ Document scanned successfully! Confidence: ${Math.round(result.confidence)}%`;
                               document.body.appendChild(successMsg);
                               
                               setTimeout(() => {
@@ -663,17 +670,7 @@ export default function Home() {
                               
                             } catch (error) {
                               console.error('OCR scanning failed:', error);
-                              // Show detailed error message
-                              const errorMsg = document.createElement('div');
-                              errorMsg.className = 'fixed top-20 right-4 bg-red-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
-                              errorMsg.innerHTML = `❌ OCR failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
-                              document.body.appendChild(errorMsg);
-                              
-                              setTimeout(() => {
-                                if (document.body.contains(errorMsg)) {
-                                  document.body.removeChild(errorMsg);
-                                }
-                              }, 5000);
+                              // Error message is already shown in the scanDocument function
                             }
                           }
                         };

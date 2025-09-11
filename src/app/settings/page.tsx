@@ -4,14 +4,13 @@ import { useState, useEffect } from 'react';
 import SettingsSidebar from '@/components/SettingsSidebar';
 import FloatingCalculator from '@/components/FloatingCalculator';
 import { AuthGuard } from '@/components/AuthGuard';
+import { useUserProfile } from '@/contexts/UserProfileContext';
 import { supabase } from '@/lib/supabase';
 import NavHeader from '@/components/NavHeader';
-import { User } from '@supabase/supabase-js';
 
 export default function Settings() {
   const [currentSection, setCurrentSection] = useState('company');
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { profile, settings, updateProfile, updateSettings } = useUserProfile();
   
   // Invoice & Template Settings
   const [templateName, setTemplateName] = useState('Standard Template');
@@ -24,8 +23,11 @@ export default function Settings() {
   const [companyEmail, setCompanyEmail] = useState('billing@yourcompany.com');
   const [companyPhone, setCompanyPhone] = useState('+1 (555) 123-4567');
 
-  // User Profile Settings (simplified)
-  const [userName, setUserName] = useState('');
+  // User Profile Settings
+  const [userName, setUserName] = useState('John Doe');
+  const [userEmail, setUserEmail] = useState('john@example.com');
+  const [userPhone, setUserPhone] = useState('+1 (555) 987-6543');
+  const [userTitle, setUserTitle] = useState('Freelancer');
 
   // Notification Settings
   const [emailNotifications, setEmailNotifications] = useState(true);
@@ -45,33 +47,8 @@ export default function Settings() {
   const [language, setLanguage] = useState('en');
   const [timezone, setTimezone] = useState('UTC-5');
 
-  // Feedback Settings
-  const [feedbackType, setFeedbackType] = useState('general');
-  const [feedbackMessage, setFeedbackMessage] = useState('');
-  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
-
-  // Load current user and saved settings on component mount
+  // Load saved settings on component mount
   useEffect(() => {
-    const loadUserAndSettings = async () => {
-      try {
-        // Get current user
-        const { data: { user }, error } = await supabase.auth.getUser();
-        if (error) {
-          console.error('Error getting user:', error);
-        } else {
-          setUser(user);
-          console.log('Current user loaded:', user?.email);
-        }
-      } catch (error) {
-        console.error('Error loading user:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadUserAndSettings();
-
-    // Load saved settings from localStorage
     if (typeof window !== 'undefined') {
       const savedSettings = localStorage.getItem('userSettings');
       if (savedSettings) {
@@ -85,7 +62,10 @@ export default function Settings() {
         setCompanyAddress(settings.companyAddress || '123 Business St, City, State 12345');
         setCompanyEmail(settings.companyEmail || 'billing@yourcompany.com');
         setCompanyPhone(settings.companyPhone || '+1 (555) 123-4567');
-        setUserName(settings.userName || user?.user_metadata?.full_name || '');
+        setUserName(settings.userName || 'John Doe');
+        setUserEmail(settings.userEmail || 'john@example.com');
+        setUserPhone(settings.userPhone || '+1 (555) 987-6543');
+        setUserTitle(settings.userTitle || 'Freelancer');
         setEmailNotifications(settings.emailNotifications !== undefined ? settings.emailNotifications : true);
         setInvoiceReminders(settings.invoiceReminders !== undefined ? settings.invoiceReminders : true);
         setPaymentAlerts(settings.paymentAlerts !== undefined ? settings.paymentAlerts : false);
@@ -99,7 +79,7 @@ export default function Settings() {
         setTimezone(settings.timezone || 'UTC-5');
       }
     }
-  }, [user]);
+  }, []);
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
@@ -117,6 +97,9 @@ export default function Settings() {
         currency,
         templateName,
         userName,
+        userEmail,
+        userPhone,
+        userTitle,
         emailNotifications,
         invoiceReminders,
         paymentAlerts,
@@ -269,75 +252,6 @@ export default function Settings() {
     }
   };
 
-  const handleFeedbackSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!feedbackMessage.trim()) {
-      alert('Please enter your feedback message');
-      return;
-    }
-
-    try {
-      // Show loading message
-      const loadingMsg = document.createElement('div');
-      loadingMsg.className = 'fixed top-20 right-4 bg-blue-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
-      loadingMsg.innerHTML = '📤 Submitting feedback...';
-      document.body.appendChild(loadingMsg);
-
-      // Submit feedback to API
-      const response = await fetch('/api/feedback', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          type: feedbackType,
-          message: feedbackMessage,
-          userEmail: user?.email,
-          userName: userName || user?.email?.split('@')[0],
-        }),
-      });
-
-      // Remove loading message
-      if (document.body.contains(loadingMsg)) {
-        document.body.removeChild(loadingMsg);
-      }
-
-      if (response.ok) {
-        setFeedbackSubmitted(true);
-        setFeedbackMessage('');
-        
-        // Show success message
-        const successMsg = document.createElement('div');
-        successMsg.className = 'fixed top-20 right-4 bg-green-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
-        successMsg.innerHTML = '✅ Feedback submitted successfully!';
-        document.body.appendChild(successMsg);
-        
-        setTimeout(() => {
-          if (document.body.contains(successMsg)) {
-            document.body.removeChild(successMsg);
-          }
-        }, 3000);
-      } else {
-        throw new Error('Failed to submit feedback');
-      }
-    } catch (error) {
-      console.error('Feedback submission error:', error);
-      
-      // Show error message
-      const errorMsg = document.createElement('div');
-      errorMsg.className = 'fixed top-20 right-4 bg-red-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
-      errorMsg.innerHTML = '❌ Failed to submit feedback. Please try again.';
-      document.body.appendChild(errorMsg);
-      
-      setTimeout(() => {
-        if (document.body.contains(errorMsg)) {
-          document.body.removeChild(errorMsg);
-        }
-      }, 4000);
-    }
-  };
-
   const renderSectionContent = () => {
     switch (currentSection) {
       case 'company':
@@ -464,82 +378,59 @@ export default function Settings() {
         return (
           <div className="glass-effect rounded-2xl shadow-sm border border-white/20 p-6 animate-enter" style={{animationDelay: '300ms'}}>
             <h2 className="text-2xl font-semibold leading-tight tracking-tight text-white mb-6">User Profile</h2>
-            
-            {loading ? (
-              <div className="flex items-center justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
-                <span className="ml-3 text-white/70">Loading profile...</span>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                {/* Account Information Display */}
-                <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-                  <h3 className="text-white font-medium mb-3">Account Information</h3>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-white/70">Email:</span>
-                      <span className="text-white font-medium">{user?.email || 'Not available'}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-white/70">User ID:</span>
-                      <span className="text-white/60 font-mono text-xs">{user?.id?.slice(0, 8)}...</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-white/70">Account Created:</span>
-                      <span className="text-white/70">{user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'Unknown'}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-white/70">Last Sign In:</span>
-                      <span className="text-white/70">{user?.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleDateString() : 'Unknown'}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-white/70">Email Verified:</span>
-                      <span className={`font-medium ${user?.email_confirmed_at ? 'text-green-400' : 'text-yellow-400'}`}>
-                        {user?.email_confirmed_at ? '✅ Verified' : '⚠️ Pending'}
-                      </span>
-                    </div>
-                  </div>
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="user-name">Full Name</label>
+                  <input
+                    className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-white/10 text-white placeholder-white/60"
+                    id="user-name"
+                    type="text"
+                    defaultValue={profile?.full_name || ''}
+                    onChange={(e) => updateProfile({ full_name: e.target.value })}
+                  />
                 </div>
-
-                <div className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="user-name">Display Name</label>
-                    <input
-                      className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-white/10 text-white placeholder-white/60"
-                      id="user-name"
-                      type="text"
-                      value={userName}
-                      onChange={(e) => setUserName(e.target.value)}
-                      placeholder="Enter your display name"
-                    />
-                    <p className="text-xs text-white/50 mt-1">This is how your name will appear on invoices</p>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="user-email">Email Address</label>
-                    <input
-                      className="w-full px-4 py-2 border border-white/10 rounded-lg bg-white/5 text-white/70 cursor-not-allowed"
-                      id="user-email"
-                      type="email"
-                      value={user?.email || ''}
-                      disabled
-                    />
-                    <p className="text-xs text-white/50 mt-1">Email cannot be changed. Contact support if needed.</p>
-                  </div>
-                </div>
-
-                <div className="flex justify-end gap-3 pt-4">
-                  <button className="px-5 py-2 border border-white/20 text-sm font-medium text-white/70 rounded-lg hover:bg-white/10 transition-colors" type="button">Cancel</button>
-                  <button 
-                    className="px-5 py-2 bg-[var(--primary-color)] text-white text-sm font-medium rounded-lg hover:bg-[var(--primary-color)]/80 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary-color)]" 
-                    type="button"
-                    onClick={handleSave}
-                  >
-                    Save Changes
-                  </button>
+                <div>
+                  <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="user-title">Job Title</label>
+                  <input
+                    className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-white/10 text-white placeholder-white/60"
+                    id="user-title"
+                    type="text"
+                    value={userTitle}
+                    onChange={(e) => setUserTitle(e.target.value)}
+                  />
                 </div>
               </div>
-            )}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="user-email">Email Address</label>
+                  <input
+                    className="w-full px-4 py-2 border border-white/10 rounded-lg bg-white/5 text-white/70 cursor-not-allowed"
+                    id="user-email"
+                    type="email"
+                    value={profile?.email || ''}
+                    disabled
+                  />
+                  <p className="text-xs text-white/50 mt-1">Email cannot be changed</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="user-phone">Phone Number</label>
+                  <input
+                    className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-white/10 text-white placeholder-white/60"
+                    id="user-phone"
+                    type="tel"
+                    value={userPhone}
+                    onChange={(e) => setUserPhone(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4">
+                <button className="px-5 py-2 border border-white/20 text-sm font-medium text-white/70 rounded-lg hover:bg-white/10 transition-colors" type="button">Cancel</button>
+                <button className="px-5 py-2 bg-[var(--primary-color)] text-white text-sm font-medium rounded-lg hover:bg-[var(--primary-color)]/80 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary-color)]" type="submit">Save Changes</button>
+              </div>
+            </div>
           </div>
         );
 
@@ -689,98 +580,6 @@ export default function Settings() {
                         </button>
                       </div>
                     </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
-      case 'feedback':
-        return (
-          <div className="glass-effect rounded-2xl shadow-sm border border-white/20 p-6 animate-enter" style={{animationDelay: '300ms'}}>
-            <h2 className="text-2xl font-semibold leading-tight tracking-tight text-white mb-6">Feedback & Support</h2>
-            
-            {feedbackSubmitted ? (
-              <div className="text-center py-8">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold text-white mb-2">Thank You!</h3>
-                <p className="text-white/70 mb-6">Your feedback has been submitted successfully. We appreciate your input!</p>
-                <button
-                  onClick={() => setFeedbackSubmitted(false)}
-                  className="px-4 py-2 bg-[var(--primary-color)] text-white rounded-lg hover:bg-[var(--primary-color)]/80 transition-colors"
-                >
-                  Submit Another Feedback
-                </button>
-              </div>
-            ) : (
-              <form onSubmit={handleFeedbackSubmit} className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="feedback-type">Feedback Type</label>
-                  <select
-                    className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-white/10 text-white"
-                    id="feedback-type"
-                    value={feedbackType}
-                    onChange={(e) => setFeedbackType(e.target.value)}
-                  >
-                    <option value="general" className="bg-slate-800 text-white">General Feedback</option>
-                    <option value="bug" className="bg-slate-800 text-white">Bug Report</option>
-                    <option value="feature" className="bg-slate-800 text-white">Feature Request</option>
-                    <option value="improvement" className="bg-slate-800 text-white">Improvement Suggestion</option>
-                    <option value="support" className="bg-slate-800 text-white">Support Request</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="feedback-message">Your Message</label>
-                  <textarea
-                    className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-white/10 text-white placeholder-white/60"
-                    id="feedback-message"
-                    rows={6}
-                    value={feedbackMessage}
-                    onChange={(e) => setFeedbackMessage(e.target.value)}
-                    placeholder="Please describe your feedback, bug report, or feature request in detail..."
-                    required
-                  />
-                  <p className="text-xs text-white/50 mt-1">Be as specific as possible to help us understand your needs</p>
-                </div>
-
-                <div className="flex justify-end gap-3 pt-4">
-                  <button 
-                    type="button"
-                    className="px-5 py-2 border border-white/20 text-sm font-medium text-white/70 rounded-lg hover:bg-white/10 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button 
-                    type="submit"
-                    className="px-5 py-2 bg-[var(--primary-color)] text-white text-sm font-medium rounded-lg hover:bg-[var(--primary-color)]/80 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary-color)]"
-                  >
-                    Submit Feedback
-                  </button>
-                </div>
-              </form>
-            )}
-
-            <div className="mt-8 pt-6 border-t border-white/10">
-              <h3 className="text-lg font-medium text-white mb-4">Other Ways to Get Help</h3>
-              <div className="space-y-3">
-                <div className="flex items-center gap-3 p-3 bg-white/5 rounded-lg">
-                  <span className="material-symbols-outlined text-white/70">email</span>
-                  <div>
-                    <p className="text-white font-medium">Email Support</p>
-                    <p className="text-white/60 text-sm">stitchesx.service@gmail.com</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-white/5 rounded-lg">
-                  <span className="material-symbols-outlined text-white/70">help</span>
-                  <div>
-                    <p className="text-white font-medium">Documentation</p>
-                    <p className="text-white/60 text-sm">Check our help center for guides and tutorials</p>
                   </div>
                 </div>
               </div>
