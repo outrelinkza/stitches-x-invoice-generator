@@ -1,8 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
-    // Warning: This allows production builds to successfully complete even if
-    // your project has ESLint errors.
+    // Completely disable ESLint during builds
     ignoreDuringBuilds: true,
     dirs: [], // Disable ESLint entirely during builds
   },
