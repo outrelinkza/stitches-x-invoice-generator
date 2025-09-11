@@ -5,7 +5,6 @@ import Script from "next/script";
 import AuroraBackground from "@/components/AuroraBackground";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { UserProfileProvider } from "@/contexts/UserProfileContext";
-import AnalyticsComponent from "./analytics";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -36,12 +35,13 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+        <script src="https://cdn.vercel-insights.com/v1/script.js" defer></script>
+        <script src="https://va.vercel-scripts.com/v1/script.js" defer></script>
       </head>
       <body
         className={`${inter.variable} ${notoSans.variable} min-h-screen text-gray-300 antialiased selection:bg-blue-600/40`}
         style={{ fontFamily: 'Inter, sans-serif' }}
       >
-        <AnalyticsComponent />
         <AuroraBackground />
         <AuthProvider>
           <UserProfileProvider>
@@ -51,7 +51,6 @@ export default function RootLayout({
           </UserProfileProvider>
         </AuthProvider>
         <Script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer />
-        <AnalyticsComponent />
       </body>
     </html>
   );
