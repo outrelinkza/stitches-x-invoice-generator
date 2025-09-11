@@ -4,13 +4,14 @@ import { useState, useEffect } from 'react';
 import SettingsSidebar from '@/components/SettingsSidebar';
 import FloatingCalculator from '@/components/FloatingCalculator';
 import { AuthGuard } from '@/components/AuthGuard';
-import { useUserProfile } from '@/contexts/UserProfileContext';
 import { supabase } from '@/lib/supabase';
 import NavHeader from '@/components/NavHeader';
+import { User } from '@supabase/supabase-js';
 
 export default function Settings() {
   const [currentSection, setCurrentSection] = useState('company');
-  const { profile, settings, updateProfile, updateSettings } = useUserProfile();
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
   
   // Invoice & Template Settings
   const [templateName, setTemplateName] = useState('Standard Template');
@@ -47,8 +48,28 @@ export default function Settings() {
   const [language, setLanguage] = useState('en');
   const [timezone, setTimezone] = useState('UTC-5');
 
-  // Load saved settings on component mount
+  // Load current user and saved settings on component mount
   useEffect(() => {
+    const loadUserAndSettings = async () => {
+      try {
+        // Get current user
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (error) {
+          console.error('Error getting user:', error);
+        } else {
+          setUser(user);
+          console.log('Current user loaded:', user?.email);
+        }
+      } catch (error) {
+        console.error('Error loading user:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUserAndSettings();
+
+    // Load saved settings from localStorage
     if (typeof window !== 'undefined') {
       const savedSettings = localStorage.getItem('userSettings');
       if (savedSettings) {
@@ -62,8 +83,8 @@ export default function Settings() {
         setCompanyAddress(settings.companyAddress || '123 Business St, City, State 12345');
         setCompanyEmail(settings.companyEmail || 'billing@yourcompany.com');
         setCompanyPhone(settings.companyPhone || '+1 (555) 123-4567');
-        setUserName(settings.userName || 'John Doe');
-        setUserEmail(settings.userEmail || 'john@example.com');
+        setUserName(settings.userName || user?.user_metadata?.full_name || 'User');
+        setUserEmail(settings.userEmail || user?.email || '');
         setUserPhone(settings.userPhone || '+1 (555) 987-6543');
         setUserTitle(settings.userTitle || 'Freelancer');
         setEmailNotifications(settings.emailNotifications !== undefined ? settings.emailNotifications : true);
@@ -79,7 +100,7 @@ export default function Settings() {
         setTimezone(settings.timezone || 'UTC-5');
       }
     }
-  }, []);
+  }, [user]);
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
@@ -378,59 +399,105 @@ export default function Settings() {
         return (
           <div className="glass-effect rounded-2xl shadow-sm border border-white/20 p-6 animate-enter" style={{animationDelay: '300ms'}}>
             <h2 className="text-2xl font-semibold leading-tight tracking-tight text-white mb-6">User Profile</h2>
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="user-name">Full Name</label>
-                  <input
-                    className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-white/10 text-white placeholder-white/60"
-                    id="user-name"
-                    type="text"
-                    defaultValue={profile?.full_name || ''}
-                    onChange={(e) => updateProfile({ full_name: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="user-title">Job Title</label>
-                  <input
-                    className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-white/10 text-white placeholder-white/60"
-                    id="user-title"
-                    type="text"
-                    value={userTitle}
-                    onChange={(e) => setUserTitle(e.target.value)}
-                  />
-                </div>
+            
+            {loading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                <span className="ml-3 text-white/70">Loading profile...</span>
               </div>
+            ) : (
+              <div className="space-y-6">
+                {/* Account Information Display */}
+                <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                  <h3 className="text-white font-medium mb-3">Account Information</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-white/70">Email:</span>
+                      <span className="text-white font-medium">{user?.email || 'Not available'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-white/70">User ID:</span>
+                      <span className="text-white/60 font-mono text-xs">{user?.id?.slice(0, 8)}...</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-white/70">Account Created:</span>
+                      <span className="text-white/70">{user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'Unknown'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-white/70">Last Sign In:</span>
+                      <span className="text-white/70">{user?.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleDateString() : 'Unknown'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-white/70">Email Verified:</span>
+                      <span className={`font-medium ${user?.email_confirmed_at ? 'text-green-400' : 'text-yellow-400'}`}>
+                        {user?.email_confirmed_at ? '✅ Verified' : '⚠️ Pending'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="user-email">Email Address</label>
-                  <input
-                    className="w-full px-4 py-2 border border-white/10 rounded-lg bg-white/5 text-white/70 cursor-not-allowed"
-                    id="user-email"
-                    type="email"
-                    value={profile?.email || ''}
-                    disabled
-                  />
-                  <p className="text-xs text-white/50 mt-1">Email cannot be changed</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="user-name">Full Name</label>
+                    <input
+                      className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-white/10 text-white placeholder-white/60"
+                      id="user-name"
+                      type="text"
+                      value={userName}
+                      onChange={(e) => setUserName(e.target.value)}
+                      placeholder="Enter your full name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="user-title">Job Title</label>
+                    <input
+                      className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-white/10 text-white placeholder-white/60"
+                      id="user-title"
+                      type="text"
+                      value={userTitle}
+                      onChange={(e) => setUserTitle(e.target.value)}
+                      placeholder="e.g., Freelancer, Designer, Consultant"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="user-phone">Phone Number</label>
-                  <input
-                    className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-white/10 text-white placeholder-white/60"
-                    id="user-phone"
-                    type="tel"
-                    value={userPhone}
-                    onChange={(e) => setUserPhone(e.target.value)}
-                  />
-                </div>
-              </div>
 
-              <div className="flex justify-end gap-3 pt-4">
-                <button className="px-5 py-2 border border-white/20 text-sm font-medium text-white/70 rounded-lg hover:bg-white/10 transition-colors" type="button">Cancel</button>
-                <button className="px-5 py-2 bg-[var(--primary-color)] text-white text-sm font-medium rounded-lg hover:bg-[var(--primary-color)]/80 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary-color)]" type="submit">Save Changes</button>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="user-email">Email Address</label>
+                    <input
+                      className="w-full px-4 py-2 border border-white/10 rounded-lg bg-white/5 text-white/70 cursor-not-allowed"
+                      id="user-email"
+                      type="email"
+                      value={user?.email || ''}
+                      disabled
+                    />
+                    <p className="text-xs text-white/50 mt-1">Email cannot be changed. Contact support if needed.</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="user-phone">Phone Number</label>
+                    <input
+                      className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-white/10 text-white placeholder-white/60"
+                      id="user-phone"
+                      type="tel"
+                      value={userPhone}
+                      onChange={(e) => setUserPhone(e.target.value)}
+                      placeholder="+1 (555) 123-4567"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-3 pt-4">
+                  <button className="px-5 py-2 border border-white/20 text-sm font-medium text-white/70 rounded-lg hover:bg-white/10 transition-colors" type="button">Cancel</button>
+                  <button 
+                    className="px-5 py-2 bg-[var(--primary-color)] text-white text-sm font-medium rounded-lg hover:bg-[var(--primary-color)]/80 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary-color)]" 
+                    type="button"
+                    onClick={handleSave}
+                  >
+                    Save Changes
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         );
 
