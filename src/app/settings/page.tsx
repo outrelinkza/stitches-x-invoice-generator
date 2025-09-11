@@ -6,14 +6,11 @@ import FloatingCalculator from '@/components/FloatingCalculator';
 import { AuthGuard } from '@/components/AuthGuard';
 import { supabase } from '@/lib/supabase';
 import NavHeader from '@/components/NavHeader';
+import { useUserProfile } from '@/contexts/UserProfileContext';
 
 export default function Settings() {
   const [currentSection, setCurrentSection] = useState('company');
-  // Note: UserProfile functionality temporarily disabled to prevent 406 errors
-  const profile = null;
-  const settings = null;
-  const updateProfile = async () => ({ success: false, error: 'Feature temporarily disabled' });
-  const updateSettings = async () => ({ success: false, error: 'Feature temporarily disabled' });
+  const { profile, settings, updateProfile, updateSettings } = useUserProfile();
   
   // Invoice & Template Settings
   const [templateName, setTemplateName] = useState('Standard Template');

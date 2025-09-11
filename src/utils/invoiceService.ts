@@ -36,70 +36,119 @@ export interface InvoiceData {
 export class InvoiceService {
   // Save invoice to Supabase
   static async saveInvoice(invoiceData: Omit<InvoiceData, 'id' | 'user_id' | 'created_at' | 'updated_at'>): Promise<InvoiceData> {
-    // Return success without making any database calls to prevent 406 errors
-    return {
-      ...invoiceData,
-      id: Date.now().toString(),
-      user_id: 'temp-user',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      throw new Error('User must be authenticated to save invoices');
+    }
+
+    const { data, error } = await supabase
+      .from('invoices')
+      .insert({
+        user_id: user.id,
+        ...invoiceData
+      })
+      .select()
+      .single();
+
+    if (error) {
+      throw new Error(`Failed to save invoice: ${error.message}`);
+    }
+
+    return data;
   }
 
   // Update existing invoice
   static async updateInvoice(invoiceId: string, updates: Partial<InvoiceData>): Promise<InvoiceData> {
-    // Return success without making any database calls to prevent 406 errors
-    return {
-      id: invoiceId,
-      user_id: 'temp-user',
-      invoice_number: 'INV-001',
-      items: [],
-      subtotal: 0,
-      tax_rate: 0,
-      tax_amount: 0,
-      total: 0,
-      template: 'standard',
-      status: 'draft',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      ...updates,
-    };
+    const { data, error } = await supabase
+      .from('invoices')
+      .update(updates)
+      .eq('id', invoiceId)
+      .select()
+      .single();
+
+    if (error) {
+      throw new Error(`Failed to update invoice: ${error.message}`);
+    }
+
+    return data;
   }
 
   // Get all invoices for current user
   static async getUserInvoices(): Promise<InvoiceData[]> {
-    // Return empty array without making any database calls to prevent 406 errors
-    return [];
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      throw new Error('User must be authenticated to fetch invoices');
+    }
+
+    const { data, error } = await supabase
+      .from('invoices')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      throw new Error(`Failed to fetch invoices: ${error.message}`);
+    }
+
+    return data || [];
   }
 
   // Get single invoice by ID
   static async getInvoice(invoiceId: string): Promise<InvoiceData> {
-    // Return default invoice without making any database calls to prevent 406 errors
-    return {
-      id: invoiceId,
-      user_id: 'temp-user',
-      invoice_number: 'INV-001',
-      items: [],
-      subtotal: 0,
-      tax_rate: 0,
-      tax_amount: 0,
-      total: 0,
-      template: 'standard',
-      status: 'draft',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
+    const { data, error } = await supabase
+      .from('invoices')
+      .select('*')
+      .eq('id', invoiceId)
+      .single();
+
+    if (error) {
+      throw new Error(`Failed to fetch invoice: ${error.message}`);
+    }
+
+    return data;
   }
 
   // Delete invoice
   static async deleteInvoice(invoiceId: string): Promise<void> {
-    // Return success without making any database calls to prevent 406 errors
-    return;
+    const { error } = await supabase
+      .from('invoices')
+      .delete()
+      .eq('id', invoiceId);
+
+    if (error) {
+      throw new Error(`Failed to delete invoice: ${error.message}`);
+    }
   }
 
   // Generate next invoice number
   static async getNextInvoiceNumber(): Promise<string> {
-    // Return default invoice number without making any database calls to prevent 406 errors
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      return 'INV-001';
+    }
+
+    const { data, error } = await supabase
+      .from('invoices')
+      .select('invoice_number')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(1);
+
+    if (error || !data || data.length === 0) {
+      return 'INV-001';
+    }
+
+    const lastInvoiceNumber = data[0].invoice_number;
+    const match = lastInvoiceNumber.match(/INV-(\d+)/);
+    
+    if (match) {
+      const nextNumber = parseInt(match[1]) + 1;
+      return `INV-${nextNumber.toString().padStart(3, '0')}`;
+    }
+
     return 'INV-001';
   }
 
