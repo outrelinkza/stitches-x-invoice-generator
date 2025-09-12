@@ -21,27 +21,35 @@ export default function Settings() {
   const [companyEmail, setCompanyEmail] = useState('stitchesx.service@gmail.com');
 
   // User Profile Settings
-  const [userName, setUserName] = useState('Your Name');
-  const [userEmail, setUserEmail] = useState('your@email.com');
+  const [userName, setUserName] = useState('');
+  const [userEmail, setUserEmail] = useState('');
 
   // Data Management
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
+  // Feedback Form
+  const [feedback, setFeedback] = useState('');
+  const [feedbackName, setFeedbackName] = useState('');
+  const [feedbackEmail, setFeedbackEmail] = useState('');
+  const [rating, setRating] = useState(0);
+  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
+
   // Load saved settings on component mount
   useEffect(() => {
     if (profile) {
-      setUserName(profile.full_name || 'Your Name');
-      setCompanyName(profile.company_name || 'Stitches X');
-      setCompanyAddress(profile.company_address || 'Your Business Address');
-      setCompanyEmail(profile.company_contact || 'stitchesx.service@gmail.com');
+      setUserName(profile.full_name || '');
+      setUserEmail(profile.email || '');
+      setCompanyName(profile.company_name || '');
+      setCompanyAddress(profile.company_address || '');
+      setCompanyEmail(profile.company_contact || '');
     }
     
     if (settings) {
       setTaxRate(settings.default_tax_rate || 10);
       setPaymentTerms(settings.default_payment_terms || 'Net 15');
-      setCompanyName(settings.company_name || 'Stitches X');
-      setCompanyAddress(settings.company_address || 'Your Business Address');
-      setCompanyEmail(settings.company_contact || 'stitchesx.service@gmail.com');
+      setCompanyName(settings.company_name || '');
+      setCompanyAddress(settings.company_address || '');
+      setCompanyEmail(settings.company_contact || '');
     }
     
     // Set default values for functional settings only
@@ -172,6 +180,50 @@ export default function Settings() {
       // Show error message
       showError('Failed to delete data. Please try again.');
     }
+  };
+
+  const handleFeedbackSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmittingFeedback(true);
+    
+    try {
+      // Send real feedback email
+      const response = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: feedbackName.trim(),
+          email: feedbackEmail.trim(),
+          feedback: feedback.trim(),
+          rating: rating > 0 ? rating : undefined,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        // Reset form
+        setFeedback('');
+        setFeedbackName('');
+        setFeedbackEmail('');
+        setRating(0);
+        
+        // Show success message
+        showSuccess('Thank you for your feedback! We appreciate your input.');
+      } else {
+        // Show error message
+        showError(result.error || 'Failed to submit feedback. Please try again.');
+      }
+    } catch (error) {
+      console.error('Feedback form error:', error);
+      
+      // Show error message
+      showError('Network error. Please check your connection and try again.');
+    }
+    
+    setIsSubmittingFeedback(false);
   };
 
   const renderSectionContent = () => {
@@ -343,16 +395,95 @@ export default function Settings() {
                 <p className="text-white/70 mb-6">
                   We'd love to hear your thoughts and suggestions to help us improve Stitches X.
                 </p>
-                <a
-                  href="/feedback"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--primary-color)] text-white rounded-lg hover:bg-[var(--primary-color)]/80 transition-colors font-medium"
-                >
-                  <span className="material-symbols-outlined">feedback</span>
-                  Share Your Feedback
-                </a>
               </div>
+
+              {/* Feedback Form */}
+              <form onSubmit={handleFeedbackSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="feedback-name">Your Name</label>
+                    <input
+                      className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-white/10 text-white placeholder-white/60"
+                      id="feedback-name"
+                      name="feedback-name"
+                      type="text"
+                      placeholder="John Doe"
+                      value={feedbackName}
+                      onChange={(e) => setFeedbackName(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="feedback-email">Your Email</label>
+                    <input
+                      className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-white/10 text-white placeholder-white/60"
+                      id="feedback-email"
+                      name="feedback-email"
+                      type="email"
+                      placeholder="your@email.com"
+                      value={feedbackEmail}
+                      onChange={(e) => setFeedbackEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="rating">Rating (Optional)</label>
+                  <div className="flex space-x-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => setRating(star)}
+                        className={`text-2xl transition-colors ${
+                          star <= rating ? 'text-yellow-400' : 'text-white/30 hover:text-yellow-300'
+                        }`}
+                      >
+                        ★
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="feedback-text">Your Feedback</label>
+                  <textarea
+                    className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-white/10 text-white placeholder-white/60"
+                    id="feedback-text"
+                    name="feedback-text"
+                    placeholder="Tell us what you love or what we can improve..."
+                    rows={5}
+                    value={feedback}
+                    onChange={(e) => setFeedback(e.target.value)}
+                    required
+                  />
+                </div>
+                
+                <div className="flex justify-end gap-3 pt-4">
+                  <button 
+                    className="px-5 py-2 border border-white/20 text-sm font-medium text-white/70 rounded-lg hover:bg-white/10 transition-colors" 
+                    type="button"
+                    onClick={() => {
+                      setFeedback('');
+                      setFeedbackName('');
+                      setFeedbackEmail('');
+                      setRating(0);
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    className="px-5 py-2 bg-[var(--primary-color)] text-white text-sm font-medium rounded-lg hover:bg-[var(--primary-color)]/80 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary-color)] disabled:opacity-50 disabled:cursor-not-allowed" 
+                    type="submit"
+                    disabled={isSubmittingFeedback || !feedback.trim()}
+                  >
+                    {isSubmittingFeedback ? 'Submitting...' : 'Submit Feedback'}
+                  </button>
+                </div>
+              </form>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
                 <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
                   <h3 className="text-white font-medium mb-2">💡 Suggestions</h3>
                   <p className="text-white/70 text-sm">

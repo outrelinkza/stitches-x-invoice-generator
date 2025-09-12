@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useUserProfile } from '@/contexts/UserProfileContext';
 
 interface SettingsSidebarProps {
   currentSection?: string;
@@ -8,12 +9,33 @@ interface SettingsSidebarProps {
 }
 
 export default function SettingsSidebar({ currentSection, onSectionChange }: SettingsSidebarProps) {
+  const { profile } = useUserProfile();
+  
   const settingsCategories = [
     { id: 'company', icon: 'business', label: 'Company & Invoice' },
     { id: 'profile', icon: 'person', label: 'User Profile' },
     { id: 'feedback', icon: 'feedback', label: 'Feedback' },
     { id: 'security', icon: 'security', label: 'Data Management' },
   ];
+
+  // Get user initials and name
+  const getUserInitials = () => {
+    if (profile?.full_name) {
+      return profile.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+    }
+    if (profile?.email) {
+      return profile.email[0].toUpperCase();
+    }
+    return 'U';
+  };
+
+  const getUserName = () => {
+    return profile?.full_name || 'User';
+  };
+
+  const getUserEmail = () => {
+    return profile?.email || 'user@email.com';
+  };
 
   return (
     <aside className="w-64 flex-shrink-0 glass-effect border-r border-white/20 flex flex-col p-4 animate-enter" style={{animationDelay: '50ms'}}>
@@ -46,11 +68,11 @@ export default function SettingsSidebar({ currentSection, onSectionChange }: Set
                   <div className="mt-auto">
                     <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 transition-colors">
                       <div className="flex items-center justify-center size-10 bg-white/20 rounded-full">
-                        <span className="text-white font-semibold text-sm">OM</span>
+                        <span className="text-white font-semibold text-sm">{getUserInitials()}</span>
                       </div>
                       <div>
-                        <p className="font-semibold text-sm text-white">Olivia Martin</p>
-                        <p className="text-xs text-white/60">olivia.martin@email.com</p>
+                        <p className="font-semibold text-sm text-white">{getUserName()}</p>
+                        <p className="text-xs text-white/60">{getUserEmail()}</p>
                       </div>
                     </div>
                   </div>
