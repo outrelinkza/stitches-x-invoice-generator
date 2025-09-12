@@ -265,7 +265,7 @@ export default function Contacts() {
                       id="email"
                       name="email"
                       type="email"
-                      placeholder="john@example.com"
+                      placeholder="your@email.com"
                       value={formData.email}
                       onChange={handleInputChange}
                       required

@@ -64,7 +64,7 @@ export default function Profile() {
                     <div className="sm:col-span-3">
                       <label className="block text-sm font-medium leading-6 text-gray-900" htmlFor="email">Email Address</label>
                       <div className="mt-2">
-                        <input autoComplete="email" className="block w-full rounded-lg border-0 bg-white py-2.5 px-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[var(--primary-color)] sm:text-sm sm:leading-6" id="email" name="email" placeholder="john.doe@example.com" type="email"/>
+                        <input autoComplete="email" className="block w-full rounded-lg border-0 bg-white py-2.5 px-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[var(--primary-color)] sm:text-sm sm:leading-6" id="email" name="email" placeholder="your@email.com" type="email"/>
                       </div>
                     </div>
                     <div className="sm:col-span-3">

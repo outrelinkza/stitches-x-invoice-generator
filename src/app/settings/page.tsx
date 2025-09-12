@@ -24,7 +24,7 @@ export default function Settings() {
   const [invoiceNumber, setInvoiceNumber] = useState('INV-001');
   const [companyName, setCompanyName] = useState('Stitches X');
   const [companyAddress, setCompanyAddress] = useState('Your Business Address');
-  const [companyEmail, setCompanyEmail] = useState('hello@stitchesx.com');
+  const [companyEmail, setCompanyEmail] = useState('stitchesx.service@gmail.com');
   const [companyPhone, setCompanyPhone] = useState('+1 (555) 123-4567');
 
   // User Profile Settings
@@ -64,7 +64,7 @@ export default function Settings() {
         setInvoiceNumber(settings.invoiceNumber || 'INV-001');
         setCompanyName(settings.companyName || 'Stitches X');
         setCompanyAddress(settings.companyAddress || 'Your Business Address');
-        setCompanyEmail(settings.companyEmail || 'hello@stitchesx.com');
+        setCompanyEmail(settings.companyEmail || 'stitchesx.service@gmail.com');
         setCompanyPhone(settings.companyPhone || '+1 (555) 123-4567');
         setUserName(settings.userName || 'Your Name');
         setUserEmail(settings.userEmail || 'your@email.com');

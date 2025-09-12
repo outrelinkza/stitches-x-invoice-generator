@@ -1087,7 +1087,7 @@ export default function Home() {
                     const pdfData: InvoiceData = {
                       companyName: invoiceData.companyName || 'Stitches X',
                       companyAddress: invoiceData.companyAddress || 'Your Business Address',
-                      companyContact: invoiceData.companyContact || 'hello@stitchesx.com',
+                      companyContact: invoiceData.companyContact || 'stitchesx.service@gmail.com',
                       logo: logo || undefined,
                       clientName: invoiceData.clientName || 'Client Name',
                       clientAddress: invoiceData.clientAddress || 'Client Address',
@@ -1181,7 +1181,7 @@ export default function Home() {
                     const pdfData: InvoiceData = {
                       companyName: invoiceData.companyName || 'Stitches X',
                       companyAddress: invoiceData.companyAddress || 'Your Business Address',
-                      companyContact: invoiceData.companyContact || 'hello@stitchesx.com',
+                      companyContact: invoiceData.companyContact || 'stitchesx.service@gmail.com',
                       logo: logo || undefined,
                       clientName: invoiceData.clientName || 'Client Name',
                       clientAddress: invoiceData.clientAddress || 'Client Address',

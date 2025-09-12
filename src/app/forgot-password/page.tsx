@@ -34,7 +34,7 @@ export default function ForgotPassword() {
                 className="relative block w-full appearance-none rounded-lg border border-gray-300 bg-white/50 px-4 py-3 text-gray-900 placeholder-gray-500 shadow-sm focus:z-10 focus:border-[var(--primary-color)] focus:outline-none focus:ring-[var(--primary-color)] sm:text-sm" 
                 id="email" 
                 name="email" 
-                placeholder="you@example.com" 
+                placeholder="your@email.com" 
                 required 
                 type="email"
               />

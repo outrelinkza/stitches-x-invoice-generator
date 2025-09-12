@@ -40,7 +40,7 @@ const createTransporter = () => {
   return nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: process.env.EMAIL_USER || 'hello@stitchesx.com',
+      user: process.env.EMAIL_USER || 'stitchesx.service@gmail.com',
       pass: process.env.EMAIL_PASS || process.env.APP_PASSWORD, // Use App Password for Gmail
     },
   });
@@ -51,7 +51,7 @@ export const sendEmail = async (emailData: EmailData): Promise<boolean> => {
     const transporter = createTransporter();
     
     const mailOptions = {
-      from: `"Stitches X" <${process.env.EMAIL_USER || 'hello@stitchesx.com'}>`,
+      from: `"Stitches X" <${process.env.EMAIL_USER || 'stitchesx.service@gmail.com'}>`,
       to: emailData.to,
       subject: emailData.subject,
       html: emailData.html,
@@ -123,7 +123,7 @@ This message was sent from the Stitches X contact form.
   `;
 
   return await sendEmail({
-    to: 'hello@stitchesx.com',
+    to: 'stitchesx.service@gmail.com',
     subject: `Contact Form: ${formData.subject}`,
     html,
     text,
@@ -258,7 +258,7 @@ This feedback was submitted through the Stitches X feedback form.
   `;
 
   return await sendEmail({
-    to: 'hello@stitchesx.com',
+    to: 'stitchesx.service@gmail.com',
     subject: `Feedback from ${feedbackData.name}`,
     html,
     text,
