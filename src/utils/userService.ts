@@ -33,6 +33,11 @@ export interface UserSettings {
 // Get user profile from Supabase auth and custom profile data
 export const getUserProfile = async (user: User): Promise<UserProfile | null> => {
   try {
+    if (!user || !user.id) {
+      console.warn('No user provided to getUserProfile');
+      return null;
+    }
+
     // First try to get custom profile data from user_profiles table
     const { data: profileData, error: profileError } = await supabase
       .from('user_profiles')
@@ -42,15 +47,19 @@ export const getUserProfile = async (user: User): Promise<UserProfile | null> =>
 
     if (profileError && profileError.code !== 'PGRST116') {
       console.warn('Error fetching user profile:', profileError);
+      // Don't throw error, just return basic profile
     }
 
     // Return profile data if found, otherwise return basic auth profile
     if (profileData) {
       return {
         id: profileData.id,
-        email: profileData.email || user.email || '',
+        email: user.email || '',
         full_name: profileData.full_name || user.user_metadata?.full_name || '',
         avatar_url: profileData.avatar_url || user.user_metadata?.avatar_url || '',
+        company_name: profileData.company_name || '',
+        company_address: profileData.company_address || '',
+        company_contact: profileData.company_contact || '',
         created_at: profileData.created_at || user.created_at,
         updated_at: profileData.updated_at || user.created_at,
       };
@@ -62,6 +71,9 @@ export const getUserProfile = async (user: User): Promise<UserProfile | null> =>
       email: user.email || '',
       full_name: user.user_metadata?.full_name || '',
       avatar_url: user.user_metadata?.avatar_url || '',
+      company_name: '',
+      company_address: '',
+      company_contact: '',
       created_at: user.created_at,
       updated_at: user.updated_at || user.created_at,
     };
@@ -73,6 +85,9 @@ export const getUserProfile = async (user: User): Promise<UserProfile | null> =>
       email: user.email || '',
       full_name: user.user_metadata?.full_name || '',
       avatar_url: user.user_metadata?.avatar_url || '',
+      company_name: '',
+      company_address: '',
+      company_contact: '',
       created_at: user.created_at,
       updated_at: user.updated_at || user.created_at,
     };
@@ -86,9 +101,10 @@ export const updateUserProfile = async (user: User, updates: Partial<UserProfile
       .from('user_profiles')
       .upsert({
         id: user.id,
-        email: user.email,
         full_name: updates.full_name,
-        avatar_url: updates.avatar_url,
+        company_name: updates.company_name,
+        company_address: updates.company_address,
+        company_contact: updates.company_contact,
         updated_at: new Date().toISOString(),
       });
 
@@ -106,6 +122,11 @@ export const updateUserProfile = async (user: User, updates: Partial<UserProfile
 // Get user settings
 export const getUserSettings = async (userId: string): Promise<UserSettings | null> => {
   try {
+    if (!userId) {
+      console.warn('No userId provided to getUserSettings');
+      return null;
+    }
+
     const { data, error } = await supabase
       .from('user_settings')
       .select('*')
@@ -114,6 +135,7 @@ export const getUserSettings = async (userId: string): Promise<UserSettings | nu
 
     if (error && error.code !== 'PGRST116') {
       console.warn('Error fetching user settings:', error);
+      // Don't throw error, just return default settings
     }
 
     if (data) {

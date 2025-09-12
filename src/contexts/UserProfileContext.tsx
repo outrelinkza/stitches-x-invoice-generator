@@ -59,7 +59,18 @@ export const UserProfileProvider: React.FC<UserProfileProviderProps> = ({ childr
         setProfile(profileResult.value);
       } else {
         console.warn('Failed to load user profile:', profileResult.reason);
-        setProfile(null);
+        // Set a basic profile from user data instead of null
+        setProfile({
+          id: user.id,
+          email: user.email || '',
+          full_name: user.user_metadata?.full_name || '',
+          avatar_url: user.user_metadata?.avatar_url || '',
+          company_name: '',
+          company_address: '',
+          company_contact: '',
+          created_at: user.created_at,
+          updated_at: user.updated_at || user.created_at,
+        });
       }
 
       // Handle settings result
@@ -67,12 +78,41 @@ export const UserProfileProvider: React.FC<UserProfileProviderProps> = ({ childr
         setSettings(settingsResult.value);
       } else {
         console.warn('Failed to load user settings:', settingsResult.reason);
-        setSettings(null);
+        // Set default settings instead of null
+        setSettings({
+          id: '',
+          user_id: user.id,
+          default_currency: 'GBP',
+          default_payment_terms: 'Net 15',
+          default_tax_rate: 0,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        });
       }
 
     } catch (err) {
       console.error('Error loading user data:', err);
-      setError('Failed to load user data');
+      // Don't set error state, just use fallback data
+      setProfile({
+        id: user.id,
+        email: user.email || '',
+        full_name: user.user_metadata?.full_name || '',
+        avatar_url: user.user_metadata?.avatar_url || '',
+        company_name: '',
+        company_address: '',
+        company_contact: '',
+        created_at: user.created_at,
+        updated_at: user.updated_at || user.created_at,
+      });
+      setSettings({
+        id: '',
+        user_id: user.id,
+        default_currency: 'GBP',
+        default_payment_terms: 'Net 15',
+        default_tax_rate: 0,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
     } finally {
       setLoading(false);
     }
