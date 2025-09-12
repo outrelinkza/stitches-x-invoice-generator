@@ -334,6 +334,53 @@ export default function Settings() {
           </div>
         );
 
+      case 'feedback':
+        return (
+          <div className="glass-effect rounded-2xl shadow-sm border border-white/20 p-6 animate-enter" style={{animationDelay: '300ms'}}>
+            <h2 className="text-2xl font-semibold leading-tight tracking-tight text-white mb-6">Feedback</h2>
+            <div className="space-y-6">
+              <div className="text-center">
+                <p className="text-white/70 mb-6">
+                  We'd love to hear your thoughts and suggestions to help us improve Stitches X.
+                </p>
+                <a
+                  href="/feedback"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--primary-color)] text-white rounded-lg hover:bg-[var(--primary-color)]/80 transition-colors font-medium"
+                >
+                  <span className="material-symbols-outlined">feedback</span>
+                  Share Your Feedback
+                </a>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                  <h3 className="text-white font-medium mb-2">💡 Suggestions</h3>
+                  <p className="text-white/70 text-sm">
+                    Have ideas for new features or improvements? We'd love to hear them!
+                  </p>
+                </div>
+                <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
+                  <h3 className="text-white font-medium mb-2">🐛 Bug Reports</h3>
+                  <p className="text-white/70 text-sm">
+                    Found something that's not working? Let us know so we can fix it.
+                  </p>
+                </div>
+                <div className="p-4 bg-purple-500/10 border border-purple-500/20 rounded-lg">
+                  <h3 className="text-white font-medium mb-2">⭐ Experience</h3>
+                  <p className="text-white/70 text-sm">
+                    How has your experience been? Your feedback helps us serve you better.
+                  </p>
+                </div>
+                <div className="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+                  <h3 className="text-white font-medium mb-2">📧 Contact</h3>
+                  <p className="text-white/70 text-sm">
+                    Need direct support? Contact us at stitchesx.service@gmail.com
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
 
       default:
         return null;
