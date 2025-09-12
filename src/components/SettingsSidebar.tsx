@@ -11,9 +11,7 @@ export default function SettingsSidebar({ currentSection, onSectionChange }: Set
   const settingsCategories = [
     { id: 'company', icon: 'business', label: 'Company & Invoice' },
     { id: 'profile', icon: 'person', label: 'User Profile' },
-    { id: 'feedback', icon: 'feedback', label: 'Feedback' },
-    { id: 'security', icon: 'security', label: 'Security' },
-    { id: 'appearance', icon: 'palette', label: 'Appearance' },
+    { id: 'security', icon: 'security', label: 'Data Management' },
   ];
 
   return (

@@ -13,38 +13,19 @@ export default function Settings() {
   const [currentSection, setCurrentSection] = useState('company');
   const { profile, settings, updateProfile, updateSettings } = useUserProfile();
   
-  // Invoice & Template Settings
-  const [templateName, setTemplateName] = useState('Standard Template');
+  // Invoice & Company Settings (Functional)
   const [taxRate, setTaxRate] = useState(10);
   const [paymentTerms, setPaymentTerms] = useState('Net 15');
-  const [currency, setCurrency] = useState('USD - United States Dollar');
-  const [invoiceNumber, setInvoiceNumber] = useState('INV-001');
   const [companyName, setCompanyName] = useState('Stitches X');
   const [companyAddress, setCompanyAddress] = useState('Your Business Address');
   const [companyEmail, setCompanyEmail] = useState('stitchesx.service@gmail.com');
-  const [companyPhone, setCompanyPhone] = useState('+1 (555) 123-4567');
 
   // User Profile Settings
   const [userName, setUserName] = useState('Your Name');
   const [userEmail, setUserEmail] = useState('your@email.com');
 
-  // Notification Settings
-  const [emailNotifications, setEmailNotifications] = useState(true);
-  const [invoiceReminders, setInvoiceReminders] = useState(true);
-  const [paymentAlerts, setPaymentAlerts] = useState(false);
-  const [weeklyReports, setWeeklyReports] = useState(true);
-
-  // Security Settings
-  const [twoFactorAuth, setTwoFactorAuth] = useState(false);
-  const [sessionTimeout, setSessionTimeout] = useState('30');
-  const [loginAlerts, setLoginAlerts] = useState(true);
+  // Data Management
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-
-  // Appearance Settings
-  const [darkMode, setDarkMode] = useState(true);
-  const [fontSize, setFontSize] = useState('medium');
-  const [language, setLanguage] = useState('en');
-  const [timezone, setTimezone] = useState('UTC-5');
 
   // Load saved settings on component mount
   useEffect(() => {
@@ -63,22 +44,7 @@ export default function Settings() {
       setCompanyEmail(settings.company_contact || 'stitchesx.service@gmail.com');
     }
     
-    // Set default values for additional settings
-    setCompanyPhone('+1 (555) 123-4567');
-    setInvoiceNumber('INV-001');
-    setCurrency('USD - United States Dollar');
-    setTemplateName('Standard Template');
-    setEmailNotifications(true);
-    setInvoiceReminders(true);
-    setPaymentAlerts(false);
-    setWeeklyReports(true);
-    setTwoFactorAuth(false);
-    setSessionTimeout('30');
-    setLoginAlerts(true);
-    setDarkMode(true);
-    setFontSize('medium');
-    setLanguage('en');
-    setTimezone('UTC-5');
+    // Set default values for functional settings only
   }, [profile, settings]);
 
   const handleSave = async (e: React.FormEvent) => {
@@ -215,27 +181,15 @@ export default function Settings() {
           <div className="glass-effect rounded-2xl shadow-sm border border-white/20 p-6 animate-enter" style={{animationDelay: '300ms'}}>
             <h2 className="text-2xl font-semibold leading-tight tracking-tight text-white mb-6">Company & Invoice Settings</h2>
             <form onSubmit={handleSave} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="company-name">Company Name</label>
-                  <input
-                    className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-white/10 text-white placeholder-white/60"
-                    id="company-name"
-                    type="text"
-                    value={companyName}
-                    onChange={(e) => setCompanyName(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="invoice-number">Starting Invoice Number</label>
-                  <input
-                    className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-white/10 text-white placeholder-white/60"
-                    id="invoice-number"
-                    type="text"
-                    value={invoiceNumber}
-                    onChange={(e) => setInvoiceNumber(e.target.value)}
-                  />
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="company-name">Company Name</label>
+                <input
+                  className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-white/10 text-white placeholder-white/60"
+                  id="company-name"
+                  type="text"
+                  value={companyName}
+                  onChange={(e) => setCompanyName(e.target.value)}
+                />
               </div>
 
               <div>
@@ -249,27 +203,15 @@ export default function Settings() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="company-email">Company Email</label>
-                  <input
-                    className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-white/10 text-white placeholder-white/60"
-                    id="company-email"
-                    type="email"
-                    value={companyEmail}
-                    onChange={(e) => setCompanyEmail(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="company-phone">Company Phone</label>
-                  <input
-                    className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-white/10 text-white placeholder-white/60"
-                    id="company-phone"
-                    type="tel"
-                    value={companyPhone}
-                    onChange={(e) => setCompanyPhone(e.target.value)}
-                  />
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="company-email">Company Email</label>
+                <input
+                  className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-white/10 text-white placeholder-white/60"
+                  id="company-email"
+                  type="email"
+                  value={companyEmail}
+                  onChange={(e) => setCompanyEmail(e.target.value)}
+                />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -299,28 +241,6 @@ export default function Settings() {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="currency">Default Currency</label>
-                <select
-                  className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-white/10 text-white"
-                  id="currency"
-                  value={currency}
-                  onChange={(e) => setCurrency(e.target.value)}
-                >
-                  <option value="USD - United States Dollar" className="bg-slate-800 text-white">USD ($) - United States Dollar</option>
-                  <option value="EUR - Euro" className="bg-slate-800 text-white">EUR (€) - Euro</option>
-                  <option value="GBP - British Pound" className="bg-slate-800 text-white">GBP (£) - British Pound</option>
-                  <option value="CAD - Canadian Dollar" className="bg-slate-800 text-white">CAD (C$) - Canadian Dollar</option>
-                  <option value="AUD - Australian Dollar" className="bg-slate-800 text-white">AUD (A$) - Australian Dollar</option>
-                  <option value="JPY - Japanese Yen" className="bg-slate-800 text-white">JPY (¥) - Japanese Yen</option>
-                  <option value="CHF - Swiss Franc" className="bg-slate-800 text-white">CHF (CHF) - Swiss Franc</option>
-                  <option value="CNY - Chinese Yuan" className="bg-slate-800 text-white">CNY (¥) - Chinese Yuan</option>
-                  <option value="INR - Indian Rupee" className="bg-slate-800 text-white">INR (₹) - Indian Rupee</option>
-                  <option value="BRL - Brazilian Real" className="bg-slate-800 text-white">BRL (R$) - Brazilian Real</option>
-                  <option value="MXN - Mexican Peso" className="bg-slate-800 text-white">MXN ($) - Mexican Peso</option>
-                  <option value="SGD - Singapore Dollar" className="bg-slate-800 text-white">SGD (S$) - Singapore Dollar</option>
-                </select>
-              </div>
 
               <div className="flex justify-end gap-3 pt-4">
                 <button className="px-5 py-2 border border-white/20 text-sm font-medium text-white/70 rounded-lg hover:bg-white/10 transition-colors" type="button">Cancel</button>
@@ -335,27 +255,6 @@ export default function Settings() {
           <div className="glass-effect rounded-2xl shadow-sm border border-white/20 p-6 animate-enter" style={{animationDelay: '300ms'}}>
             <h2 className="text-2xl font-semibold leading-tight tracking-tight text-white mb-6">User Profile</h2>
             <div className="space-y-6">
-              {/* User Avatar Section */}
-              <div className="flex items-center gap-4">
-                <div className="relative">
-                  <img 
-                    alt="User Avatar" 
-                    className="rounded-full size-16 border-2 border-white/20" 
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpupqkQmJxj_bMedSJmdAMWAHtS4edFiDkEWKHBmAFfhZ2RalJfO4fbMsDLiDQv9tBLe_qigHPr43hW5r7R0IAjqubzylinVsDC6UiIaaZKxP_GB46wGzu9EKfsxbe3LBt2vlyuDda0sn0iAihGn3LWmfmyzfYo6RWHvuLZAbFif5z6UU82dCwZc1hRCtPGTqUxsDPZTnanT8FaW-vTZbkZcq61oMHucloUn5JYvX_cD0gTyMwU5wpp7tQti-TrSN8pgWdkW_ccoE" 
-                    loading="lazy"
-                  />
-                  <button className="absolute -bottom-1 -right-1 bg-[var(--primary-color)] text-white rounded-full p-1 hover:bg-[var(--primary-color)]/80 transition-colors">
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                  </button>
-                </div>
-                <div>
-                  <h3 className="text-white font-medium">Profile Picture</h3>
-                  <p className="text-sm text-white/60">Click the + button to upload a new photo</p>
-                </div>
-              </div>
-
               <div>
                 <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="user-name">Full Name</label>
                 <input
@@ -387,151 +286,46 @@ export default function Settings() {
           </div>
         );
 
-      case 'notifications':
-        return (
-          <div className="glass-effect rounded-2xl shadow-sm border border-white/20 p-6 animate-enter" style={{animationDelay: '300ms'}}>
-            <h2 className="text-2xl font-semibold leading-tight tracking-tight text-white mb-6">Notifications</h2>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <label htmlFor="email-notifications" className="text-white/90 font-medium">Email Notifications</label>
-                  <p className="text-sm text-white/60">Receive updates via email</p>
-                </div>
-                <input 
-                  type="checkbox" 
-                  id="email-notifications" 
-                  className="form-checkbox h-5 w-5 text-[var(--primary-color)] rounded border-white/20 bg-white/10 focus:ring-[var(--primary-color)]" 
-                  checked={emailNotifications}
-                  onChange={(e) => setEmailNotifications(e.target.checked)}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <label htmlFor="invoice-reminders" className="text-white/90 font-medium">Invoice Reminders</label>
-                  <p className="text-sm text-white/60">Get reminded about overdue invoices</p>
-                </div>
-                <input 
-                  type="checkbox" 
-                  id="invoice-reminders" 
-                  className="form-checkbox h-5 w-5 text-[var(--primary-color)] rounded border-white/20 bg-white/10 focus:ring-[var(--primary-color)]" 
-                  checked={invoiceReminders}
-                  onChange={(e) => setInvoiceReminders(e.target.checked)}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <label htmlFor="payment-alerts" className="text-white/90 font-medium">Payment Alerts</label>
-                  <p className="text-sm text-white/60">Notifications when payments are received</p>
-                </div>
-                <input 
-                  type="checkbox" 
-                  id="payment-alerts" 
-                  className="form-checkbox h-5 w-5 text-[var(--primary-color)] rounded border-white/20 bg-white/10 focus:ring-[var(--primary-color)]" 
-                  checked={paymentAlerts}
-                  onChange={(e) => setPaymentAlerts(e.target.checked)}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <label htmlFor="weekly-reports" className="text-white/90 font-medium">Weekly Reports</label>
-                  <p className="text-sm text-white/60">Summary of your invoice activity</p>
-                </div>
-                <input 
-                  type="checkbox" 
-                  id="weekly-reports" 
-                  className="form-checkbox h-5 w-5 text-[var(--primary-color)] rounded border-white/20 bg-white/10 focus:ring-[var(--primary-color)]" 
-                  checked={weeklyReports}
-                  onChange={(e) => setWeeklyReports(e.target.checked)}
-                />
-              </div>
-            </div>
-          </div>
-        );
 
       case 'security':
         return (
           <div className="glass-effect rounded-2xl shadow-sm border border-white/20 p-6 animate-enter" style={{animationDelay: '300ms'}}>
-            <h2 className="text-2xl font-semibold leading-tight tracking-tight text-white mb-6">Security & Data</h2>
+            <h2 className="text-2xl font-semibold leading-tight tracking-tight text-white mb-6">Data Management</h2>
             <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <label htmlFor="two-factor-auth" className="text-white/90 font-medium">Two-Factor Authentication</label>
-                  <p className="text-sm text-white/60">Add an extra layer of security</p>
-                </div>
-                <input 
-                  type="checkbox" 
-                  id="two-factor-auth" 
-                  className="form-checkbox h-5 w-5 text-[var(--primary-color)] rounded border-white/20 bg-white/10 focus:ring-[var(--primary-color)]" 
-                  checked={twoFactorAuth}
-                  onChange={(e) => setTwoFactorAuth(e.target.checked)}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <label htmlFor="login-alerts" className="text-white/90 font-medium">Login Alerts</label>
-                  <p className="text-sm text-white/60">Get notified of new login attempts</p>
-                </div>
-                <input 
-                  type="checkbox" 
-                  id="login-alerts" 
-                  className="form-checkbox h-5 w-5 text-[var(--primary-color)] rounded border-white/20 bg-white/10 focus:ring-[var(--primary-color)]" 
-                  checked={loginAlerts}
-                  onChange={(e) => setLoginAlerts(e.target.checked)}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="session-timeout">Session Timeout (minutes)</label>
-                <select
-                  className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-white/10 text-white"
-                  id="session-timeout"
-                  value={sessionTimeout}
-                  onChange={(e) => setSessionTimeout(e.target.value)}
-                >
-                  <option value="15" className="bg-slate-800 text-white">15 minutes</option>
-                  <option value="30" className="bg-slate-800 text-white">30 minutes</option>
-                  <option value="60" className="bg-slate-800 text-white">1 hour</option>
-                  <option value="120" className="bg-slate-800 text-white">2 hours</option>
-                </select>
-              </div>
-
               {/* Data Export Section */}
-              <div className="pt-6 border-t border-white/10">
-                <h3 className="text-lg font-medium text-white mb-4">Data Management</h3>
-                
-                <div className="space-y-4">
-                  <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <h4 className="text-white font-medium mb-2">Export Your Data</h4>
-                        <p className="text-white/70 text-sm mb-3">
-                          Download a complete copy of all your data including invoices, settings, and profile information. 
-                          This is useful for backup purposes or if you want to switch to another service.
-                        </p>
-                        <button
-                          onClick={handleDataExport}
-                          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-colors"
-                        >
-                          Download My Data
-                        </button>
-                      </div>
+              <div className="space-y-4">
+                <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <h4 className="text-white font-medium mb-2">Export Your Data</h4>
+                      <p className="text-white/70 text-sm mb-3">
+                        Download a complete copy of all your data including invoices, settings, and profile information. 
+                        This is useful for backup purposes or if you want to switch to another service.
+                      </p>
+                      <button
+                        onClick={handleDataExport}
+                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-colors"
+                      >
+                        Download My Data
+                      </button>
                     </div>
                   </div>
+                </div>
 
-                  <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <h4 className="text-white font-medium mb-2">Delete All Data</h4>
-                        <p className="text-white/70 text-sm mb-3">
-                          Permanently delete all your data from our servers. This action cannot be undone. 
-                          You will need to confirm this action.
-                        </p>
-                        <button
-                          onClick={() => setShowDeleteConfirm(true)}
-                          className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition-colors"
-                        >
-                          Delete All My Data
-                        </button>
-                      </div>
+                <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <h4 className="text-white font-medium mb-2">Delete All Data</h4>
+                      <p className="text-white/70 text-sm mb-3">
+                        Permanently delete all your data from our servers. This action cannot be undone. 
+                        You will need to confirm this action.
+                      </p>
+                      <button
+                        onClick={() => setShowDeleteConfirm(true)}
+                        className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition-colors"
+                      >
+                        Delete All My Data
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -540,70 +334,6 @@ export default function Settings() {
           </div>
         );
 
-      case 'appearance':
-        return (
-          <div className="glass-effect rounded-2xl shadow-sm border border-white/20 p-6 animate-enter" style={{animationDelay: '300ms'}}>
-            <h2 className="text-2xl font-semibold leading-tight tracking-tight text-white mb-6">Appearance & Language</h2>
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <label htmlFor="dark-mode" className="text-white/90 font-medium">Dark Mode</label>
-                  <p className="text-sm text-white/60">Use dark theme interface</p>
-                </div>
-                <input 
-                  type="checkbox" 
-                  id="dark-mode" 
-                  className="form-checkbox h-5 w-5 text-[var(--primary-color)] rounded border-white/20 bg-white/10 focus:ring-[var(--primary-color)]" 
-                  checked={darkMode}
-                  onChange={(e) => setDarkMode(e.target.checked)}
-                />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="font-size">Font Size</label>
-                  <select
-                    className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-white/10 text-white"
-                    id="font-size"
-                    value={fontSize}
-                    onChange={(e) => setFontSize(e.target.value)}
-                  >
-                    <option value="small" className="bg-slate-800 text-white">Small</option>
-                    <option value="medium" className="bg-slate-800 text-white">Medium</option>
-                    <option value="large" className="bg-slate-800 text-white">Large</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="language">Language</label>
-                  <select
-                    className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-white/10 text-white"
-                    id="language"
-                    value={language}
-                    onChange={(e) => setLanguage(e.target.value)}
-                  >
-                    <option value="en" className="bg-slate-800 text-white">English</option>
-                    <option value="es" className="bg-slate-800 text-white">Spanish</option>
-                    <option value="fr" className="bg-slate-800 text-white">French</option>
-                    <option value="de" className="bg-slate-800 text-white">German</option>
-                  </select>
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="timezone">Timezone</label>
-                <select
-                  className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-white/10 text-white"
-                  id="timezone"
-                  value={timezone}
-                  onChange={(e) => setTimezone(e.target.value)}
-                >
-                  <option value="UTC-5" className="bg-slate-800 text-white">UTC-5 (EST)</option>
-                  <option value="UTC-8" className="bg-slate-800 text-white">UTC-8 (PST)</option>
-                  <option value="UTC+0" className="bg-slate-800 text-white">UTC+0 (GMT)</option>
-                  <option value="UTC+1" className="bg-slate-800 text-white">UTC+1 (CET)</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        );
 
       default:
         return null;

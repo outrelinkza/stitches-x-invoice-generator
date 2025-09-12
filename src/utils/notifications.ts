@@ -10,21 +10,21 @@ export interface NotificationOptions {
 }
 
 const getNotificationStyles = (type: NotificationType): string => {
-  const baseStyles = 'fixed top-20 right-4 px-4 py-3 rounded-lg shadow-lg z-50 transition-all duration-300 ease-in-out transform';
+  const baseStyles = 'fixed top-20 right-4 px-4 py-3 rounded-lg shadow-lg z-50 transition-all duration-300 ease-in-out transform glass-effect border border-white/20';
   
   switch (type) {
     case 'success':
-      return `${baseStyles} bg-green-600 text-white`;
+      return `${baseStyles} text-white`;
     case 'error':
-      return `${baseStyles} bg-red-600 text-white`;
+      return `${baseStyles} text-white`;
     case 'warning':
-      return `${baseStyles} bg-yellow-600 text-white`;
+      return `${baseStyles} text-white`;
     case 'info':
-      return `${baseStyles} bg-blue-600 text-white`;
+      return `${baseStyles} text-white`;
     case 'loading':
-      return `${baseStyles} bg-purple-600 text-white`;
+      return `${baseStyles} text-white`;
     default:
-      return `${baseStyles} bg-gray-600 text-white`;
+      return `${baseStyles} text-white`;
   }
 };
 
