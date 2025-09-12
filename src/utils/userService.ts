@@ -183,12 +183,7 @@ export const getUserInvoices = async (userId: string) => {
     return data || [];
   } catch (error) {
     console.error('Error getting user invoices:', error);
-    // Fallback to localStorage if database not available
-    if (typeof window !== 'undefined') {
-      const localInvoices = JSON.parse(localStorage.getItem('savedInvoices') || '[]');
-      return localInvoices;
-    }
-    return [];
+    throw error;
   }
 };
 
@@ -211,19 +206,7 @@ export const saveUserInvoice = async (userId: string, invoiceData: Record<string
     return { success: true };
   } catch (error) {
     console.error('Error saving user invoice:', error);
-    // Fallback to localStorage if database not available
-    if (typeof window !== 'undefined') {
-      const existingInvoices = JSON.parse(localStorage.getItem('savedInvoices') || '[]');
-      const newInvoice = {
-        ...invoiceData,
-        id: Date.now().toString(),
-        user_id: userId,
-        created_at: new Date().toISOString(),
-      };
-      existingInvoices.unshift(newInvoice);
-      localStorage.setItem('savedInvoices', JSON.stringify(existingInvoices));
-    }
-    return { success: true };
+    throw error;
   }
 };
 

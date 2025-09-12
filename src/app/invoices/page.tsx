@@ -28,11 +28,8 @@ export default function Invoices() {
         setInvoices(userInvoices);
       } catch (error) {
         console.error('Failed to load invoices:', error);
-        // Fallback to localStorage if database not available
-        if (typeof window !== 'undefined') {
-          const savedInvoices = JSON.parse(localStorage.getItem('savedInvoices') || '[]');
-          setInvoices(savedInvoices);
-        }
+        // Set empty state if database fails
+        setInvoices([]);
       } finally {
         setLoading(false);
       }

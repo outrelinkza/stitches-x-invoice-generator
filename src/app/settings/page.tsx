@@ -64,30 +64,24 @@ export default function Settings() {
       setCompanyEmail(settings.company_contact || 'stitchesx.service@gmail.com');
     }
     
-    // Load additional settings from localStorage as fallback
-    if (typeof window !== 'undefined') {
-      const savedSettings = localStorage.getItem('userSettings');
-      if (savedSettings) {
-        const localSettings = JSON.parse(savedSettings);
-        setCompanyPhone(localSettings.companyPhone || '+1 (555) 123-4567');
-        setInvoiceNumber(localSettings.invoiceNumber || 'INV-001');
-        setCurrency(localSettings.currency || 'USD - United States Dollar');
-        setTemplateName(localSettings.templateName || 'Standard Template');
-        setUserPhone(localSettings.userPhone || '+1 (555) 987-6543');
-        setUserTitle(localSettings.userTitle || 'Business Owner');
-        setEmailNotifications(localSettings.emailNotifications !== undefined ? localSettings.emailNotifications : true);
-        setInvoiceReminders(localSettings.invoiceReminders !== undefined ? localSettings.invoiceReminders : true);
-        setPaymentAlerts(localSettings.paymentAlerts !== undefined ? localSettings.paymentAlerts : false);
-        setWeeklyReports(localSettings.weeklyReports !== undefined ? localSettings.weeklyReports : true);
-        setTwoFactorAuth(localSettings.twoFactorAuth !== undefined ? localSettings.twoFactorAuth : false);
-        setSessionTimeout(localSettings.sessionTimeout || '30');
-        setLoginAlerts(localSettings.loginAlerts !== undefined ? localSettings.loginAlerts : true);
-        setDarkMode(localSettings.darkMode !== undefined ? localSettings.darkMode : true);
-        setFontSize(localSettings.fontSize || 'medium');
-        setLanguage(localSettings.language || 'en');
-        setTimezone(localSettings.timezone || 'UTC-5');
-      }
-    }
+    // Set default values for additional settings
+    setCompanyPhone('+1 (555) 123-4567');
+    setInvoiceNumber('INV-001');
+    setCurrency('USD - United States Dollar');
+    setTemplateName('Standard Template');
+    setUserPhone('+1 (555) 987-6543');
+    setUserTitle('Business Owner');
+    setEmailNotifications(true);
+    setInvoiceReminders(true);
+    setPaymentAlerts(false);
+    setWeeklyReports(true);
+    setTwoFactorAuth(false);
+    setSessionTimeout('30');
+    setLoginAlerts(true);
+    setDarkMode(true);
+    setFontSize('medium');
+    setLanguage('en');
+    setTimezone('UTC-5');
   }, [profile, settings]);
 
   const handleSave = async (e: React.FormEvent) => {

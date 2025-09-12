@@ -33,34 +33,8 @@ export default function Templates() {
         }
       } catch (error) {
         console.error('Failed to load templates:', error);
-        // Fallback to default templates
-        const defaultTemplates = [
-          {
-            id: '1',
-            name: 'Standard Template',
-            description: 'Clean and professional design for all business types.',
-            is_default: true,
-            is_public: false,
-            created_at: new Date().toISOString(),
-          },
-          {
-            id: '2',
-            name: 'Minimalist Dark',
-            description: 'Sleek dark theme with minimal design elements.',
-            is_default: false,
-            is_public: false,
-            created_at: new Date().toISOString(),
-          },
-          {
-            id: '3',
-            name: 'Creative Agency',
-            description: 'Bold and creative design perfect for agencies.',
-            is_default: false,
-            is_public: false,
-            created_at: new Date().toISOString(),
-          }
-        ];
-        setTemplates(defaultTemplates);
+        // Set empty state if database fails
+        setTemplates([]);
       } finally {
         setLoading(false);
       }

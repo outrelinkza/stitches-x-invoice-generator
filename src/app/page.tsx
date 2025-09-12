@@ -276,22 +276,19 @@ export default function Home() {
       // Silent save - no popup notification
     } catch (error) {
       console.error('Failed to save draft:', error);
-      // Fallback to localStorage if Supabase fails
-      const formData = new FormData(document.querySelector('form') as HTMLFormElement);
-      const draftData = {
-        id: Date.now(),
-        timestamp: new Date().toISOString(),
-        invoiceType,
-        logo,
-        formData: Object.fromEntries(formData),
-      };
+      // Show error notification
+      const errorMsg = document.createElement('div');
+      errorMsg.className = 'fixed top-20 right-4 bg-red-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
+      errorMsg.innerHTML = '❌ Failed to save draft. Please try again.';
+      document.body.appendChild(errorMsg);
       
-      const updatedDrafts = [...savedDrafts, draftData];
-      setSavedDrafts(updatedDrafts);
-      localStorage.setItem('invoiceDrafts', JSON.stringify(updatedDrafts));
-      setHasUnsavedChanges(false);
+      setTimeout(() => {
+        if (document.body.contains(errorMsg)) {
+          document.body.removeChild(errorMsg);
+        }
+      }, 3000);
     }
-  }, [user, invoiceType, logo, savedDrafts]);
+  }, [user]);
 
   const handleFormChange = useCallback(() => {
     setHasUnsavedChanges(true);
@@ -319,19 +316,8 @@ export default function Home() {
       console.error('Failed to get next invoice number from Supabase:', error);
     }
     
-    // Fallback to localStorage
-    const savedInvoices = JSON.parse(localStorage.getItem('savedInvoices') || '[]');
-    const lastInvoice = savedInvoices[savedInvoices.length - 1];
-    let nextNumber = 1;
-    
-    if (lastInvoice && lastInvoice.invoiceNumber) {
-      const match = lastInvoice.invoiceNumber.match(/(\d+)$/);
-      if (match) {
-        nextNumber = parseInt(match[1]) + 1;
-      }
-    }
-    
-    return `INV-${nextNumber.toString().padStart(3, '0')}`;
+    // Default invoice number if no user or database fails
+    return 'INV-001';
   }, [user]);
 
   // Auto-generate invoice number on component mount
@@ -362,57 +348,18 @@ export default function Home() {
 
   // Smart Tax Rate Memory
   const getSuggestedTaxRates = () => {
-    if (typeof window === 'undefined') return [8, 10, 15, 20, 25];
-    const savedInvoices = JSON.parse(localStorage.getItem('savedInvoices') || '[]');
-    const taxRates = savedInvoices
-      .map((invoice: { taxRate?: number }) => invoice.taxRate)
-      .filter((rate: number | undefined): rate is number => rate !== undefined && rate > 0)
-      .reduce((acc: Record<number, number>, rate: number) => {
-        acc[rate] = (acc[rate] || 0) + 1;
-        return acc;
-      }, {});
-    
-    // Return most used tax rates, plus common defaults
-    const commonRates = [8, 10, 15, 20, 25];
-    const suggestedRates = Object.keys(taxRates)
-      .sort((a, b) => taxRates[b] - taxRates[a])
-      .slice(0, 3)
-      .map(rate => parseInt(rate));
-    
-    return [...new Set([...suggestedRates, ...commonRates])].slice(0, 5);
+    // Return common tax rates
+    return [8, 10, 15, 20, 25];
   };
 
   // AI Auto-Fill Suggestions
   const getClientSuggestions = (): Array<{ name: string; address?: string; contact?: string }> => {
-    if (typeof window === 'undefined') return [];
-    const savedInvoices = JSON.parse(localStorage.getItem('savedInvoices') || '[]');
-    const clients = savedInvoices
-      .map((invoice: { clientName?: string; clientAddress?: string; clientContact?: string }) => ({
-        name: invoice.clientName,
-        address: invoice.clientAddress,
-        contact: invoice.clientContact
-      }))
-      .filter((client: { name?: string }): client is { name: string; address?: string; contact?: string } => Boolean(client.name))
-      .reduce((acc: Record<string, { name: string; address?: string; contact?: string }>, client: { name: string; address?: string; contact?: string }) => {
-        if (!acc[client.name]) {
-          acc[client.name] = client;
-        }
-        return acc;
-      }, {});
-    
-    return Object.values(clients).slice(0, 5) as Array<{ name: string; address?: string; contact?: string }>;
+    // Return empty array - client suggestions will come from database in future
+    return [];
   };
 
   // Smart Template Selection
   const getTemplateSuggestion = () => {
-    if (typeof window === 'undefined') return 'Standard Template';
-    const templatePreferences = JSON.parse(localStorage.getItem('templatePreferences') || '{}');
-    const invoiceTypePreferences = templatePreferences[invoiceType] || {};
-    
-    // Get most used template for this invoice type
-    const mostUsedTemplate = Object.keys(invoiceTypePreferences)
-      .sort((a, b) => (invoiceTypePreferences[b] || 0) - (invoiceTypePreferences[a] || 0))[0];
-    
     // Default suggestions based on invoice type
     const defaultSuggestions = {
       'product_sales': 'Standard Template',
@@ -421,17 +368,12 @@ export default function Home() {
       'simple_receipt': 'Minimalist Template'
     };
     
-    return mostUsedTemplate || defaultSuggestions[invoiceType as keyof typeof defaultSuggestions] || 'Standard Template';
+    return defaultSuggestions[invoiceType as keyof typeof defaultSuggestions] || 'Standard Template';
   };
 
   const updateTemplatePreference = (templateName: string) => {
-    if (typeof window === 'undefined') return;
-    const templatePreferences = JSON.parse(localStorage.getItem('templatePreferences') || '{}');
-    if (!templatePreferences[invoiceType]) {
-      templatePreferences[invoiceType] = {};
-    }
-    templatePreferences[invoiceType][templateName] = (templatePreferences[invoiceType][templateName] || 0) + 1;
-    localStorage.setItem('templatePreferences', JSON.stringify(templatePreferences));
+    // Template preferences will be stored in database in future
+    console.log('Template preference updated:', templateName);
   };
 
   // Calculate total with tax
@@ -1059,29 +1001,14 @@ export default function Home() {
                       }
                     }
                     
-                    // Save invoice data for future suggestions
-                    if (typeof window !== 'undefined') {
-                      const savedInvoices = JSON.parse(localStorage.getItem('savedInvoices') || '[]');
-                      const newInvoice = {
-                        ...invoiceData,
-                        id: Date.now().toString(),
-                        timestamp: new Date().toISOString(),
-                        status: 'draft',
-                        total: calculateTotal(invoiceData),
-                        template: selectedTemplate
-                      };
-                      savedInvoices.push(newInvoice);
-                      localStorage.setItem('savedInvoices', JSON.stringify(savedInvoices));
-                      
-                      // Update template preference
-                      updateTemplatePreference(
-                        selectedTemplate === 'standard' ? 'Standard Template' :
-                        selectedTemplate === 'minimalist-dark' ? 'Minimalist Dark Template' :
-                        selectedTemplate === 'recurring-clients' ? 'Recurring Clients Template' :
-                        selectedTemplate === 'creative-agency' ? 'Creative Agency Template' :
-                        selectedTemplate === 'consulting' ? 'Consulting Template' : 'Standard Template'
-                      );
-                    }
+                    // Update template preference
+                    updateTemplatePreference(
+                      selectedTemplate === 'standard' ? 'Standard Template' :
+                      selectedTemplate === 'minimalist-dark' ? 'Minimalist Dark Template' :
+                      selectedTemplate === 'recurring-clients' ? 'Recurring Clients Template' :
+                      selectedTemplate === 'creative-agency' ? 'Creative Agency Template' :
+                      selectedTemplate === 'consulting' ? 'Consulting Template' : 'Standard Template'
+                    );
                     
                     // Generate real PDF invoice
                     const pdfData: InvoiceData = {
@@ -1166,16 +1093,7 @@ export default function Home() {
                       }
                     }
                     
-                    // Update invoice status to 'paid'
-                    if (typeof window !== 'undefined') {
-                      const savedInvoices = JSON.parse(localStorage.getItem('savedInvoices') || '[]');
-                      const lastInvoice = savedInvoices[savedInvoices.length - 1];
-                      if (lastInvoice) {
-                        lastInvoice.status = 'paid';
-                        lastInvoice.paidDate = new Date().toISOString();
-                        localStorage.setItem('savedInvoices', JSON.stringify(savedInvoices));
-                      }
-                    }
+                    // Invoice status will be updated in database
                     
                     // Generate real PDF invoice for payment
                     const pdfData: InvoiceData = {
