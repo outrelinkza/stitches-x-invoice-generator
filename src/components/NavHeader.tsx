@@ -27,7 +27,7 @@ export default function NavHeader({ currentPage }: NavHeaderProps) {
             <svg className="h-8 w-8 text-black" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
               <path clipRule="evenodd" d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z" fill="currentColor" fillRule="evenodd"></path>
             </svg>
-            <h2 className="text-xl font-bold tracking-tight text-white">Stitches X</h2>
+            <h2 className="text-xl font-bold tracking-tight text-white">InvoicePro</h2>
           </a>
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
             {navItems.map((item) => (

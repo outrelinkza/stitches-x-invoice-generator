@@ -105,10 +105,10 @@ export default function Invoices() {
                 <h1 className="text-4xl font-bold tracking-tight text-white">Invoices</h1>
                 <p className="mt-1 text-lg text-white/70">Manage and track your invoices.</p>
               </div>
-              <button className="flex items-center gap-2 px-4 py-2 bg-[var(--primary-color)] text-white text-sm font-medium rounded-lg hover:bg-[var(--primary-color)]/80 transition-colors">
+              <a href="/" className="flex items-center gap-2 px-4 py-2 bg-[var(--primary-color)] text-white text-sm font-medium rounded-lg hover:bg-[var(--primary-color)]/80 transition-colors">
                 <span className="material-symbols-outlined text-base">add</span>
                 <span>Create Invoice</span>
-              </button>
+              </a>
             </div>
           </header>
           
