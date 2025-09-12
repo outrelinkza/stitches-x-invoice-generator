@@ -466,13 +466,13 @@ export default function Home() {
                 <h2 className="text-xl font-bold tracking-tight text-white">Stitches X</h2>
               </div>
               <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-                <a className="relative group text-white/70 hover:text-white transition-colors" href="/dashboard">
+                <a className="relative group text-white hover:text-white transition-colors" href="/dashboard">
                   <span>Dashboard</span>
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-full"></span>
                 </a>
-                <a className="relative group text-white hover:text-white transition-colors" href="/invoices">
+                <a className="relative group text-white/70 hover:text-white transition-colors" href="/invoices">
                   <span>Invoices</span>
-                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-white transition-all duration-300"></span>
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-full"></span>
                 </a>
                 <a className="relative group text-white/70 hover:text-white transition-colors" href="/templates">
                   <span>Templates</span>

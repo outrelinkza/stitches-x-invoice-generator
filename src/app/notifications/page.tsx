@@ -15,10 +15,8 @@ export default function Notifications() {
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-[var(--text-secondary)]">
             <a className="hover:text-[var(--text-primary)] transition-colors" href="/dashboard">Dashboard</a>
             <a className="hover:text-[var(--text-primary)] transition-colors" href="/invoices">Invoices</a>
-            <a className="hover:text-[var(--text-primary)] transition-colors" href="#">Estimates</a>
-            <a className="hover:text-[var(--text-primary)] transition-colors" href="#">Clients</a>
-            <a className="hover:text-[var(--text-primary)] transition-colors" href="#">Products</a>
-            <a className="hover:text-[var(--text-primary)] transition-colors" href="#">Reporting</a>
+            <a className="hover:text-[var(--text-primary)] transition-colors" href="/templates">Templates</a>
+            <a className="hover:text-[var(--text-primary)] transition-colors" href="/settings">Settings</a>
           </nav>
           <div className="flex items-center gap-4">
             <button className="flex h-10 w-10 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-gray-100 text-[var(--text-secondary)] hover:bg-gray-200 transition-colors">

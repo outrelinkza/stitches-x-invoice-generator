@@ -42,14 +42,14 @@ export default function Support() {
               </div>
               
               <div className="space-y-6">
-                <a className="flex items-start gap-4 p-4 rounded-xl hover:bg-gray-100 transition-colors" href="mailto:stitchesx.service@gmail.com">
+                <a className="flex items-start gap-4 p-4 rounded-xl hover:bg-gray-100 transition-colors" href="mailto:hello@stitchesx.com">
                   <div className="flex-shrink-0 size-12 rounded-lg bg-gray-100 flex items-center justify-center">
                     <span className="material-symbols-outlined text-gray-600 text-2xl"> mail </span>
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900">Email Us</h3>
                     <p className="text-gray-600 text-sm">Our support team is available 24/7.</p>
-                    <p className="text-blue-600 font-medium text-sm mt-1">stitchesx.service@gmail.com</p>
+                    <p className="text-blue-600 font-medium text-sm mt-1">hello@stitchesx.com</p>
                   </div>
                 </a>
                 

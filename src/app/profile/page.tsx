@@ -21,7 +21,7 @@ export default function Profile() {
             <a className="hover:text-gray-900" href="/invoices">Invoices</a>
             <a className="hover:text-gray-900" href="/templates">Templates</a>
             <a className="hover:text-gray-900" href="/settings">Settings</a>
-            <a className="text-gray-900 font-semibold" href="/profile">Settings</a>
+            <a className="text-gray-900 font-semibold" href="/profile">Profile</a>
           </nav>
           <div className="flex items-center gap-4">
             <button className="flex h-10 w-10 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-gray-100 text-[var(--text-secondary)] hover:bg-gray-200 transition-colors">

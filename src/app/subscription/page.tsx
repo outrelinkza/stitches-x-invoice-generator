@@ -22,7 +22,7 @@ export default function Subscription() {
             <a className="text-gray-600 hover:text-gray-900 text-sm font-medium leading-normal" href="/invoices">Invoices</a>
             <a className="text-gray-600 hover:text-gray-900 text-sm font-medium leading-normal" href="/templates">Templates</a>
             <a className="text-gray-600 hover:text-gray-900 text-sm font-medium leading-normal" href="/settings">Settings</a>
-            <a className="text-gray-900 text-sm font-semibold leading-normal" href="/profile">Settings</a>
+            <a className="text-gray-900 text-sm font-semibold leading-normal" href="/profile">Profile</a>
           </div>
           <div className="flex flex-1 justify-end gap-4">
             <button className="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 bg-gray-100 hover:bg-gray-200 text-gray-700">
