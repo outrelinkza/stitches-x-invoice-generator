@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
+import { showSuccess } from '@/utils/notifications';
 
 interface AuthContextType {
   user: User | null;
@@ -61,19 +62,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(session?.user ?? null);
         setLoading(false);
 
-        // Handle successful sign in
+        // Handle successful sign in (only show notification for actual sign-in events, not page loads)
         if (event === 'SIGNED_IN' && session?.user) {
-          // Show success message
-          const successMsg = document.createElement('div');
-          successMsg.className = 'fixed top-20 right-4 bg-white/10 backdrop-blur-xl border border-white/20 text-white px-6 py-4 rounded-xl shadow-2xl z-50 transition-all';
-          successMsg.innerHTML = 'Successfully signed in!';
-          document.body.appendChild(successMsg);
-          
-          setTimeout(() => {
-            if (document.body.contains(successMsg)) {
-              document.body.removeChild(successMsg);
-            }
-          }, 3000);
+          // Only show notification if this is a fresh sign-in (not a page refresh)
+          const isPageRefresh = sessionStorage.getItem('auth-notification-shown');
+          if (!isPageRefresh) {
+            // Show success message using centralized notification system
+            showSuccess('Successfully signed in!');
+            
+            // Mark that we've shown the notification
+            sessionStorage.setItem('auth-notification-shown', 'true');
+          }
         }
 
         // Handle sign out
@@ -83,6 +82,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             localStorage.removeItem('savedInvoices');
             localStorage.removeItem('userSettings');
             localStorage.removeItem('selectedTemplate');
+            // Clear the notification flag so it can show again on next sign-in
+            sessionStorage.removeItem('auth-notification-shown');
           }
         }
       }

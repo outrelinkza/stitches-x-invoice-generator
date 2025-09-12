@@ -35,6 +35,7 @@ export interface InvoiceData {
   // Additional Info
   additionalNotes?: string;
   template: string;
+  watermark?: string;
 }
 
 export const generateInvoicePDF = (data: InvoiceData): void => {
@@ -195,6 +196,18 @@ export const generateInvoicePDF = (data: InvoiceData): void => {
   doc.setFontSize(8);
   doc.setTextColor(150, 150, 150);
   doc.text('Thank you for your business!', pageWidth / 2, pageHeight - 20, { align: 'center' });
+  
+  // Add watermark if provided
+  if (data.watermark) {
+    doc.setGState(new doc.GState({ opacity: 0.1 }));
+    doc.setFontSize(16);
+    doc.setTextColor(200, 200, 200);
+    doc.text(data.watermark, pageWidth / 2, pageHeight / 2, { 
+      align: 'center',
+      angle: 45 
+    });
+    doc.setGState(new doc.GState({ opacity: 1 }));
+  }
   
   // Save the PDF
   doc.save(`invoice-${data.invoiceNumber}.pdf`);

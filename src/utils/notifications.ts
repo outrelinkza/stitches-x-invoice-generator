@@ -141,8 +141,9 @@ export const hideNotification = () => {
   const existingNotifications = document.querySelectorAll('.notification-toast');
   existingNotifications.forEach(notification => {
     if (document.body.contains(notification)) {
-      notification.style.transform = 'translateX(100%) scale(0.95)';
-      notification.style.opacity = '0';
+      const htmlElement = notification as HTMLElement;
+      htmlElement.style.transform = 'translateX(100%) scale(0.95)';
+      htmlElement.style.opacity = '0';
       setTimeout(() => {
         if (document.body.contains(notification)) {
           document.body.removeChild(notification);

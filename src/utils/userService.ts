@@ -47,6 +47,67 @@ export const getUserProfile = async (user: User): Promise<UserProfile | null> =>
 
     if (profileError && profileError.code !== 'PGRST116') {
       console.warn('Error fetching user profile:', profileError);
+      
+      // If it's a network error, return a fallback profile
+      if (profileError.message?.includes('Load failed') || profileError.message?.includes('TypeError')) {
+        console.log('Network error detected, returning fallback profile');
+        return {
+          id: user.id,
+          email: user.email || '',
+          full_name: user.user_metadata?.full_name || '',
+          company_name: '',
+          company_address: '',
+          company_contact: '',
+          default_currency: 'USD',
+          default_payment_terms: '30',
+          default_tax_rate: 0,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+      }
+      // If it's a 406 error, try to create the profile
+      if (profileError.message?.includes('406') || profileError.message?.includes('Not Acceptable')) {
+        console.log('getUserProfile: 406 error detected, attempting to create profile');
+        try {
+          const { data: newProfile, error: createError } = await supabase
+            .from('user_profiles')
+            .insert({
+              id: user.id,
+              user_id: user.id,
+              full_name: user.user_metadata?.full_name || '',
+              company_name: '',
+              company_address: '',
+              company_contact: '',
+              default_currency: 'GBP',
+              default_payment_terms: 'Net 15',
+              default_tax_rate: 0
+            })
+            .select()
+            .single();
+          
+          if (createError) {
+            console.warn('Error creating user profile:', createError);
+          } else {
+            console.log('getUserProfile: Profile created successfully:', newProfile);
+            return {
+              id: user.id,
+              email: user.email || '',
+              full_name: newProfile.full_name || user.user_metadata?.full_name || '',
+              avatar_url: user.user_metadata?.avatar_url || '',
+              company_name: newProfile.company_name || '',
+              company_address: newProfile.company_address || '',
+              company_contact: newProfile.company_contact || '',
+              default_currency: newProfile.default_currency || 'GBP',
+              default_payment_terms: newProfile.default_payment_terms || 'Net 15',
+              default_tax_rate: newProfile.default_tax_rate || 0,
+              created_at: newProfile.created_at,
+              updated_at: newProfile.updated_at,
+            };
+          }
+        } catch (createErr) {
+          console.warn('Error creating profile:', createErr);
+        }
+      }
       // Don't throw error, just return basic profile
     }
 
@@ -60,6 +121,9 @@ export const getUserProfile = async (user: User): Promise<UserProfile | null> =>
         company_name: profileData.company_name || '',
         company_address: profileData.company_address || '',
         company_contact: profileData.company_contact || '',
+        default_currency: profileData.default_currency || 'GBP',
+        default_payment_terms: profileData.default_payment_terms || 'Net 15',
+        default_tax_rate: profileData.default_tax_rate || 0,
         created_at: profileData.created_at || user.created_at,
         updated_at: profileData.updated_at || user.created_at,
       };
@@ -74,6 +138,9 @@ export const getUserProfile = async (user: User): Promise<UserProfile | null> =>
       company_name: '',
       company_address: '',
       company_contact: '',
+      default_currency: 'GBP',
+      default_payment_terms: 'Net 15',
+      default_tax_rate: 0,
       created_at: user.created_at,
       updated_at: user.updated_at || user.created_at,
     };
@@ -88,6 +155,9 @@ export const getUserProfile = async (user: User): Promise<UserProfile | null> =>
       company_name: '',
       company_address: '',
       company_contact: '',
+      default_currency: 'GBP',
+      default_payment_terms: 'Net 15',
+      default_tax_rate: 0,
       created_at: user.created_at,
       updated_at: user.updated_at || user.created_at,
     };
@@ -101,10 +171,14 @@ export const updateUserProfile = async (user: User, updates: Partial<UserProfile
       .from('user_profiles')
       .upsert({
         id: user.id,
+        user_id: user.id,
         full_name: updates.full_name,
         company_name: updates.company_name,
         company_address: updates.company_address,
         company_contact: updates.company_contact,
+        default_currency: updates.default_currency,
+        default_payment_terms: updates.default_payment_terms,
+        default_tax_rate: updates.default_tax_rate,
         updated_at: new Date().toISOString(),
       });
 

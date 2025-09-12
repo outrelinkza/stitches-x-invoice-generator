@@ -36,7 +36,7 @@ export const UserProfileProvider: React.FC<UserProfileProviderProps> = ({ childr
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const loadUserData = async () => {
+  const loadUserData = async (retryCount = 0) => {
     if (!user) {
       setProfile(null);
       setSettings(null);
@@ -48,17 +48,27 @@ export const UserProfileProvider: React.FC<UserProfileProviderProps> = ({ childr
       setLoading(true);
       setError(null);
 
-      // Use Promise.allSettled to handle both requests independently
-      const [profileResult, settingsResult] = await Promise.allSettled([
-        getUserProfile(user),
-        getUserSettings(user.id)
-      ]);
+      // Get user profile (which now contains all settings data)
+      const profileResult = await getUserProfile(user);
 
       // Handle profile result
-      if (profileResult.status === 'fulfilled') {
-        setProfile(profileResult.value);
+      if (profileResult) {
+        setProfile(profileResult);
+        // Extract settings from profile data
+        setSettings({
+          id: profileResult.id,
+          user_id: user.id,
+          default_currency: profileResult.default_currency || 'GBP',
+          default_payment_terms: profileResult.default_payment_terms || 'Net 15',
+          default_tax_rate: profileResult.default_tax_rate || 0,
+          company_name: profileResult.company_name || '',
+          company_address: profileResult.company_address || '',
+          company_contact: profileResult.company_contact || '',
+          created_at: profileResult.created_at,
+          updated_at: profileResult.updated_at,
+        });
       } else {
-        console.warn('Failed to load user profile:', profileResult.reason);
+        console.warn('Failed to load user profile');
         // Set a basic profile from user data instead of null
         setProfile({
           id: user.id,
@@ -71,20 +81,16 @@ export const UserProfileProvider: React.FC<UserProfileProviderProps> = ({ childr
           created_at: user.created_at,
           updated_at: user.updated_at || user.created_at,
         });
-      }
-
-      // Handle settings result
-      if (settingsResult.status === 'fulfilled') {
-        setSettings(settingsResult.value);
-      } else {
-        console.warn('Failed to load user settings:', settingsResult.reason);
-        // Set default settings instead of null
+        // Set default settings
         setSettings({
-          id: '',
+          id: user.id,
           user_id: user.id,
           default_currency: 'GBP',
           default_payment_terms: 'Net 15',
           default_tax_rate: 0,
+          company_name: '',
+          company_address: '',
+          company_contact: '',
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         });
@@ -92,6 +98,16 @@ export const UserProfileProvider: React.FC<UserProfileProviderProps> = ({ childr
 
     } catch (err) {
       console.error('Error loading user data:', err);
+      
+      // Retry on network errors (up to 2 retries)
+      if (retryCount < 2 && (err instanceof Error && (err.message.includes('Load failed') || err.message.includes('TypeError')))) {
+        console.log(`Retrying loadUserData (attempt ${retryCount + 1}/2)...`);
+        setTimeout(() => {
+          loadUserData(retryCount + 1);
+        }, 1000 * (retryCount + 1)); // Exponential backoff
+        return;
+      }
+      
       // Don't set error state, just use fallback data
       setProfile({
         id: user.id,
@@ -141,7 +157,17 @@ export const UserProfileProvider: React.FC<UserProfileProviderProps> = ({ childr
     }
 
     try {
-      const result = await updateUserSettings(user.id, updates);
+      // Convert settings updates to profile updates since they're in the same table now
+      const profileUpdates: Partial<UserProfile> = {
+        default_currency: updates.default_currency,
+        default_payment_terms: updates.default_payment_terms,
+        default_tax_rate: updates.default_tax_rate,
+        company_name: updates.company_name,
+        company_address: updates.company_address,
+        company_contact: updates.company_contact,
+      };
+      
+      const result = await updateUserProfile(user, profileUpdates);
       if (result.success) {
         await loadUserData(); // Refresh data after update
       }

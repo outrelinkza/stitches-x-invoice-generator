@@ -4,8 +4,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import FloatingCalculator from '@/components/FloatingCalculator';
 import { generateInvoicePDF, InvoiceData } from '@/utils/pdfGenerator';
-import { scanDocument, autoFillForm } from '@/utils/ocrScanner';
-import { createSubscription, createOneTimePayment, PRICING_PLANS } from '@/utils/paymentService';
+import { createOneTimePayment, createSubscription, PRICING_PLANS } from '@/utils/paymentService';
 import { useAuth } from '@/contexts/AuthContext';
 import dynamic from 'next/dynamic';
 
@@ -24,6 +23,7 @@ export default function Home() {
   const [isFormValid, setIsFormValid] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
+  const [isGuestMode, setIsGuestMode] = useState(false);
   const { user, signOut } = useAuth();
   const router = useRouter();
   const [showTotals, setShowTotals] = useState(true);
@@ -36,8 +36,36 @@ export default function Home() {
   const [selectedTemplate, setSelectedTemplate] = useState('standard');
   const logoInputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  
 
   // No redirect - let authenticated users stay on invoice page
+
+  // Handle payment success/cancel messages
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const paymentStatus = urlParams.get('payment');
+      const subscriptionStatus = urlParams.get('subscription');
+      
+      if (paymentStatus === 'success') {
+        showSuccess('Payment successful! Your invoice is ready for download.');
+        // Clean up URL
+        window.history.replaceState({}, '', window.location.pathname);
+      } else if (paymentStatus === 'cancelled') {
+        showError('Payment was cancelled. You can try again anytime.');
+        // Clean up URL
+        window.history.replaceState({}, '', window.location.pathname);
+      } else if (subscriptionStatus === 'success') {
+        showSuccess('Subscription activated! You now have unlimited access.');
+        // Clean up URL
+        window.history.replaceState({}, '', window.location.pathname);
+      } else if (subscriptionStatus === 'cancelled') {
+        showError('Subscription was cancelled. You can try again anytime.');
+        // Clean up URL
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+    }
+  }, []);
 
   // Load selected template on component mount
   useEffect(() => {
@@ -187,11 +215,7 @@ export default function Home() {
     } catch (error) {
       console.error('Checkout error:', error);
       
-      // Remove loading message if it exists
-      const existingMsg = document.querySelector('.fixed.top-20.right-4');
-      if (existingMsg) {
-        document.body.removeChild(existingMsg);
-      }
+      hideNotification();
       
       // Show error message
       showError('Payment failed. Please try again.');
@@ -238,17 +262,7 @@ export default function Home() {
       // Silent save - no popup notification
     } catch (error) {
       console.error('Failed to save draft:', error);
-      // Show error notification
-      const errorMsg = document.createElement('div');
-      errorMsg.className = 'fixed top-20 right-4 bg-red-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
-      errorMsg.innerHTML = '❌ Failed to save draft. Please check your connection and try again.';
-      document.body.appendChild(errorMsg);
-      
-      setTimeout(() => {
-        if (document.body.contains(errorMsg)) {
-          document.body.removeChild(errorMsg);
-        }
-      }, 5000);
+      showError('Failed to save draft. Please check your connection and try again.');
     }
   }, [user]);
 
@@ -295,29 +309,77 @@ export default function Home() {
     return [8, 10, 15, 20, 25];
   };
 
-  // AI Auto-Fill Suggestions
-  const getClientSuggestions = (): Array<{ name: string; address?: string; contact?: string }> => {
-    // Return empty array - client suggestions will come from database in future
-    return [];
-  };
 
-  // Smart Template Selection
-  const getTemplateSuggestion = () => {
-    // Default suggestions based on invoice type
-    const defaultSuggestions = {
-      'product_sales': 'Standard Template',
-      'freelance_consulting': 'Consulting Template',
-      'time_tracking': 'Time-Based Template',
-      'simple_receipt': 'Minimalist Template'
-    };
-    
-    return defaultSuggestions[invoiceType as keyof typeof defaultSuggestions] || 'Standard Template';
-  };
+
 
   const updateTemplatePreference = (templateName: string) => {
     // Template preferences will be stored in database in future
     console.log('Template preference updated:', templateName);
   };
+
+  // Calculate line item total
+  const calculateLineTotal = useCallback((quantity: number, rate: number) => {
+    return (quantity * rate).toFixed(2);
+  }, []);
+
+  // Calculate subtotal from all line items
+  const calculateSubtotal = useCallback(() => {
+    const lineItems = document.querySelectorAll('[data-line-item]');
+    let subtotal = 0;
+    
+    lineItems.forEach((item) => {
+      const quantityInput = item.querySelector('input[name="quantity"]') as HTMLInputElement;
+      const rateInput = item.querySelector('input[name="rate"]') as HTMLInputElement;
+      const quantity = parseFloat(quantityInput?.value) || 0;
+      const rate = parseFloat(rateInput?.value) || 0;
+      subtotal += quantity * rate;
+    });
+    
+    return subtotal;
+  }, []);
+
+  // Update line item total when quantity or rate changes
+  const updateLineItemTotal = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const lineItem = event.target.closest('[data-line-item]');
+    if (!lineItem) return;
+    
+    const quantityInput = lineItem.querySelector('input[name="quantity"]') as HTMLInputElement;
+    const rateInput = lineItem.querySelector('input[name="rate"]') as HTMLInputElement;
+    const totalSpan = lineItem.querySelector('[data-line-total]') as HTMLSpanElement;
+    
+    const quantity = parseFloat(quantityInput?.value) || 0;
+    const rate = parseFloat(rateInput?.value) || 0;
+    const total = calculateLineTotal(quantity, rate);
+    
+    if (totalSpan) {
+      totalSpan.textContent = `$${total}`;
+    }
+    
+    // Update subtotal
+    updateSubtotal();
+  }, [calculateLineTotal]);
+
+  // Update subtotal and total
+  const updateSubtotal = useCallback(() => {
+    const subtotal = calculateSubtotal();
+    const subtotalInput = document.querySelector('input[name="subtotal"]') as HTMLInputElement;
+    const taxRateInput = document.querySelector('input[name="taxRate"]') as HTMLInputElement;
+    const totalSpan = document.querySelector('[data-total-display]') as HTMLSpanElement;
+    
+    if (subtotalInput) {
+      subtotalInput.value = subtotal.toFixed(2);
+    }
+    
+    const taxRate = parseFloat(taxRateInput?.value) || 0;
+    const taxAmount = (subtotal * taxRate) / 100;
+    const total = subtotal + taxAmount;
+    
+    if (totalSpan) {
+      totalSpan.textContent = `$${total.toFixed(2)}`;
+    }
+    
+    setCurrentTotal(total.toFixed(2));
+  }, [calculateSubtotal]);
 
   // Calculate total with tax (memoized for performance)
   const calculateTotal = useCallback((invoiceData: Record<string, string | number>) => {
@@ -369,7 +431,23 @@ export default function Home() {
                 </a>
               </nav>
               <div className="flex items-center gap-4">
-                {user ? (
+                {isGuestMode && !user ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                      <span className="text-white text-sm font-medium">G</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-white text-sm font-medium">Guest Mode</span>
+                      <span className="text-white/60 text-xs">Pay per download</span>
+                    </div>
+                    <button 
+                      onClick={() => setIsGuestMode(false)}
+                      className="text-white/70 hover:text-white transition-colors text-sm font-medium cursor-pointer"
+                    >
+                      Switch to Login
+                    </button>
+                  </div>
+                ) : user ? (
                   <>
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
@@ -395,6 +473,12 @@ export default function Home() {
                   </>
                 ) : (
                   <>
+                    <button 
+                      onClick={() => setIsGuestMode(true)}
+                      className="text-white/70 hover:text-white transition-colors text-sm font-medium cursor-pointer"
+                    >
+                      Continue as Guest
+                    </button>
                     <button 
                       onClick={() => {
                         setAuthMode('signin');
@@ -425,9 +509,9 @@ export default function Home() {
           <div className="w-full max-w-4xl space-y-8">
             <div className="text-center animate-enter" style={{animationDelay: '200ms'}}>
               <h1 className="font-display text-5xl font-medium tracking-tight text-white sm:text-7xl/none">
-                AI&nbsp;<span className="bg-clip-text text-transparent bg-gradient-to-r from-red-200 via-red-300 to-yellow-200">Invoice Generator</span>
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-red-200 via-red-300 to-yellow-200">Professional Invoice Generator</span>
               </h1>
-              <p className="mt-8 max-w-2xl mx-auto text-lg/8 text-white/80">Create professional invoices with ease, powered by AI.</p>
+              <p className="mt-8 max-w-2xl mx-auto text-lg/8 text-white/80">Create beautiful, professional invoices in seconds. Multiple templates, auto-calculation, and instant PDF generation.</p>
               
               {/* Selected Template Display */}
               <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full border border-white/20">
@@ -456,6 +540,30 @@ export default function Home() {
               selectedTemplate === 'custom' ? 'bg-gradient-to-br from-purple-900/30 to-indigo-900/30 border border-purple-500/20' :
               'glass-effect'
             }`} style={{animationDelay: '300ms'}}>
+              {/* Guest Mode Banner */}
+              {isGuestMode && !user && (
+                <div className="mb-6 p-4 rounded-lg bg-gradient-to-r from-green-500/20 to-blue-500/20 border border-green-400/30">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                      <span className="text-white text-sm font-medium">G</span>
+                    </div>
+                    <div>
+                      <h4 className="text-white font-medium">Guest Mode Active</h4>
+                      <p className="text-white/70 text-sm">Choose your plan • No account needed • Instant access</p>
+                    </div>
+                    <button 
+                      onClick={() => {
+                        setAuthMode('signup');
+                        setAuthModalOpen(true);
+                      }}
+                      className="ml-auto px-3 py-1 bg-white/10 hover:bg-white/20 text-white text-sm rounded-lg border border-white/20 transition-colors"
+                    >
+                      Create Account
+                    </button>
+                  </div>
+                </div>
+              )}
+              
               <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
                 {/* Company Info Section */}
                 <section className="space-y-6">
@@ -500,17 +608,38 @@ export default function Home() {
                     <div className="space-y-4 flex-1">
                       <label className="block">
                         <span className="text-sm font-medium text-white/90">Company Name</span>
-                        <input name="companyName" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="Stitches X" type="text" aria-label="Company Name" required/>
+                        <input 
+                          name="companyName" 
+                          className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} 
+                          placeholder="Stitches X" 
+                          type="text" 
+                          aria-label="Company Name" 
+                          required
+                        />
                       </label>
                       <label className="block">
                         <span className="text-sm font-medium text-white/90">Email/Phone</span>
-                        <input name="companyContact" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="stitchesx.service@gmail.com" type="text" aria-label="Company Contact" required/>
+                        <input 
+                          name="companyContact" 
+                          className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} 
+                          placeholder="Company email" 
+                          type="text" 
+                          aria-label="Company Contact" 
+                          required
+                        />
                       </label>
                     </div>
                   </div>
                   <label className="block">
                     <span className="text-sm font-medium text-white/90">Address</span>
-                    <textarea name="companyAddress" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="123 Business Street, City, State 12345" rows={2} aria-label="Company Address" required></textarea>
+                    <textarea 
+                      name="companyAddress" 
+                      className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} 
+                      placeholder="Company address" 
+                      rows={2} 
+                      aria-label="Company Address" 
+                      required
+                    ></textarea>
                   </label>
                 </section>
 
@@ -518,53 +647,6 @@ export default function Home() {
                 <section className="space-y-6">
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold text-white">Client Info</h3>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        // Create file input for document scanning
-                        const input = document.createElement('input');
-                        input.type = 'file';
-                        input.accept = 'image/*,.pdf';
-                        input.multiple = false;
-                        
-                        input.onchange = async (e) => {
-                          const file = (e.target as HTMLInputElement).files?.[0];
-                          if (file) {
-                            try {
-                              // Perform real OCR scanning
-                              const result = await scanDocument(file);
-                              
-                              // Auto-fill form with extracted data
-                              if (formRef.current) {
-                                autoFillForm(result.extractedData, formRef);
-                              }
-                              
-                              // Show success message with confidence
-                              const successMsg = document.createElement('div');
-                              successMsg.className = 'fixed top-20 right-4 bg-green-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
-                              successMsg.innerHTML = `✅ Document scanned successfully! Confidence: ${Math.round(result.confidence)}%`;
-                              document.body.appendChild(successMsg);
-                              
-                              setTimeout(() => {
-                                if (document.body.contains(successMsg)) {
-                                  document.body.removeChild(successMsg);
-                                }
-                              }, 4000);
-                              
-                            } catch (error) {
-                              console.error('OCR scanning failed:', error);
-                              // Error message is already shown in the scanDocument function
-                            }
-                          }
-                        };
-                        
-                        input.click();
-                      }}
-                      className="flex items-center gap-2 px-3 py-2 bg-white/10 hover:bg-white/20 text-white text-sm rounded-lg border border-white/20 transition-colors"
-                    >
-                      <span className="material-symbols-outlined text-base">upload_file</span>
-                      Upload Document
-                    </button>
                   </div>
                   <div className="space-y-4">
                     <label className="block">
@@ -574,25 +656,7 @@ export default function Home() {
                         className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} 
                         placeholder="Client Name" aria-label="Client Name" required 
                         type="text"
-                        list="clientNames"
-                        onChange={(e) => {
-                          // Auto-fill address and contact when client name is selected
-                          const selectedClient = getClientSuggestions().find(client => 
-                            client.name.toLowerCase() === e.target.value.toLowerCase()
-                          );
-                          if (selectedClient && selectedClient.address && selectedClient.contact) {
-                            const addressInput = document.querySelector('textarea[name="clientAddress"]') as HTMLTextAreaElement;
-                            const contactInput = document.querySelector('input[name="clientContact"]') as HTMLInputElement;
-                            if (addressInput) addressInput.value = selectedClient.address;
-                            if (contactInput) contactInput.value = selectedClient.contact;
-                          }
-                        }}
                       />
-                      <datalist id="clientNames">
-                        {getClientSuggestions().map((client, index) => (
-                          <option key={index} value={client.name} />
-                        ))}
-                      </datalist>
                     </label>
                     <label className="block">
                       <span className="text-sm font-medium text-white/90">Address</span>
@@ -600,7 +664,7 @@ export default function Home() {
                     </label>
                     <label className="block">
                       <span className="text-sm font-medium text-white/90">Email/Phone</span>
-                      <input name="clientContact" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="client@example.com" type="text"/>
+                      <input name="clientContact" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="Client email" type="text"/>
                     </label>
                   </div>
                 </section>
@@ -609,7 +673,7 @@ export default function Home() {
               {/* Template-Specific Sections */}
               {getTemplateFeatures().showSubscriptionFields && (
                 <section className="space-y-6 p-6 bg-blue-900/20 rounded-lg border border-blue-500/20">
-                  <h3 className="text-lg font-semibold text-blue-200">🔄 Recurring Client Features</h3>
+                  <h3 className="text-lg font-semibold text-blue-200">Recurring Client Features</h3>
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <label className="block">
                       <span className="text-sm font-medium text-blue-200">Subscription Type</span>
@@ -629,7 +693,7 @@ export default function Home() {
 
               {getTemplateFeatures().showProjectFields && (
                 <section className="space-y-6 p-6 bg-pink-900/20 rounded-lg border border-pink-500/20">
-                  <h3 className="text-lg font-semibold text-pink-200">🎨 Creative Project Features</h3>
+                  <h3 className="text-lg font-semibold text-pink-200">Creative Project Features</h3>
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <label className="block">
                       <span className="text-sm font-medium text-pink-200">Project Type</span>
@@ -642,7 +706,7 @@ export default function Home() {
                     </label>
                     <label className="block">
                       <span className="text-sm font-medium text-pink-200">Project Timeline</span>
-                      <input type="text" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="2-3 weeks" />
+                      <input type="text" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="Timeline" />
                     </label>
                   </div>
                 </section>
@@ -650,7 +714,7 @@ export default function Home() {
 
               {getTemplateFeatures().showHourlyRates && (
                 <section className="space-y-6 p-6 bg-gray-900/20 rounded-lg border border-gray-500/20">
-                  <h3 className="text-lg font-semibold text-gray-200">💼 Consulting Features</h3>
+                  <h3 className="text-lg font-semibold text-gray-200">Consulting Features</h3>
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <label className="block">
                       <span className="text-sm font-medium text-gray-200">Consultation Type</span>
@@ -663,7 +727,7 @@ export default function Home() {
                     </label>
                     <label className="block">
                       <span className="text-sm font-medium text-gray-200">Hourly Rate</span>
-                      <input type="number" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="150" />
+                      <input type="number" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="Hours" />
                     </label>
                   </div>
                 </section>
@@ -680,17 +744,17 @@ export default function Home() {
                       value={invoiceNumber}
                       onChange={(e) => setInvoiceNumber(e.target.value)}
                       className="mt-1 block w-full rounded-md border-white/20 bg-white/10 shadow-sm focus:ring-0 input-focus-glow text-white placeholder-white/60" 
-                      placeholder="INV-001" 
+                      placeholder="Invoice number" 
                       type="text"
                     />
                   </label>
                   <label className="block">
                     <span className="text-sm font-medium text-white/90">Invoice Date</span>
-                    <input name="invoiceDate" className="mt-1 block w-full rounded-md border-white/20 bg-white/10 shadow-sm focus:ring-0 input-focus-glow text-white" type="date"/>
+                    <input name="date" className="mt-1 block w-full rounded-md border-white/20 bg-white/10 shadow-sm focus:ring-0 input-focus-glow text-white" type="date" defaultValue={new Date().toISOString().split('T')[0]}/>
                   </label>
                 <label className="block">
                   <span className="text-sm font-medium text-white/90">Due Date</span>
-                  <input name="dueDate" className="mt-1 block w-full rounded-md border-white/20 bg-white/10 shadow-sm focus:ring-0 input-focus-glow text-white" type="date"/>
+                  <input name="dueDate" className="mt-1 block w-full rounded-md border-white/20 bg-white/10 shadow-sm focus:ring-0 input-focus-glow text-white" type="date" defaultValue={new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}/>
                 </label>
                   <label className="block">
                     <span className="text-sm font-medium text-white/90">Invoice Type</span>
@@ -706,6 +770,7 @@ export default function Home() {
                       <option value="simple_receipt" className="bg-slate-800 text-white">Simple Receipt</option>
                     </select>
                   </label>
+
         </div>
               </section>
 
@@ -720,11 +785,11 @@ export default function Home() {
                       <div className="col-span-2"><span className="text-sm font-medium text-white/90">Price</span></div>
                       <div className="col-span-2"><span className="text-sm font-medium text-white/90">Total</span></div>
                     </div>
-                    <div className="grid grid-cols-12 gap-4 items-center">
+                    <div className="grid grid-cols-12 gap-4 items-center" data-line-item>
                       <input name="itemDescription" className={`col-span-5 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="e.g., iPhone 15 Pro" type="text"/>
-                      <input name="quantity" className={`col-span-2 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="1" type="number"/>
-                      <input name="rate" className={`col-span-2 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="999" type="number"/>
-                      <span className="col-span-2 text-sm text-white">$999.00</span>
+                      <input name="quantity" className={`col-span-2 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="1" type="number" defaultValue="1" onChange={updateLineItemTotal}/>
+                      <input name="rate" className={`col-span-2 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="Rate" type="number" onChange={updateLineItemTotal}/>
+                      <span className="col-span-2 text-sm text-white" data-line-total>$0.00</span>
                       <button type="button" className="col-span-1 text-white/60 hover:text-red-400 transition-transform duration-200 hover:scale-110">
                         <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                           <path clipRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" fillRule="evenodd"></path>
@@ -747,11 +812,11 @@ export default function Home() {
                       <div className="col-span-2"><span className="text-sm font-medium text-white/90">Rate</span></div>
                       <div className="col-span-2"><span className="text-sm font-medium text-white/90">Total</span></div>
                     </div>
-                    <div className="grid grid-cols-12 gap-4 items-center">
+                    <div className="grid grid-cols-12 gap-4 items-center" data-line-item>
                       <input name="serviceDescription" className={`col-span-5 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="e.g., UI/UX Design" type="text"/>
-                      <input name="hours" className={`col-span-2 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="10" type="number"/>
-                      <input name="hourlyRate" className={`col-span-2 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="150" type="number"/>
-                      <span className="col-span-2 text-sm text-white">$1500.00</span>
+                      <input name="quantity" className={`col-span-2 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="Qty" type="number" onChange={updateLineItemTotal}/>
+                      <input name="rate" className={`col-span-2 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="Rate" type="number" onChange={updateLineItemTotal}/>
+                      <span className="col-span-2 text-sm text-white" data-line-total>$0.00</span>
                       <button type="button" className="col-span-1 text-white/60 hover:text-red-400 transition-transform duration-200 hover:scale-110">
                         <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                           <path clipRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" fillRule="evenodd"></path>
@@ -779,7 +844,7 @@ export default function Home() {
                       </label>
                       <label className="block">
                         <span className="text-sm font-medium text-white/90">Hourly Rate ($)</span>
-                        <input className="mt-1 block w-full rounded-md border-white/20 bg-white/10 shadow-sm focus:ring-0 input-focus-glow text-white placeholder-white/60" placeholder="75" type="number"/>
+                        <input name="hourlyRate" className="mt-1 block w-full rounded-md border-white/20 bg-white/10 shadow-sm focus:ring-0 input-focus-glow text-white placeholder-white/60" placeholder="Hourly rate" type="number"/>
                       </label>
                     </div>
                     <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10">
@@ -796,7 +861,7 @@ export default function Home() {
                         onClick={() => {
                           const startTime = (document.querySelector('input[type="time"]') as HTMLInputElement)?.value;
                           const endTime = (document.querySelectorAll('input[type="time"]')[1] as HTMLInputElement)?.value;
-                          const hourlyRate = parseFloat((document.querySelector('input[placeholder="75"]') as HTMLInputElement)?.value || '0');
+                          const hourlyRate = parseFloat((document.querySelector('input[name="hourlyRate"]') as HTMLInputElement)?.value || '0');
                           
                           if (startTime && endTime) {
                             const start = new Date(`2000-01-01T${startTime}`);
@@ -805,25 +870,9 @@ export default function Home() {
                             const diffHours = diffMs / (1000 * 60 * 60);
                             const totalAmount = diffHours * hourlyRate;
                             
-                            const timeMsg = document.createElement('div');
-                            timeMsg.className = 'fixed top-20 right-4 bg-blue-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
-                            timeMsg.innerHTML = `⏱️ Hours: ${diffHours.toFixed(2)} | Total: $${totalAmount.toFixed(2)}`;
-                            document.body.appendChild(timeMsg);
-                            setTimeout(() => {
-                              if (document.body.contains(timeMsg)) {
-                                document.body.removeChild(timeMsg);
-                              }
-                            }, 3000);
+                            showSuccess(`Hours: ${diffHours.toFixed(2)} | Total: $${totalAmount.toFixed(2)}`);
                           } else {
-                            const errorMsg = document.createElement('div');
-                            errorMsg.className = 'fixed top-20 right-4 bg-red-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
-                            errorMsg.innerHTML = '⚠️ Please enter start time, end time, and hourly rate';
-                            document.body.appendChild(errorMsg);
-                            setTimeout(() => {
-                              if (document.body.contains(errorMsg)) {
-                                document.body.removeChild(errorMsg);
-                              }
-                            }, 3000);
+                            showError('Please enter start time, end time, and hourly rate');
                           }
                         }}
                         className="px-3 py-1 text-xs bg-white/10 hover:bg-white/20 text-white rounded border border-white/20 transition-colors"
@@ -849,11 +898,11 @@ export default function Home() {
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                       <label className="block">
                         <span className="text-sm font-medium text-white/90">Description</span>
-                        <input className="mt-1 block w-full rounded-md border-white/20 bg-white/10 shadow-sm focus:ring-0 input-focus-glow text-white placeholder-white/60" placeholder="Payment for services rendered" type="text"/>
+                        <input name="itemDescription" className="mt-1 block w-full rounded-md border-white/20 bg-white/10 shadow-sm focus:ring-0 input-focus-glow text-white placeholder-white/60" placeholder="Payment for services rendered" type="text"/>
                       </label>
                       <label className="block">
                         <span className="text-sm font-medium text-white/90">Amount</span>
-                        <input className="mt-1 block w-full rounded-md border-white/20 bg-white/10 shadow-sm focus:ring-0 input-focus-glow text-white placeholder-white/60" placeholder="500" type="number"/>
+                        <input name="rate" className="mt-1 block w-full rounded-md border-white/20 bg-white/10 shadow-sm focus:ring-0 input-focus-glow text-white placeholder-white/60" placeholder="Amount" type="number"/>
                       </label>
                     </div>
                   </div>
@@ -883,7 +932,7 @@ export default function Home() {
                             <input 
                               name="subtotal"
                               className="w-full rounded-md border-white/20 bg-white/10 shadow-sm focus:ring-0 input-focus-glow text-right pr-2 text-white placeholder-white/60" 
-                              placeholder="1500" 
+                              placeholder="Amount" 
                               type="number"
                               onChange={handleFormChange}
                             />
@@ -895,7 +944,7 @@ export default function Home() {
                             <input 
                               name="taxRate"
                               className="w-full rounded-md border-white/20 bg-white/10 shadow-sm focus:ring-0 input-focus-glow text-right pr-2 text-white placeholder-white/60" 
-                              placeholder="10" 
+                              placeholder="Tax rate" 
                               type="number"
                               list="taxRates"
                               onChange={handleFormChange}
@@ -910,7 +959,7 @@ export default function Home() {
                         <div className="border-t border-white/30 my-2"></div>
                         <div className="flex justify-between items-center">
                           <span className="text-lg font-bold text-white">Total</span>
-                          <span className="text-lg font-bold text-white">${currentTotal}</span>
+                          <span className="text-lg font-bold text-white" data-total-display>${currentTotal}</span>
                         </div>
                       </div>
                     </div>
@@ -930,163 +979,148 @@ export default function Home() {
 
               {/* Action Buttons */}
               <div className="flex flex-col items-center gap-4 pt-6 sm:flex-row sm:justify-center">
-                <button 
-                  type="button"
-                  onClick={() => {
-                    // Get form data and filter out empty fields
-                    const formData = new FormData(document.querySelector('form') as HTMLFormElement);
-                    const invoiceData: Record<string, string> = {};
-                    
-                    // Only include non-empty fields
-                    for (const [key, value] of formData.entries()) {
-                      if (value && value.toString().trim() !== '') {
-                        invoiceData[key] = value.toString();
-                      }
-                    }
-                    
-                    // Update template preference
-                    updateTemplatePreference(
-                      selectedTemplate === 'standard' ? 'Standard Template' :
-                      selectedTemplate === 'minimalist-dark' ? 'Minimalist Dark Template' :
-                      selectedTemplate === 'recurring-clients' ? 'Recurring Clients Template' :
-                      selectedTemplate === 'creative-agency' ? 'Creative Agency Template' :
-                      selectedTemplate === 'consulting' ? 'Consulting Template' : 'Standard Template'
-                    );
-                    
-                    // Generate real PDF invoice
-                    const pdfData: InvoiceData = {
-                      companyName: invoiceData.companyName || 'Stitches X',
-                      companyAddress: invoiceData.companyAddress || 'Your Business Address',
-                      companyContact: invoiceData.companyContact || 'stitchesx.service@gmail.com',
-                      logo: logo || undefined,
-                      clientName: invoiceData.clientName || 'Client Name',
-                      clientAddress: invoiceData.clientAddress || 'Client Address',
-                      clientContact: invoiceData.clientContact || 'client@email.com',
-                      invoiceNumber: invoiceData.invoiceNumber || 'INV-001',
-                      date: invoiceData.date || new Date().toISOString().split('T')[0],
-                      dueDate: invoiceData.dueDate || new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                      paymentTerms: invoiceData.paymentTerms || 'Net 15',
-                      items: [
-                        {
-                          description: invoiceData.itemDescription || invoiceData.serviceDescription || 'Service/Product',
-                          quantity: parseFloat(invoiceData.quantity || invoiceData.hours || '1'),
-                          rate: parseFloat(invoiceData.rate || invoiceData.hourlyRate || '0'),
-                          amount: parseFloat(invoiceData.quantity || '1') * parseFloat(invoiceData.rate || '0') || parseFloat(invoiceData.hours || '1') * parseFloat(invoiceData.hourlyRate || '0')
-                        }
-                      ],
-                      subtotal: parseFloat(invoiceData.subtotal || '0'),
-                      taxRate: parseFloat(invoiceData.taxRate || '0'),
-                      taxAmount: parseFloat(invoiceData.taxAmount || '0'),
-                      total: parseFloat(invoiceData.total || '0'),
-                      additionalNotes: invoiceData.additionalNotes || '',
-                      template: selectedTemplate
-                    };
-                    
-                    // Generate and download PDF
-                    generateInvoicePDF(pdfData);
-                    setIsFormValid(true);
-                    
-                    // Show success message with email option
-                    const successMsg = document.createElement('div');
-                    successMsg.className = 'fixed top-20 right-4 bg-green-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
-                    successMsg.innerHTML = '✅ PDF invoice generated and downloaded!';
-                    document.body.appendChild(successMsg);
-                    
-                    // Ask if user wants to email the invoice
-                    if (pdfData.clientName && pdfData.clientContact && pdfData.clientContact.includes('@')) {
-                      setTimeout(() => {
-                        if (document.body.contains(successMsg)) {
-                          document.body.removeChild(successMsg);
-                        }
-                        
-                        const emailMsg = document.createElement('div');
-                        emailMsg.className = 'fixed top-20 right-4 bg-blue-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
-                        emailMsg.innerHTML = `📧 Email invoice to ${pdfData.clientName}? <button onclick="sendInvoiceEmail('${pdfData.clientContact}', '${pdfData.clientName}', '${pdfData.invoiceNumber}', ${pdfData.total}, '${pdfData.companyName}')" class="ml-2 underline">Yes</button>`;
-                        document.body.appendChild(emailMsg);
-                        
-                        setTimeout(() => {
-                          if (document.body.contains(emailMsg)) {
-                            document.body.removeChild(emailMsg);
+                {/* Guest Mode: Payment Options */}
+                {isGuestMode && !user ? (
+                  <div className="flex flex-col gap-3 w-full">
+                    {/* One-time Payment */}
+                    <button 
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          showLoading('Processing payment...');
+                          
+                          const success = await createOneTimePayment(
+                            PRICING_PLANS.premium.priceId, // £3.50 per invoice
+                            undefined
+                          );
+                          
+                          if (success) {
+                            hideNotification();
+                          } else {
+                            showError('Payment failed. Please try again.');
                           }
-                        }, 8000);
-                      }, 3000);
-                    } else {
-                      setTimeout(() => {
-                        if (document.body.contains(successMsg)) {
-                          document.body.removeChild(successMsg);
+                        } catch (error) {
+                          console.error('Payment error:', error);
+                          showError('Payment processing failed. Please try again.');
                         }
-                      }, 3000);
-                    }
-                  }} 
-                  className="w-full rounded-lg bg-[var(--primary-color)] px-6 py-3 text-sm font-bold text-white shadow-lg sm:w-auto btn-hover-effect hover:bg-blue-600"
-                >
-                  Generate Invoice
-                </button>
-                <button 
-                  type="button"
-                  onClick={() => {
-                    // Get form data and filter out empty fields
-                    const formData = new FormData(document.querySelector('form') as HTMLFormElement);
-                    const invoiceData: Record<string, string> = {};
+                      }}
+                      className="w-full rounded-lg bg-gradient-to-r from-green-500 to-blue-500 px-6 py-3 text-sm font-bold text-white shadow-lg btn-hover-effect hover:from-green-600 hover:to-blue-600"
+                    >
+                      Pay Per Invoice (£3.50)
+                    </button>
                     
-                    // Only include non-empty fields
-                    for (const [key, value] of formData.entries()) {
-                      if (value && value.toString().trim() !== '') {
-                        invoiceData[key] = value.toString();
-                      }
-                    }
-                    
-                    // Invoice status will be updated in database
-                    
-                    // Generate real PDF invoice for payment
-                    const pdfData: InvoiceData = {
-                      companyName: invoiceData.companyName || 'Stitches X',
-                      companyAddress: invoiceData.companyAddress || 'Your Business Address',
-                      companyContact: invoiceData.companyContact || 'stitchesx.service@gmail.com',
-                      logo: logo || undefined,
-                      clientName: invoiceData.clientName || 'Client Name',
-                      clientAddress: invoiceData.clientAddress || 'Client Address',
-                      clientContact: invoiceData.clientContact || 'client@email.com',
-                      invoiceNumber: invoiceData.invoiceNumber || 'INV-001',
-                      date: invoiceData.date || new Date().toISOString().split('T')[0],
-                      dueDate: invoiceData.dueDate || new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                      paymentTerms: invoiceData.paymentTerms || 'Net 15',
-                      items: [
-                        {
-                          description: invoiceData.itemDescription || invoiceData.serviceDescription || 'Service/Product',
-                          quantity: parseFloat(invoiceData.quantity || invoiceData.hours || '1'),
-                          rate: parseFloat(invoiceData.rate || invoiceData.hourlyRate || '0'),
-                          amount: parseFloat(invoiceData.quantity || '1') * parseFloat(invoiceData.rate || '0') || parseFloat(invoiceData.hours || '1') * parseFloat(invoiceData.hourlyRate || '0')
+                    {/* Subscription Option */}
+                    <button 
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          showLoading('Setting up subscription...');
+                          
+                          const success = await createSubscription({
+                            priceId: PRICING_PLANS.pro.priceId, // £29.99/month
+                            customerEmail: undefined,
+                            metadata: { plan: 'guest_pro' }
+                          });
+                          
+                          if (success) {
+                            hideNotification();
+                          } else {
+                            showError('Subscription setup failed. Please try again.');
+                          }
+                        } catch (error) {
+                          console.error('Subscription error:', error);
+                          showError('Subscription setup failed. Please try again.');
                         }
-                      ],
-                      subtotal: parseFloat(invoiceData.subtotal || '0'),
-                      taxRate: parseFloat(invoiceData.taxRate || '0'),
-                      taxAmount: parseFloat(invoiceData.taxAmount || '0'),
-                      total: parseFloat(invoiceData.total || '0'),
-                      additionalNotes: invoiceData.additionalNotes || '',
-                      template: selectedTemplate
-                    };
+                      }}
+                      className="w-full rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-3 text-sm font-bold text-white shadow-lg btn-hover-effect hover:from-purple-600 hover:to-pink-600"
+                    >
+                      Unlimited Access (£29.99/month)
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    {/* Logged User: Free Invoice Generation */}
+                    <button 
+                      type="button"
+                      onClick={() => {
+                        // Logged user: Generate free invoice
+                        const formData = new FormData(document.querySelector('form') as HTMLFormElement);
+                        const invoiceData: Record<string, string> = {};
+                        
+                        for (const [key, value] of formData.entries()) {
+                          if (value && value.toString().trim() !== '') {
+                            invoiceData[key] = value.toString();
+                          }
+                        }
+                        
+                        const pdfData: InvoiceData = {
+                          companyName: invoiceData.companyName || 'Stitches X',
+                          companyAddress: invoiceData.companyAddress || 'Your Business Address',
+                          companyContact: invoiceData.companyContact || 'stitchesx.service@gmail.com',
+                          logo: logo || undefined,
+                          clientName: invoiceData.clientName || 'Client Name',
+                          clientAddress: invoiceData.clientAddress || 'Client Address',
+                          clientContact: invoiceData.clientContact || 'client@email.com',
+                          invoiceNumber: invoiceData.invoiceNumber || 'INV-001',
+                          date: invoiceData.date || new Date().toISOString().split('T')[0],
+                          dueDate: invoiceData.dueDate || new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                          paymentTerms: invoiceData.paymentTerms || 'Net 15',
+                          items: [
+                            {
+                              description: invoiceData.itemDescription || invoiceData.serviceDescription || 'Service/Product',
+                              quantity: parseFloat(invoiceData.quantity || invoiceData.hours || '1'),
+                              rate: parseFloat(invoiceData.rate || invoiceData.hourlyRate || '0'),
+                              amount: parseFloat(invoiceData.quantity || '1') * parseFloat(invoiceData.rate || '0') || parseFloat(invoiceData.hours || '1') * parseFloat(invoiceData.hourlyRate || '0')
+                            }
+                          ],
+                          subtotal: parseFloat(invoiceData.subtotal || '0'),
+                          taxRate: parseFloat(invoiceData.taxRate || '0'),
+                          taxAmount: parseFloat(invoiceData.taxAmount || '0'),
+                          total: parseFloat(invoiceData.total || '0'),
+                          additionalNotes: invoiceData.additionalNotes || '',
+                          template: selectedTemplate
+                        };
+                        
+                        generateInvoicePDF(pdfData);
+                        setIsFormValid(true);
+                        showSuccess('Free invoice generated! (2/2 this month)');
+                      }} 
+                      className="w-full rounded-lg bg-[var(--primary-color)] px-6 py-3 text-sm font-bold text-white shadow-lg sm:w-auto btn-hover-effect hover:bg-blue-600"
+                    >
+                      Generate Free Invoice
+                    </button>
                     
-                    // Generate and download PDF
-                    generateInvoicePDF(pdfData);
-                    
-                    // Show success message
-                    const downloadMsg = document.createElement('div');
-                    downloadMsg.className = 'fixed top-20 right-4 bg-blue-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
-                    downloadMsg.innerHTML = '📄 PDF invoice downloaded and marked as paid!';
-                    document.body.appendChild(downloadMsg);
-                    
-                    setTimeout(() => {
-                      if (document.body.contains(downloadMsg)) {
-                        document.body.removeChild(downloadMsg);
-                      }
-                    }, 3000);
-                  }}
-                  className={`w-full rounded-lg px-6 py-3 text-sm font-bold shadow-lg sm:w-auto btn-hover-effect ${isFormValid ? 'btn-glass-enabled text-white' : 'btn-disabled'}`}
-                  disabled={!isFormValid}
-                >
-                  Pay & Download Invoice
-                </button>
+                    {/* Logged User: Premium Download */}
+                    <button 
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          showLoading('Processing premium payment...');
+                          
+                          // Use your existing Stripe integration for premium downloads
+                          const success = await createOneTimePayment(
+                            PRICING_PLANS.basic.priceId, // £1.50 per invoice (premium for logged users)
+                            user?.email || undefined
+                          );
+                          
+                          if (success) {
+                            // Payment will redirect to Stripe checkout
+                            hideNotification();
+                          } else {
+                            showError('Payment failed. Please try again.');
+                          }
+                        } catch (error) {
+                          console.error('Payment error:', error);
+                          showError('Payment processing failed. Please try again.');
+                        }
+                      }}
+                      className={`w-full rounded-lg px-6 py-3 text-sm font-bold shadow-lg sm:w-auto btn-hover-effect ${isFormValid ? 'btn-glass-enabled text-white' : 'btn-disabled'}`}
+                      disabled={!isFormValid}
+                    >
+                      Premium Download (£1.50)
+                    </button>
+                  </>
+                )}
                 <button 
                   type="button"
                   onClick={() => setShowResetModal(true)} 
@@ -1206,7 +1240,7 @@ export default function Home() {
                             <svg className="w-5 h-5 text-green-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                             </svg>
-                            Smart auto-fill
+                            Auto-calculation
                           </li>
                           <li className="flex items-center text-white/80">
                             <svg className="w-5 h-5 text-green-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
@@ -1350,7 +1384,7 @@ export default function Home() {
                           <svg className="w-5 h-5 text-green-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                           </svg>
-                          Smart auto-fill
+                          Auto-calculation
                         </li>
                         <li className="flex items-center text-white/80">
                           <svg className="w-5 h-5 text-green-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
@@ -1437,15 +1471,7 @@ export default function Home() {
                   />
                   <button 
                     onClick={() => {
-                      const subscribeMsg = document.createElement('div');
-                      subscribeMsg.className = 'fixed top-20 right-4 bg-green-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
-                      subscribeMsg.innerHTML = '🎉 Thank you for subscribing!';
-                      document.body.appendChild(subscribeMsg);
-                      setTimeout(() => {
-                        if (document.body.contains(subscribeMsg)) {
-                          document.body.removeChild(subscribeMsg);
-                        }
-                      }, 3000);
+                      showSuccess('Thank you for subscribing!');
                     }}
                     className="px-6 py-3 bg-white text-black rounded-full font-medium hover:bg-neutral-100 transition-colors cursor-pointer"
                   >

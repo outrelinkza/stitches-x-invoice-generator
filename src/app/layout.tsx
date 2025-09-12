@@ -5,6 +5,7 @@ import Script from "next/script";
 import AuroraBackground from "@/components/AuroraBackground";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { UserProfileProvider } from "@/contexts/UserProfileContext";
+import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -19,8 +20,8 @@ const notoSans = Noto_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Stitches X - AI Invoice Generator",
-  description: "AI Invoice Generator",
+  title: "Stitches X - Professional Invoice Generator",
+  description: "Create beautiful, professional invoices in seconds. Multiple templates, auto-calculation, and instant PDF generation.",
 };
 
 export default function RootLayout({
@@ -49,6 +50,7 @@ export default function RootLayout({
         </UserProfileProvider>
       </AuthProvider>
         <Script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer />
+        <Analytics />
       </body>
     </html>
   );

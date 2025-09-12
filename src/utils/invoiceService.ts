@@ -42,11 +42,18 @@ export class InvoiceService {
       throw new Error('User must be authenticated to save invoices');
     }
 
+    // Filter out null/empty values to prevent database errors
+    const cleanInvoiceData = Object.fromEntries(
+      Object.entries(invoiceData).filter(([_, value]) => 
+        value !== null && value !== undefined && value !== ''
+      )
+    );
+
     const { data, error } = await supabase
       .from('invoices')
       .insert({
         user_id: user.id,
-        ...invoiceData
+        ...cleanInvoiceData
       })
       .select()
       .single();
@@ -60,9 +67,16 @@ export class InvoiceService {
 
   // Update existing invoice
   static async updateInvoice(invoiceId: string, updates: Partial<InvoiceData>): Promise<InvoiceData> {
+    // Filter out null/empty values to prevent database errors
+    const cleanUpdates = Object.fromEntries(
+      Object.entries(updates).filter(([_, value]) => 
+        value !== null && value !== undefined && value !== ''
+      )
+    );
+
     const { data, error } = await supabase
       .from('invoices')
-      .update(updates)
+      .update(cleanUpdates)
       .eq('id', invoiceId)
       .select()
       .single();
@@ -160,6 +174,22 @@ export class InvoiceService {
     return this.saveInvoice(invoiceData);
   }
 
+  // Validate and format date
+  private static validateDate(dateString: string | null): string | null {
+    if (!dateString || dateString.trim() === '') {
+      return null;
+    }
+    
+    // Check if it's a valid date
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      return null;
+    }
+    
+    // Return in YYYY-MM-DD format
+    return date.toISOString().split('T')[0];
+  }
+
   // Extract invoice data from form
   private static extractInvoiceDataFromForm(formData: FormData): Omit<InvoiceData, 'id' | 'user_id' | 'created_at' | 'updated_at'> {
     const items: InvoiceItem[] = [];
@@ -190,8 +220,8 @@ export class InvoiceService {
       client_name: formData.get('clientName') as string || '',
       client_address: formData.get('clientAddress') as string || '',
       client_contact: formData.get('clientContact') as string || '',
-      date: formData.get('date') as string || new Date().toISOString().split('T')[0],
-      due_date: formData.get('dueDate') as string || '',
+      date: this.validateDate(formData.get('date') as string) || new Date().toISOString().split('T')[0],
+      due_date: this.validateDate(formData.get('dueDate') as string) || '',
       payment_terms: formData.get('paymentTerms') as string || '',
       items,
       subtotal,

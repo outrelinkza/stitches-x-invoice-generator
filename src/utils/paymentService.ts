@@ -85,8 +85,8 @@ export const createSubscription = async (subscriptionData: SubscriptionData): Pr
     const paymentData: PaymentData = {
       priceId: subscriptionData.priceId,
       mode: 'subscription',
-      successUrl: `${window.location.origin}/dashboard?subscription=success`,
-      cancelUrl: `${window.location.origin}/pricing?subscription=cancelled`,
+      successUrl: `${window.location.origin}/?subscription=success`,
+      cancelUrl: `${window.location.origin}/?subscription=cancelled`,
       customerEmail: subscriptionData.customerEmail,
       metadata: subscriptionData.metadata,
     };
@@ -103,8 +103,8 @@ export const createOneTimePayment = async (priceId: string, customerEmail?: stri
     const paymentData: PaymentData = {
       priceId,
       mode: 'payment',
-      successUrl: `${window.location.origin}/dashboard?payment=success`,
-      cancelUrl: `${window.location.origin}/pricing?payment=cancelled`,
+      successUrl: `${window.location.origin}/?payment=success`,
+      cancelUrl: `${window.location.origin}/?payment=cancelled`,
       customerEmail,
     };
 
