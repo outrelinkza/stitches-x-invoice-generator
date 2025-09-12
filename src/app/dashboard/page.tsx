@@ -5,6 +5,7 @@ import NavHeader from '@/components/NavHeader';
 import FloatingCalculator from '@/components/FloatingCalculator';
 import { AuthGuard } from '@/components/AuthGuard';
 import { AnalyticsService } from '@/utils/analyticsService';
+import { showSuccess, showInfo } from '@/utils/notifications';
 import { InvoiceService } from '@/utils/invoiceService';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -57,31 +58,13 @@ export default function Dashboard() {
     
     if (success && plan) {
       // Show success message
-      const successMsg = document.createElement('div');
-      successMsg.className = 'fixed top-20 right-4 bg-green-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
-      successMsg.innerHTML = `🎉 Welcome to ${plan}! Your subscription is now active.`;
-      document.body.appendChild(successMsg);
-      
-      setTimeout(() => {
-        if (document.body.contains(successMsg)) {
-          document.body.removeChild(successMsg);
-        }
-      }, 5000);
+      showSuccess(`Welcome to ${plan}! Your subscription is now active.`, 5000);
       
       // Clean up URL
       window.history.replaceState({}, document.title, '/dashboard');
     } else if (canceled) {
       // Show cancel message
-      const cancelMsg = document.createElement('div');
-      cancelMsg.className = 'fixed top-20 right-4 bg-yellow-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
-      cancelMsg.innerHTML = 'ℹ️ Checkout was canceled. You can try again anytime.';
-      document.body.appendChild(cancelMsg);
-      
-      setTimeout(() => {
-        if (document.body.contains(cancelMsg)) {
-          document.body.removeChild(cancelMsg);
-        }
-      }, 3000);
+      showInfo('Checkout was canceled. You can try again anytime.');
       
       // Clean up URL
       window.history.replaceState({}, document.title, '/dashboard');

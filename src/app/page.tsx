@@ -16,6 +16,7 @@ const AuthModal = dynamic(() => import('@/components/AuthModal').then(mod => ({ 
   </div>
 });
 import { InvoiceService } from '@/utils/invoiceService';
+import { showSuccess, showError, showInfo, showLoading, hideNotification } from '@/utils/notifications';
 
 export default function Home() {
   const [invoiceType, setInvoiceType] = useState('product_sales');
@@ -71,40 +72,13 @@ export default function Home() {
           const result = await response.json();
 
           if (response.ok) {
-            const successMsg = document.createElement('div');
-            successMsg.className = 'fixed top-20 right-4 bg-green-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
-            successMsg.innerHTML = '✅ Invoice sent successfully!';
-            document.body.appendChild(successMsg);
-            
-            setTimeout(() => {
-              if (document.body.contains(successMsg)) {
-                document.body.removeChild(successMsg);
-              }
-            }, 3000);
+            showSuccess('Invoice sent successfully!');
           } else {
-            const errorMsg = document.createElement('div');
-            errorMsg.className = 'fixed top-20 right-4 bg-red-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
-            errorMsg.innerHTML = `❌ ${result.error || 'Failed to send invoice email.'}`;
-            document.body.appendChild(errorMsg);
-            
-            setTimeout(() => {
-              if (document.body.contains(errorMsg)) {
-                document.body.removeChild(errorMsg);
-              }
-            }, 3000);
+            showError(result.error || 'Failed to send invoice email.');
           }
         } catch (error) {
           console.error('Invoice email error:', error);
-          const errorMsg = document.createElement('div');
-          errorMsg.className = 'fixed top-20 right-4 bg-red-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
-          errorMsg.innerHTML = '❌ Network error. Please try again.';
-          document.body.appendChild(errorMsg);
-          
-          setTimeout(() => {
-            if (document.body.contains(errorMsg)) {
-              document.body.removeChild(errorMsg);
-            }
-          }, 3000);
+          showError('Network error. Please try again.');
         }
       };
     }
@@ -166,10 +140,7 @@ export default function Home() {
   const handleStripeCheckout = async (plan: string) => {
     try {
       // Show loading notification
-      const checkoutMsg = document.createElement('div');
-      checkoutMsg.className = 'fixed top-20 right-4 bg-blue-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
-      checkoutMsg.innerHTML = `🚀 Redirecting to ${plan} checkout...`;
-      document.body.appendChild(checkoutMsg);
+      showInfo(`Redirecting to ${plan} checkout...`);
       
       let success = false;
       
@@ -230,16 +201,7 @@ export default function Home() {
       }
       
       // Show error message
-      const errorMsg = document.createElement('div');
-      errorMsg.className = 'fixed top-20 right-4 bg-red-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
-      errorMsg.innerHTML = '❌ Payment failed. Please try again.';
-      document.body.appendChild(errorMsg);
-      
-      setTimeout(() => {
-        if (document.body.contains(errorMsg)) {
-          document.body.removeChild(errorMsg);
-        }
-      }, 3000);
+      showError('Payment failed. Please try again.');
     }
   };
 

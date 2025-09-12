@@ -7,6 +7,7 @@ import { AuthGuard } from '@/components/AuthGuard';
 import { supabase } from '@/lib/supabase';
 import NavHeader from '@/components/NavHeader';
 import { useUserProfile } from '@/contexts/UserProfileContext';
+import { showSuccess, showError, showInfo, showLoading, hideNotification } from '@/utils/notifications';
 
 export default function Settings() {
   const [currentSection, setCurrentSection] = useState('company');
@@ -106,53 +107,20 @@ export default function Settings() {
       });
       
       if (profileResult.success && settingsResult.success) {
-        // Show professional success notification
-        const successMsg = document.createElement('div');
-        successMsg.className = 'fixed top-20 right-4 bg-green-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
-        successMsg.innerHTML = '✅ Settings saved successfully!';
-        document.body.appendChild(successMsg);
-        
-        setTimeout(() => {
-          if (document.body.contains(successMsg)) {
-            document.body.removeChild(successMsg);
-          }
-        }, 3000);
+        showSuccess('Settings saved successfully!');
       } else {
-        // Show error notification
-        const errorMsg = document.createElement('div');
-        errorMsg.className = 'fixed top-20 right-4 bg-red-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
-        errorMsg.innerHTML = '❌ Failed to save settings. Please try again.';
-        document.body.appendChild(errorMsg);
-        
-        setTimeout(() => {
-          if (document.body.contains(errorMsg)) {
-            document.body.removeChild(errorMsg);
-          }
-        }, 3000);
+        showError('Failed to save settings. Please try again.');
       }
     } catch (error) {
       console.error('Error saving settings:', error);
-      // Show error notification
-      const errorMsg = document.createElement('div');
-      errorMsg.className = 'fixed top-20 right-4 bg-red-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
-      errorMsg.innerHTML = '❌ Failed to save settings. Please try again.';
-      document.body.appendChild(errorMsg);
-      
-      setTimeout(() => {
-        if (document.body.contains(errorMsg)) {
-          document.body.removeChild(errorMsg);
-        }
-      }, 3000);
+      showError('Failed to save settings. Please try again.');
     }
   };
 
   const handleDataExport = async () => {
     try {
       // Show loading message
-      const loadingMsg = document.createElement('div');
-      loadingMsg.className = 'fixed top-20 right-4 bg-blue-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
-      loadingMsg.innerHTML = '📦 Preparing your data export...';
-      document.body.appendChild(loadingMsg);
+      showLoading('Preparing your data export...');
 
       // Call our API route to export user data
       const response = await fetch('/api/export-data', {
@@ -168,9 +136,7 @@ export default function Settings() {
       }
 
       // Remove loading message
-      if (document.body.contains(loadingMsg)) {
-        document.body.removeChild(loadingMsg);
-      }
+      hideNotification();
 
       // Get the filename from the response headers
       const contentDisposition = response.headers.get('Content-Disposition');
@@ -191,47 +157,23 @@ export default function Settings() {
       URL.revokeObjectURL(url);
 
       // Show success message
-      const successMsg = document.createElement('div');
-      successMsg.className = 'fixed top-20 right-4 bg-green-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
-      successMsg.innerHTML = '✅ Data export downloaded successfully!';
-      document.body.appendChild(successMsg);
-      
-      setTimeout(() => {
-        if (document.body.contains(successMsg)) {
-          document.body.removeChild(successMsg);
-        }
-      }, 3000);
+      showSuccess('Data export downloaded successfully!');
 
     } catch (error) {
       console.error('Data export error:', error);
       
       // Remove loading message if it exists
-      const existingMsg = document.querySelector('.fixed.top-20.right-4');
-      if (existingMsg) {
-        document.body.removeChild(existingMsg);
-      }
+      hideNotification();
       
       // Show error message
-      const errorMsg = document.createElement('div');
-      errorMsg.className = 'fixed top-20 right-4 bg-red-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
-      errorMsg.innerHTML = '❌ Failed to export data. Please try again.';
-      document.body.appendChild(errorMsg);
-      
-      setTimeout(() => {
-        if (document.body.contains(errorMsg)) {
-          document.body.removeChild(errorMsg);
-        }
-      }, 4000);
+      showError('Failed to export data. Please try again.');
     }
   };
 
   const handleDeleteAllData = async () => {
     try {
       // Show loading message
-      const loadingMsg = document.createElement('div');
-      loadingMsg.className = 'fixed top-20 right-4 bg-red-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
-      loadingMsg.innerHTML = '🗑️ Deleting all your data...';
-      document.body.appendChild(loadingMsg);
+      showLoading('Deleting all your data...');
 
       // Call our API route to delete user data
       const response = await fetch('/api/delete-user-data', {
@@ -249,20 +191,12 @@ export default function Settings() {
       const result = await response.json();
 
       // Remove loading message
-      if (document.body.contains(loadingMsg)) {
-        document.body.removeChild(loadingMsg);
-      }
+      hideNotification();
 
       // Show success message and redirect
-      const successMsg = document.createElement('div');
-      successMsg.className = 'fixed top-20 right-4 bg-green-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
-      successMsg.innerHTML = `✅ ${result.message || 'All data deleted successfully'}. Redirecting...`;
-      document.body.appendChild(successMsg);
+      showSuccess(`${result.message || 'All data deleted successfully'}. Redirecting...`, 3000);
       
       setTimeout(() => {
-        if (document.body.contains(successMsg)) {
-          document.body.removeChild(successMsg);
-        }
         // Sign out and redirect to home
         window.location.href = '/';
       }, 3000);
@@ -271,22 +205,10 @@ export default function Settings() {
       console.error('Data deletion error:', error);
       
       // Remove loading message if it exists
-      const existingMsg = document.querySelector('.fixed.top-20.right-4');
-      if (existingMsg) {
-        document.body.removeChild(existingMsg);
-      }
+      hideNotification();
       
       // Show error message
-      const errorMsg = document.createElement('div');
-      errorMsg.className = 'fixed top-20 right-4 bg-red-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
-      errorMsg.innerHTML = '❌ Failed to delete data. Please try again.';
-      document.body.appendChild(errorMsg);
-      
-      setTimeout(() => {
-        if (document.body.contains(errorMsg)) {
-          document.body.removeChild(errorMsg);
-        }
-      }, 4000);
+      showError('Failed to delete data. Please try again.');
     }
   };
 

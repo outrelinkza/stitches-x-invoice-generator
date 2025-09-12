@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import NavHeader from '@/components/NavHeader';
+import { showSuccess, showError } from '@/utils/notifications';
 
 export default function Feedback() {
   const [feedback, setFeedback] = useState('');
@@ -39,43 +40,16 @@ export default function Feedback() {
         setRating(0);
         
         // Show success message
-        const successMsg = document.createElement('div');
-        successMsg.className = 'fixed top-20 right-4 bg-green-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
-        successMsg.innerHTML = '✅ Thank you for your feedback! We appreciate your input.';
-        document.body.appendChild(successMsg);
-        
-        setTimeout(() => {
-          if (document.body.contains(successMsg)) {
-            document.body.removeChild(successMsg);
-          }
-        }, 4000);
+        showSuccess('Thank you for your feedback! We appreciate your input.');
       } else {
         // Show error message
-        const errorMsg = document.createElement('div');
-        errorMsg.className = 'fixed top-20 right-4 bg-red-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
-        errorMsg.innerHTML = `❌ ${result.error || 'Failed to submit feedback. Please try again.'}`;
-        document.body.appendChild(errorMsg);
-        
-        setTimeout(() => {
-          if (document.body.contains(errorMsg)) {
-            document.body.removeChild(errorMsg);
-          }
-        }, 4000);
+        showError(result.error || 'Failed to submit feedback. Please try again.');
       }
     } catch (error) {
       console.error('Feedback form error:', error);
       
       // Show error message
-      const errorMsg = document.createElement('div');
-      errorMsg.className = 'fixed top-20 right-4 bg-red-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
-      errorMsg.innerHTML = '❌ Network error. Please check your connection and try again.';
-      document.body.appendChild(errorMsg);
-      
-      setTimeout(() => {
-        if (document.body.contains(errorMsg)) {
-          document.body.removeChild(errorMsg);
-        }
-      }, 4000);
+      showError('Network error. Please check your connection and try again.');
     }
     
     setIsSubmitting(false);
