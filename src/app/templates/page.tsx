@@ -69,8 +69,8 @@ export default function Templates() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Template Cards */}
             <div className="glass-effect rounded-2xl shadow-sm border border-white/20 p-6 animate-enter hover-tilt" style={{animationDelay: '300ms'}}>
-              <div className="w-full h-32 bg-white/10 rounded-lg flex items-center justify-center mb-4">
-                <span className="material-symbols-outlined text-white/60 text-4xl">image</span>
+              <div className="w-full h-32 bg-gradient-to-br from-blue-900/30 to-indigo-900/30 rounded-lg flex items-center justify-center mb-4">
+                <span className="material-symbols-outlined text-blue-300 text-4xl">description</span>
               </div>
               <h3 className="text-lg font-semibold text-white mb-2">Standard Template</h3>
               <p className="text-sm text-white/70 mb-4">Clean and professional design for all business types.</p>
@@ -105,8 +105,8 @@ export default function Templates() {
             </div>
 
             <div className="glass-effect rounded-2xl shadow-sm border border-white/20 p-6 animate-enter hover-tilt" style={{animationDelay: '400ms'}}>
-              <div className="w-full h-32 bg-white/10 rounded-lg flex items-center justify-center mb-4">
-                <span className="material-symbols-outlined text-white/60 text-4xl">image</span>
+              <div className="w-full h-32 bg-gradient-to-br from-gray-900/40 to-black/40 rounded-lg flex items-center justify-center mb-4">
+                <span className="material-symbols-outlined text-gray-300 text-4xl">dark_mode</span>
               </div>
               <h3 className="text-lg font-semibold text-white mb-2">Minimalist Dark</h3>
               <p className="text-sm text-white/70 mb-4">A sleek, modern dark theme for contemporary businesses.</p>
@@ -135,8 +135,8 @@ export default function Templates() {
             </div>
 
             <div className="glass-effect rounded-2xl shadow-sm border border-white/20 p-6 animate-enter hover-tilt" style={{animationDelay: '500ms'}}>
-              <div className="w-full h-32 bg-white/10 rounded-lg flex items-center justify-center mb-4">
-                <span className="material-symbols-outlined text-white/60 text-4xl">image</span>
+              <div className="w-full h-32 bg-gradient-to-br from-blue-900/30 to-purple-900/30 rounded-lg flex items-center justify-center mb-4">
+                <span className="material-symbols-outlined text-blue-300 text-4xl">repeat</span>
               </div>
               <h3 className="text-lg font-semibold text-white mb-2">Recurring Clients</h3>
               <p className="text-sm text-white/70 mb-4">Optimized for repeat customers and subscription services.</p>
@@ -165,8 +165,8 @@ export default function Templates() {
             </div>
 
             <div className="glass-effect rounded-2xl shadow-sm border border-white/20 p-6 animate-enter hover-tilt" style={{animationDelay: '600ms'}}>
-              <div className="w-full h-32 bg-white/10 rounded-lg flex items-center justify-center mb-4">
-                <span className="material-symbols-outlined text-white/60 text-4xl">image</span>
+              <div className="w-full h-32 bg-gradient-to-br from-pink-900/30 to-orange-900/30 rounded-lg flex items-center justify-center mb-4">
+                <span className="material-symbols-outlined text-pink-300 text-4xl">palette</span>
               </div>
               <h3 className="text-lg font-semibold text-white mb-2">Creative Agency</h3>
               <p className="text-sm text-white/70 mb-4">Bold and colorful design for creative professionals.</p>
@@ -195,8 +195,8 @@ export default function Templates() {
             </div>
 
             <div className="glass-effect rounded-2xl shadow-sm border border-white/20 p-6 animate-enter hover-tilt" style={{animationDelay: '700ms'}}>
-              <div className="w-full h-32 bg-white/10 rounded-lg flex items-center justify-center mb-4">
-                <span className="material-symbols-outlined text-white/60 text-4xl">image</span>
+              <div className="w-full h-32 bg-gradient-to-br from-gray-900/40 to-slate-900/40 rounded-lg flex items-center justify-center mb-4">
+                <span className="material-symbols-outlined text-gray-300 text-4xl">business_center</span>
               </div>
               <h3 className="text-lg font-semibold text-white mb-2">Consulting</h3>
               <p className="text-sm text-white/70 mb-4">Professional template for consulting and advisory services.</p>
