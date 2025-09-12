@@ -21,7 +21,19 @@ export default function Templates() {
       }
 
       try {
-        // Temporarily disabled to prevent 406 errors - using default templates
+        // Load real templates from database
+        const userTemplates = await TemplateService.getUserTemplates();
+        if (userTemplates.length > 0) {
+          setTemplates(userTemplates);
+        } else {
+          // Create default templates if none exist
+          await TemplateService.createDefaultTemplates();
+          const newTemplates = await TemplateService.getUserTemplates();
+          setTemplates(newTemplates);
+        }
+      } catch (error) {
+        console.error('Failed to load templates:', error);
+        // Fallback to default templates
         const defaultTemplates = [
           {
             id: '1',
@@ -49,8 +61,6 @@ export default function Templates() {
           }
         ];
         setTemplates(defaultTemplates);
-      } catch (error) {
-        console.error('Failed to load templates:', error);
       } finally {
         setLoading(false);
       }

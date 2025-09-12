@@ -6,15 +6,11 @@ import FloatingCalculator from '@/components/FloatingCalculator';
 import { AuthGuard } from '@/components/AuthGuard';
 import { supabase } from '@/lib/supabase';
 import NavHeader from '@/components/NavHeader';
-// import { useUserProfile } from '@/contexts/UserProfileContext';
+import { useUserProfile } from '@/contexts/UserProfileContext';
 
 export default function Settings() {
   const [currentSection, setCurrentSection] = useState('company');
-  // Temporarily disabled to prevent 406 errors
-  const profile = null;
-  const settings = null;
-  const updateProfile = async () => ({ success: false, error: 'Feature temporarily disabled' });
-  const updateSettings = async () => ({ success: false, error: 'Feature temporarily disabled' });
+  const { profile, settings, updateProfile, updateSettings } = useUserProfile();
   
   // Invoice & Template Settings
   const [templateName, setTemplateName] = useState('Standard Template');
@@ -53,83 +49,107 @@ export default function Settings() {
 
   // Load saved settings on component mount
   useEffect(() => {
+    if (profile) {
+      setUserName(profile.full_name || 'Your Name');
+      setCompanyName(profile.company_name || 'Stitches X');
+      setCompanyAddress(profile.company_address || 'Your Business Address');
+      setCompanyEmail(profile.company_contact || 'stitchesx.service@gmail.com');
+    }
+    
+    if (settings) {
+      setTaxRate(settings.default_tax_rate || 10);
+      setPaymentTerms(settings.default_payment_terms || 'Net 15');
+      setCompanyName(settings.company_name || 'Stitches X');
+      setCompanyAddress(settings.company_address || 'Your Business Address');
+      setCompanyEmail(settings.company_contact || 'stitchesx.service@gmail.com');
+    }
+    
+    // Load additional settings from localStorage as fallback
     if (typeof window !== 'undefined') {
       const savedSettings = localStorage.getItem('userSettings');
       if (savedSettings) {
-        const settings = JSON.parse(savedSettings);
-        setTemplateName(settings.templateName || 'Standard Template');
-        setTaxRate(settings.taxRate || 10);
-        setPaymentTerms(settings.paymentTerms || 'Net 15');
-        setCurrency(settings.currency || 'USD - United States Dollar');
-        setInvoiceNumber(settings.invoiceNumber || 'INV-001');
-        setCompanyName(settings.companyName || 'Stitches X');
-        setCompanyAddress(settings.companyAddress || 'Your Business Address');
-        setCompanyEmail(settings.companyEmail || 'stitchesx.service@gmail.com');
-        setCompanyPhone(settings.companyPhone || '+1 (555) 123-4567');
-        setUserName(settings.userName || 'Your Name');
-        setUserEmail(settings.userEmail || 'your@email.com');
-        setUserPhone(settings.userPhone || '+1 (555) 987-6543');
-        setUserTitle(settings.userTitle || 'Business Owner');
-        setEmailNotifications(settings.emailNotifications !== undefined ? settings.emailNotifications : true);
-        setInvoiceReminders(settings.invoiceReminders !== undefined ? settings.invoiceReminders : true);
-        setPaymentAlerts(settings.paymentAlerts !== undefined ? settings.paymentAlerts : false);
-        setWeeklyReports(settings.weeklyReports !== undefined ? settings.weeklyReports : true);
-        setTwoFactorAuth(settings.twoFactorAuth !== undefined ? settings.twoFactorAuth : false);
-        setSessionTimeout(settings.sessionTimeout || '30');
-        setLoginAlerts(settings.loginAlerts !== undefined ? settings.loginAlerts : true);
-        setDarkMode(settings.darkMode !== undefined ? settings.darkMode : true);
-        setFontSize(settings.fontSize || 'medium');
-        setLanguage(settings.language || 'en');
-        setTimezone(settings.timezone || 'UTC-5');
+        const localSettings = JSON.parse(savedSettings);
+        setCompanyPhone(localSettings.companyPhone || '+1 (555) 123-4567');
+        setInvoiceNumber(localSettings.invoiceNumber || 'INV-001');
+        setCurrency(localSettings.currency || 'USD - United States Dollar');
+        setTemplateName(localSettings.templateName || 'Standard Template');
+        setUserPhone(localSettings.userPhone || '+1 (555) 987-6543');
+        setUserTitle(localSettings.userTitle || 'Business Owner');
+        setEmailNotifications(localSettings.emailNotifications !== undefined ? localSettings.emailNotifications : true);
+        setInvoiceReminders(localSettings.invoiceReminders !== undefined ? localSettings.invoiceReminders : true);
+        setPaymentAlerts(localSettings.paymentAlerts !== undefined ? localSettings.paymentAlerts : false);
+        setWeeklyReports(localSettings.weeklyReports !== undefined ? localSettings.weeklyReports : true);
+        setTwoFactorAuth(localSettings.twoFactorAuth !== undefined ? localSettings.twoFactorAuth : false);
+        setSessionTimeout(localSettings.sessionTimeout || '30');
+        setLoginAlerts(localSettings.loginAlerts !== undefined ? localSettings.loginAlerts : true);
+        setDarkMode(localSettings.darkMode !== undefined ? localSettings.darkMode : true);
+        setFontSize(localSettings.fontSize || 'medium');
+        setLanguage(localSettings.language || 'en');
+        setTimezone(localSettings.timezone || 'UTC-5');
       }
     }
-  }, []);
+  }, [profile, settings]);
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Save settings to localStorage
-    if (typeof window !== 'undefined') {
-      const settings = {
-        companyName,
-        companyAddress,
-        companyEmail,
-        companyPhone,
-        invoiceNumber,
-        taxRate,
-        paymentTerms,
-        currency,
-        templateName,
-        userName,
-        userEmail,
-        userPhone,
-        userTitle,
-        emailNotifications,
-        invoiceReminders,
-        paymentAlerts,
-        weeklyReports,
-        twoFactorAuth,
-        sessionTimeout,
-        loginAlerts,
-        darkMode,
-        fontSize,
-        language,
-        timezone
-      };
-      localStorage.setItem('userSettings', JSON.stringify(settings));
-    }
-    
-    // Show professional success notification
-    const successMsg = document.createElement('div');
-    successMsg.className = 'fixed top-20 right-4 bg-green-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
-    successMsg.innerHTML = '✅ Settings saved successfully!';
-    document.body.appendChild(successMsg);
-    
-    setTimeout(() => {
-      if (document.body.contains(successMsg)) {
-        document.body.removeChild(successMsg);
+    try {
+      // Update profile
+      const profileResult = await updateProfile({
+        full_name: userName,
+        company_name: companyName,
+        company_address: companyAddress,
+        company_contact: companyEmail,
+      });
+      
+      // Update settings
+      const settingsResult = await updateSettings({
+        default_tax_rate: taxRate,
+        default_payment_terms: paymentTerms,
+        company_name: companyName,
+        company_address: companyAddress,
+        company_contact: companyEmail,
+      });
+      
+      if (profileResult.success && settingsResult.success) {
+        // Show professional success notification
+        const successMsg = document.createElement('div');
+        successMsg.className = 'fixed top-20 right-4 bg-green-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
+        successMsg.innerHTML = '✅ Settings saved successfully!';
+        document.body.appendChild(successMsg);
+        
+        setTimeout(() => {
+          if (document.body.contains(successMsg)) {
+            document.body.removeChild(successMsg);
+          }
+        }, 3000);
+      } else {
+        // Show error notification
+        const errorMsg = document.createElement('div');
+        errorMsg.className = 'fixed top-20 right-4 bg-red-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
+        errorMsg.innerHTML = '❌ Failed to save settings. Please try again.';
+        document.body.appendChild(errorMsg);
+        
+        setTimeout(() => {
+          if (document.body.contains(errorMsg)) {
+            document.body.removeChild(errorMsg);
+          }
+        }, 3000);
       }
-    }, 3000);
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      // Show error notification
+      const errorMsg = document.createElement('div');
+      errorMsg.className = 'fixed top-20 right-4 bg-red-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
+      errorMsg.innerHTML = '❌ Failed to save settings. Please try again.';
+      document.body.appendChild(errorMsg);
+      
+      setTimeout(() => {
+        if (document.body.contains(errorMsg)) {
+          document.body.removeChild(errorMsg);
+        }
+      }, 3000);
+    }
   };
 
   const handleDataExport = async () => {

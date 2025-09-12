@@ -22,7 +22,18 @@ export default function Dashboard() {
       }
 
       try {
-        // Temporarily disabled to prevent 406 errors - using localStorage fallback
+        // Load real analytics data
+        const analyticsData = await AnalyticsService.getUserAnalytics();
+        if (analyticsData) {
+          setAnalytics(analyticsData);
+        }
+        
+        // Load recent invoices
+        const recentInvoices = await AnalyticsService.getRecentInvoices(5);
+        setInvoices(recentInvoices);
+      } catch (error) {
+        console.error('Failed to load dashboard data:', error);
+        // Fallback to localStorage if database not available
         if (typeof window !== 'undefined') {
           const savedInvoices = JSON.parse(localStorage.getItem('savedInvoices') || '[]');
           setInvoices(savedInvoices);
@@ -35,13 +46,6 @@ export default function Dashboard() {
             pending_invoices: savedInvoices.filter((inv: any) => inv.status === 'pending').length,
             overdue_invoices: savedInvoices.filter((inv: any) => inv.status === 'overdue').length,
           });
-        }
-      } catch (error) {
-        console.error('Failed to load dashboard data:', error);
-        // Fallback to localStorage
-        if (typeof window !== 'undefined') {
-          const savedInvoices = JSON.parse(localStorage.getItem('savedInvoices') || '[]');
-          setInvoices(savedInvoices);
         }
       } finally {
         setLoading(false);
