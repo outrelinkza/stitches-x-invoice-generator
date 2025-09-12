@@ -14,17 +14,17 @@ const getNotificationStyles = (type: NotificationType): string => {
   
   switch (type) {
     case 'success':
-      return `${baseStyles} bg-green-500/90 text-white border border-green-400/30`;
+      return `${baseStyles} bg-green-600 text-white`;
     case 'error':
-      return `${baseStyles} bg-red-500/90 text-white border border-red-400/30`;
+      return `${baseStyles} bg-red-600 text-white`;
     case 'warning':
-      return `${baseStyles} bg-yellow-500/90 text-white border border-yellow-400/30`;
+      return `${baseStyles} bg-yellow-600 text-white`;
     case 'info':
-      return `${baseStyles} bg-blue-500/90 text-white border border-blue-400/30`;
+      return `${baseStyles} bg-blue-600 text-white`;
     case 'loading':
-      return `${baseStyles} bg-purple-500/90 text-white border border-purple-400/30`;
+      return `${baseStyles} bg-purple-600 text-white`;
     default:
-      return `${baseStyles} bg-gray-500/90 text-white border border-gray-400/30`;
+      return `${baseStyles} bg-gray-600 text-white`;
   }
 };
 

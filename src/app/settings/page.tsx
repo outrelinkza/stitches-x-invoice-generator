@@ -27,8 +27,6 @@ export default function Settings() {
   // User Profile Settings
   const [userName, setUserName] = useState('Your Name');
   const [userEmail, setUserEmail] = useState('your@email.com');
-  const [userPhone, setUserPhone] = useState('+1 (555) 987-6543');
-  const [userTitle, setUserTitle] = useState('Business Owner');
 
   // Notification Settings
   const [emailNotifications, setEmailNotifications] = useState(true);
@@ -70,8 +68,6 @@ export default function Settings() {
     setInvoiceNumber('INV-001');
     setCurrency('USD - United States Dollar');
     setTemplateName('Standard Template');
-    setUserPhone('+1 (555) 987-6543');
-    setUserTitle('Business Owner');
     setEmailNotifications(true);
     setInvoiceReminders(true);
     setPaymentAlerts(false);
@@ -339,51 +335,48 @@ export default function Settings() {
           <div className="glass-effect rounded-2xl shadow-sm border border-white/20 p-6 animate-enter" style={{animationDelay: '300ms'}}>
             <h2 className="text-2xl font-semibold leading-tight tracking-tight text-white mb-6">User Profile</h2>
             <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="user-name">Full Name</label>
-                  <input
-                    className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-white/10 text-white placeholder-white/60"
-                    id="user-name"
-                    type="text"
-                    defaultValue={userName}
-                    onChange={(e) => setUserName(e.target.value)}
+              {/* User Avatar Section */}
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <img 
+                    alt="User Avatar" 
+                    className="rounded-full size-16 border-2 border-white/20" 
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpupqkQmJxj_bMedSJmdAMWAHtS4edFiDkEWKHBmAFfhZ2RalJfO4fbMsDLiDQv9tBLe_qigHPr43hW5r7R0IAjqubzylinVsDC6UiIaaZKxP_GB46wGzu9EKfsxbe3LBt2vlyuDda0sn0iAihGn3LWmfmyzfYo6RWHvuLZAbFif5z6UU82dCwZc1hRCtPGTqUxsDPZTnanT8FaW-vTZbkZcq61oMHucloUn5JYvX_cD0gTyMwU5wpp7tQti-TrSN8pgWdkW_ccoE" 
+                    loading="lazy"
                   />
+                  <button className="absolute -bottom-1 -right-1 bg-[var(--primary-color)] text-white rounded-full p-1 hover:bg-[var(--primary-color)]/80 transition-colors">
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                  </button>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="user-title">Job Title</label>
-                  <input
-                    className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-white/10 text-white placeholder-white/60"
-                    id="user-title"
-                    type="text"
-                    value={userTitle}
-                    onChange={(e) => setUserTitle(e.target.value)}
-                  />
+                  <h3 className="text-white font-medium">Profile Picture</h3>
+                  <p className="text-sm text-white/60">Click the + button to upload a new photo</p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="user-email">Email Address</label>
-                  <input
-                    className="w-full px-4 py-2 border border-white/10 rounded-lg bg-white/5 text-white/70 cursor-not-allowed"
-                    id="user-email"
-                    type="email"
-                    value={userEmail}
-                    disabled
-                  />
-                  <p className="text-xs text-white/50 mt-1">Email cannot be changed</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="user-phone">Phone Number</label>
-                  <input
-                    className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-white/10 text-white placeholder-white/60"
-                    id="user-phone"
-                    type="tel"
-                    value={userPhone}
-                    onChange={(e) => setUserPhone(e.target.value)}
-                  />
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="user-name">Full Name</label>
+                <input
+                  className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-white/10 text-white placeholder-white/60"
+                  id="user-name"
+                  type="text"
+                  defaultValue={userName}
+                  onChange={(e) => setUserName(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-white/90 mb-1" htmlFor="user-email">Email Address</label>
+                <input
+                  className="w-full px-4 py-2 border border-white/10 rounded-lg bg-white/5 text-white/70 cursor-not-allowed"
+                  id="user-email"
+                  type="email"
+                  value={userEmail}
+                  disabled
+                />
+                <p className="text-xs text-white/50 mt-1">Email cannot be changed</p>
               </div>
 
               <div className="flex justify-end gap-3 pt-4">
