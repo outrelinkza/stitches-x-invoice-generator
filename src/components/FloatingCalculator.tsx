@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 
-export default function FloatingCalculator() {
+const FloatingCalculator = React.memo(function FloatingCalculator() {
   const [isOpen, setIsOpen] = useState(false);
   const [position, setPosition] = useState({ x: 20, y: 20 });
   const [isDragging, setIsDragging] = useState(false);
@@ -234,4 +234,6 @@ export default function FloatingCalculator() {
       )}
     </>
   );
-}
+});
+
+export default FloatingCalculator;

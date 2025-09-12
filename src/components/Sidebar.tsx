@@ -25,7 +25,7 @@ export default function Sidebar({ currentPage }: SidebarProps) {
       
       <div className="mt-auto">
         <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 transition-colors">
-          <img alt="User" className="rounded-full size-10" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpupqkQmJxj_bMedSJmdAMWAHtS4edFiDkEWKHBmAFfhZ2RalJfO4fbMsDLiDQv9tBLe_qigHPr43hW5r7R0IAjqubzylinVsDC6UiIaaZKxP_GB46wGzu9EKfsxbe3LBt2vlyuDda0sn0iAihGn3LWmfmyzfYo6RWHvuLZAbFif5z6UU82dCwZc1hRCtPGTqUxsDPZTnanT8FaW-vTZbkZcq61oMHucloUn5JYvX_cD0gTyMwU5wpp7tQti-TrSN8pgWdkW_ccoE"/>
+          <img alt="User" className="rounded-full size-10" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpupqkQmJxj_bMedSJmdAMWAHtS4edFiDkEWKHBmAFfhZ2RalJfO4fbMsDLiDQv9tBLe_qigHPr43hW5r7R0IAjqubzylinVsDC6UiIaaZKxP_GB46wGzu9EKfsxbe3LBt2vlyuDda0sn0iAihGn3LWmfmyzfYo6RWHvuLZAbFif5z6UU82dCwZc1hRCtPGTqUxsDPZTnanT8FaW-vTZbkZcq61oMHucloUn5JYvX_cD0gTyMwU5wpp7tQti-TrSN8pgWdkW_ccoE" loading="lazy"/>
           <div>
             <p className="font-semibold text-sm text-white">Olivia Martin</p>
             <p className="text-xs text-white/60">olivia.martin@email.com</p>

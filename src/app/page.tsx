@@ -7,7 +7,14 @@ import { generateInvoicePDF, InvoiceData } from '@/utils/pdfGenerator';
 import { scanDocument, autoFillForm } from '@/utils/ocrScanner';
 import { createSubscription, createOneTimePayment, PRICING_PLANS } from '@/utils/paymentService';
 import { useAuth } from '@/contexts/AuthContext';
-import { AuthModal } from '@/components/AuthModal';
+import dynamic from 'next/dynamic';
+
+const AuthModal = dynamic(() => import('@/components/AuthModal').then(mod => ({ default: mod.AuthModal })), {
+  ssr: false,
+  loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+  </div>
+});
 import { InvoiceService } from '@/utils/invoiceService';
 
 export default function Home() {
@@ -357,8 +364,8 @@ export default function Home() {
     console.log('Template preference updated:', templateName);
   };
 
-  // Calculate total with tax
-  const calculateTotal = (invoiceData: Record<string, string | number>) => {
+  // Calculate total with tax (memoized for performance)
+  const calculateTotal = useCallback((invoiceData: Record<string, string | number>) => {
     // Get current form values if no data provided
     if (!invoiceData || Object.keys(invoiceData).length === 0) {
       const subtotalInput = document.querySelector('input[name="subtotal"]') as HTMLInputElement;
@@ -373,7 +380,7 @@ export default function Home() {
     const taxRate = parseFloat(String(invoiceData.taxRate)) || 0;
     const taxAmount = (subtotal * taxRate) / 100;
     return (subtotal + taxAmount).toFixed(2);
-  };
+  }, []);
 
   return (
     <div className="relative flex size-full min-h-screen flex-col group/design-root overflow-x-hidden">
@@ -504,7 +511,7 @@ export default function Home() {
                     <div className="flex-shrink-0">
                       {logo ? (
                         <div className="relative group">
-                          <img src={logo} alt="Company Logo" className="h-20 w-20 rounded-full object-cover"/>
+                          <img src={logo} alt="Company Logo" className="h-20 w-20 rounded-full object-cover" loading="lazy"/>
                           <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
                             <button 
                               type="button"
