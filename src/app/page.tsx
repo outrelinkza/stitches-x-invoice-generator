@@ -120,6 +120,16 @@ export default function Home() {
         return 'border-gray-400/30 bg-gray-800/20 focus:border-gray-300 px-3 py-2 box-border';
       case 'custom':
         return 'border-purple-400/30 bg-purple-900/20 focus:border-purple-300 px-3 py-2 box-border';
+      case 'modern-tech':
+        return 'border-cyan-400/30 bg-cyan-900/20 focus:border-cyan-300 px-3 py-2 box-border';
+      case 'elegant-luxury':
+        return 'border-amber-400/30 bg-amber-900/20 focus:border-amber-300 px-3 py-2 box-border';
+      case 'healthcare':
+        return 'border-emerald-400/30 bg-emerald-900/20 focus:border-emerald-300 px-3 py-2 box-border';
+      case 'legal':
+        return 'border-slate-400/30 bg-slate-900/20 focus:border-slate-300 px-3 py-2 box-border';
+      case 'restaurant':
+        return 'border-orange-400/30 bg-orange-900/20 focus:border-orange-300 px-3 py-2 box-border';
       default:
         return 'border-white/20 bg-white/10 input-focus-glow px-3 py-2 box-border';
     }
@@ -149,6 +159,36 @@ export default function Home() {
       case 'minimalist-dark':
         return {
           showMinimalFields: true,
+          defaultPaymentTerms: 'Net 15'
+        };
+      case 'modern-tech':
+        return {
+          showProjectFields: true,
+          showMoodBoard: true,
+          defaultPaymentTerms: 'Net 15'
+        };
+      case 'elegant-luxury':
+        return {
+          showSubscriptionFields: true,
+          showRecurringOptions: true,
+          defaultPaymentTerms: 'Net 30'
+        };
+      case 'healthcare':
+        return {
+          showHourlyRates: true,
+          showConsultationTypes: true,
+          defaultPaymentTerms: 'Net 30'
+        };
+      case 'legal':
+        return {
+          showHourlyRates: true,
+          showConsultationTypes: true,
+          defaultPaymentTerms: 'Net 30'
+        };
+      case 'restaurant':
+        return {
+          showProjectFields: true,
+          showMoodBoard: true,
           defaultPaymentTerms: 'Net 15'
         };
       default:
@@ -523,6 +563,13 @@ export default function Home() {
               </h1>
               <p className="mt-8 max-w-2xl mx-auto text-lg/8 text-white/80">Create beautiful, professional invoices in seconds. Multiple templates, auto-calculation, and instant PDF generation.</p>
               
+              {/* Mobile-Optimized CTA */}
+              <div className="mt-6 p-4 rounded-lg bg-gradient-to-r from-green-500/20 to-blue-500/20 border border-green-400/30 animate-enter" style={{animationDelay: '200ms'}}>
+                <p className="text-white/90 text-sm font-medium text-center">
+                  📱 <strong>Mobile-Friendly:</strong> Create invoices on your phone, tablet, or desktop. Perfect for freelancers on the go!
+                </p>
+              </div>
+              
               {/* Selected Template Display */}
               <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full border border-white/20">
                 <span className="material-symbols-outlined text-white/70 text-sm">image</span>
@@ -534,6 +581,11 @@ export default function Home() {
                   {selectedTemplate === 'creative-agency' && 'Creative Agency Template'}
                   {selectedTemplate === 'consulting' && 'Consulting Template'}
                   {selectedTemplate === 'custom' && 'Custom Template'}
+                  {selectedTemplate === 'modern-tech' && 'Modern Tech Template'}
+                  {selectedTemplate === 'elegant-luxury' && 'Elegant Luxury Template'}
+                  {selectedTemplate === 'healthcare' && 'Healthcare Template'}
+                  {selectedTemplate === 'legal' && 'Legal Template'}
+                  {selectedTemplate === 'restaurant' && 'Restaurant Template'}
                 </span>
                 <a href="/templates" className="text-[var(--primary-color)] hover:text-[var(--primary-color)]/80 text-sm font-medium">
                   Change
@@ -548,6 +600,11 @@ export default function Home() {
               selectedTemplate === 'creative-agency' ? 'bg-gradient-to-br from-pink-900/30 to-orange-900/30 border border-pink-500/20' :
               selectedTemplate === 'consulting' ? 'bg-gradient-to-br from-gray-900/40 to-slate-900/40 border border-gray-500/20' :
               selectedTemplate === 'custom' ? 'bg-gradient-to-br from-purple-900/30 to-indigo-900/30 border border-purple-500/20' :
+              selectedTemplate === 'modern-tech' ? 'bg-gradient-to-br from-cyan-900/30 to-blue-900/30 border border-cyan-500/20' :
+              selectedTemplate === 'elegant-luxury' ? 'bg-gradient-to-br from-amber-900/30 to-yellow-900/30 border border-amber-500/20' :
+              selectedTemplate === 'healthcare' ? 'bg-gradient-to-br from-emerald-900/30 to-green-900/30 border border-emerald-500/20' :
+              selectedTemplate === 'legal' ? 'bg-gradient-to-br from-slate-900/40 to-gray-900/40 border border-slate-500/20' :
+              selectedTemplate === 'restaurant' ? 'bg-gradient-to-br from-orange-900/30 to-red-900/30 border border-orange-500/20' :
               'glass-effect'
             }`} style={{animationDelay: '300ms'}}>
               {/* Guest Mode Banner */}
@@ -1094,6 +1151,11 @@ export default function Home() {
                         generateInvoicePDF(pdfData);
                         setIsFormValid(true);
                         showSuccess('Free invoice generated! (2/2 this month)');
+                        
+                        // Show sharing prompt for viral growth
+                        setTimeout(() => {
+                          showInfo('💡 Love this template? Share InvoicePro with other freelancers!');
+                        }, 2000);
                       }} 
                       className="w-full rounded-lg bg-[var(--primary-color)] px-6 py-3 text-sm font-bold text-white shadow-lg sm:w-auto btn-hover-effect hover:bg-blue-600"
                     >
@@ -1466,6 +1528,50 @@ export default function Home() {
         </section>
 
         {/* CTA Section */}
+        {/* Viral Sharing Section */}
+        <section className="mt-8 mb-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="relative overflow-hidden text-white rounded-2xl">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-800/40 via-purple-700/30 to-pink-800/40"></div>
+              <div className="relative text-center pt-12 pr-8 pb-12 pl-8">
+                <h2 className="text-3xl font-serif font-medium mb-4">Share InvoicePro with Fellow Freelancers</h2>
+                <p className="text-lg opacity-90 mb-6 max-w-xl mx-auto">Help other freelancers create professional invoices in seconds. Share the love! 💙</p>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
+                  <button 
+                    onClick={() => {
+                      if (typeof window !== 'undefined' && navigator.share) {
+                        navigator.share({
+                          title: 'InvoicePro - Professional Invoice Generator',
+                          text: 'Create beautiful, professional invoices in seconds! Perfect for freelancers and small businesses.',
+                          url: window.location.origin
+                        });
+                      } else if (typeof window !== 'undefined') {
+                        navigator.clipboard.writeText(window.location.origin);
+                        showSuccess('Link copied to clipboard! Share it with your network.');
+                      }
+                    }}
+                    className="px-6 py-3 bg-white/20 hover:bg-white/30 text-white rounded-full font-medium transition-colors border border-white/30 flex items-center gap-2"
+                  >
+                    <span className="material-symbols-outlined text-lg">share</span>
+                    Share InvoicePro
+                  </button>
+                  <a 
+                    href={`https://twitter.com/intent/tweet?text=Just%20created%20a%20professional%20invoice%20in%20seconds%20with%20@InvoicePro!%20Perfect%20for%20freelancers%20and%20small%20businesses.%20Check%20it%20out:&url=${typeof window !== 'undefined' ? encodeURIComponent(window.location.origin) : 'https://stitchesx.vercel.app'}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-6 py-3 bg-blue-500/20 hover:bg-blue-500/30 text-white rounded-full font-medium transition-colors border border-blue-400/30 flex items-center gap-2"
+                  >
+                    <span className="material-symbols-outlined text-lg">chat</span>
+                    Tweet About It
+                  </a>
+                </div>
+                <p className="text-sm opacity-70">Help grow the freelancer community! 🚀</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Newsletter Section */}
         <section className="mt-8 mb-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="relative overflow-hidden text-white rounded-2xl">
