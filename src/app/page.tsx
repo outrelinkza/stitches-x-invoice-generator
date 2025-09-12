@@ -1040,7 +1040,7 @@ export default function Home() {
               <section>
                 <label className="block">
                   <span className="text-sm font-medium text-white/90">Additional Notes</span>
-                  <textarea name="additionalNotes" className="mt-1 block w-full rounded-md border-white/20 bg-white/10 shadow-sm focus:ring-0 input-focus-glow text-white placeholder-white/60" placeholder="Thank you for your business." rows={3}></textarea>
+                  <textarea name="additionalNotes" className="mt-1 block w-full rounded-md border-white/20 bg-white/10 shadow-sm focus:ring-0 input-focus-glow text-white placeholder-white/60 px-3 py-2 box-border" placeholder="Thank you for your business." rows={3}></textarea>
                 </label>
               </section>
 

@@ -224,7 +224,123 @@ export default function Templates() {
               </div>
             </div>
 
-            <div className="glass-effect rounded-2xl shadow-sm border border-white/20 p-6 border-dashed border-2 border-white/30 animate-enter hover-tilt" style={{animationDelay: '800ms'}}>
+            {/* New Professional Templates */}
+            <div className="glass-effect rounded-2xl shadow-sm border border-white/20 p-6 animate-enter hover-tilt" style={{animationDelay: '800ms'}}>
+              <div className="w-full h-32 bg-gradient-to-br from-cyan-900/30 to-blue-900/30 rounded-lg flex items-center justify-center mb-4">
+                <span className="material-symbols-outlined text-cyan-300 text-4xl">computer</span>
+              </div>
+              <h3 className="text-lg font-semibold text-white mb-2">Modern Tech</h3>
+              <p className="text-sm text-white/70 mb-4">Sleek cyan theme perfect for tech companies and startups.</p>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-white/60">Available</span>
+                <button 
+                  className="px-4 py-2 bg-[var(--primary-color)] text-white text-sm font-medium rounded-lg hover:bg-blue-600 transition-colors"
+                  onClick={() => {
+                    if (typeof window !== 'undefined') {
+                      localStorage.setItem('selectedTemplate', 'modern-tech');
+                      setSelectedTemplate('modern-tech');
+                      window.location.href = '/';
+                    }
+                  }}
+                >
+                  Use Template
+                </button>
+              </div>
+            </div>
+
+            <div className="glass-effect rounded-2xl shadow-sm border border-white/20 p-6 animate-enter hover-tilt" style={{animationDelay: '900ms'}}>
+              <div className="w-full h-32 bg-gradient-to-br from-amber-900/30 to-yellow-900/30 rounded-lg flex items-center justify-center mb-4">
+                <span className="material-symbols-outlined text-amber-300 text-4xl">diamond</span>
+              </div>
+              <h3 className="text-lg font-semibold text-white mb-2">Elegant Luxury</h3>
+              <p className="text-sm text-white/70 mb-4">Premium amber theme for high-end services and luxury brands.</p>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-white/60">Available</span>
+                <button 
+                  className="px-4 py-2 bg-[var(--primary-color)] text-white text-sm font-medium rounded-lg hover:bg-blue-600 transition-colors"
+                  onClick={() => {
+                    if (typeof window !== 'undefined') {
+                      localStorage.setItem('selectedTemplate', 'elegant-luxury');
+                      setSelectedTemplate('elegant-luxury');
+                      window.location.href = '/';
+                    }
+                  }}
+                >
+                  Use Template
+                </button>
+              </div>
+            </div>
+
+            <div className="glass-effect rounded-2xl shadow-sm border border-white/20 p-6 animate-enter hover-tilt" style={{animationDelay: '1000ms'}}>
+              <div className="w-full h-32 bg-gradient-to-br from-emerald-900/30 to-green-900/30 rounded-lg flex items-center justify-center mb-4">
+                <span className="material-symbols-outlined text-emerald-300 text-4xl">medical_services</span>
+              </div>
+              <h3 className="text-lg font-semibold text-white mb-2">Healthcare</h3>
+              <p className="text-sm text-white/70 mb-4">Clean emerald theme designed for medical professionals.</p>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-white/60">Available</span>
+                <button 
+                  className="px-4 py-2 bg-[var(--primary-color)] text-white text-sm font-medium rounded-lg hover:bg-blue-600 transition-colors"
+                  onClick={() => {
+                    if (typeof window !== 'undefined') {
+                      localStorage.setItem('selectedTemplate', 'healthcare');
+                      setSelectedTemplate('healthcare');
+                      window.location.href = '/';
+                    }
+                  }}
+                >
+                  Use Template
+                </button>
+              </div>
+            </div>
+
+            <div className="glass-effect rounded-2xl shadow-sm border border-white/20 p-6 animate-enter hover-tilt" style={{animationDelay: '1100ms'}}>
+              <div className="w-full h-32 bg-gradient-to-br from-slate-900/40 to-gray-900/40 rounded-lg flex items-center justify-center mb-4">
+                <span className="material-symbols-outlined text-slate-300 text-4xl">gavel</span>
+              </div>
+              <h3 className="text-lg font-semibold text-white mb-2">Legal</h3>
+              <p className="text-sm text-white/70 mb-4">Professional slate theme for law firms and legal services.</p>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-white/60">Available</span>
+                <button 
+                  className="px-4 py-2 bg-[var(--primary-color)] text-white text-sm font-medium rounded-lg hover:bg-blue-600 transition-colors"
+                  onClick={() => {
+                    if (typeof window !== 'undefined') {
+                      localStorage.setItem('selectedTemplate', 'legal');
+                      setSelectedTemplate('legal');
+                      window.location.href = '/';
+                    }
+                  }}
+                >
+                  Use Template
+                </button>
+              </div>
+            </div>
+
+            <div className="glass-effect rounded-2xl shadow-sm border border-white/20 p-6 animate-enter hover-tilt" style={{animationDelay: '1200ms'}}>
+              <div className="w-full h-32 bg-gradient-to-br from-orange-900/30 to-red-900/30 rounded-lg flex items-center justify-center mb-4">
+                <span className="material-symbols-outlined text-orange-300 text-4xl">restaurant</span>
+              </div>
+              <h3 className="text-lg font-semibold text-white mb-2">Restaurant</h3>
+              <p className="text-sm text-white/70 mb-4">Warm orange theme perfect for food service and hospitality.</p>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-white/60">Available</span>
+                <button 
+                  className="px-4 py-2 bg-[var(--primary-color)] text-white text-sm font-medium rounded-lg hover:bg-blue-600 transition-colors"
+                  onClick={() => {
+                    if (typeof window !== 'undefined') {
+                      localStorage.setItem('selectedTemplate', 'restaurant');
+                      setSelectedTemplate('restaurant');
+                      window.location.href = '/';
+                    }
+                  }}
+                >
+                  Use Template
+                </button>
+              </div>
+            </div>
+
+            <div className="glass-effect rounded-2xl shadow-sm border border-white/20 p-6 border-dashed border-2 border-white/30 animate-enter hover-tilt" style={{animationDelay: '1300ms'}}>
               <div className="w-full h-32 bg-white/5 rounded-lg flex items-center justify-center mb-4">
                 <span className="material-symbols-outlined text-white/60 text-4xl">add</span>
               </div>
