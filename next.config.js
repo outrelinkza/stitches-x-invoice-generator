@@ -6,6 +6,11 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  experimental: {
+    turbo: {
+      root: process.cwd(),
+    },
+  },
 }
 
 module.exports = nextConfig
