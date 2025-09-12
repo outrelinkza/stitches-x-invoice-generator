@@ -84,7 +84,7 @@ export default function Contacts() {
               <svg className="h-8 w-8 text-black" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                 <path clipRule="evenodd" d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z" fill="currentColor" fillRule="evenodd"></path>
               </svg>
-              <h2 className="text-white text-xl font-semibold leading-tight">Stitches X</h2>
+              <h2 className="text-white text-xl font-semibold leading-tight">InvoicePro</h2>
             </a>
             <nav className="hidden md:flex items-center gap-8">
               <a className="relative group text-white/70 hover:text-white text-sm font-medium" href="/dashboard">
@@ -160,7 +160,7 @@ export default function Contacts() {
                       <div>
                         <h3 className="text-white font-semibold mb-1">Business Inquiries</h3>
                         <p className="text-white/70 text-sm mb-2">Partnerships and enterprise solutions</p>
-                        <a href="mailto:business@stitch.com" className="text-[var(--primary-color)] hover:underline">business@stitch.com</a>
+                        <a href="mailto:business@invoicepro.com" className="text-[var(--primary-color)] hover:underline">business@invoicepro.com</a>
                       </div>
                     </div>
 
@@ -239,7 +239,7 @@ export default function Contacts() {
                       id="email"
                       name="email"
                       type="email"
-                      placeholder="stitchesx.service@gmail.com"
+                      placeholder="your.email@example.com"
                       value={formData.email}
                       onChange={handleInputChange}
                       required

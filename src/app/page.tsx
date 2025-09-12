@@ -111,17 +111,17 @@ export default function Home() {
   const getInputStyles = () => {
     switch (selectedTemplate) {
       case 'minimalist-dark':
-        return 'border-gray-600/50 bg-gray-800/30 focus:border-gray-400';
+        return 'border-gray-600/50 bg-gray-800/30 focus:border-gray-400 px-3 py-2 box-border';
       case 'recurring-clients':
-        return 'border-blue-400/30 bg-blue-900/20 focus:border-blue-300';
+        return 'border-blue-400/30 bg-blue-900/20 focus:border-blue-300 px-3 py-2 box-border';
       case 'creative-agency':
-        return 'border-pink-400/30 bg-pink-900/20 focus:border-pink-300';
+        return 'border-pink-400/30 bg-pink-900/20 focus:border-pink-300 px-3 py-2 box-border';
       case 'consulting':
-        return 'border-gray-400/30 bg-gray-800/20 focus:border-gray-300';
+        return 'border-gray-400/30 bg-gray-800/20 focus:border-gray-300 px-3 py-2 box-border';
       case 'custom':
-        return 'border-purple-400/30 bg-purple-900/20 focus:border-purple-300';
+        return 'border-purple-400/30 bg-purple-900/20 focus:border-purple-300 px-3 py-2 box-border';
       default:
-        return 'border-white/20 bg-white/10 input-focus-glow';
+        return 'border-white/20 bg-white/10 input-focus-glow px-3 py-2 box-border';
     }
   };
 
@@ -270,6 +270,16 @@ export default function Home() {
     setHasUnsavedChanges(true);
     // Update total in real-time
     setCurrentTotal(calculateTotal({}));
+    
+    // Check if form is valid
+    if (formRef.current) {
+      const formData = new FormData(formRef.current);
+      const companyName = formData.get('companyName') as string;
+      const clientName = formData.get('clientName') as string;
+      const hasValidData = companyName && clientName && companyName.trim() !== '' && clientName.trim() !== '';
+      setIsFormValid(hasValidData);
+    }
+    
     // Auto-save after a short delay
     setTimeout(() => {
       handleSaveDraft();
@@ -410,7 +420,7 @@ export default function Home() {
                 <svg className="h-8 w-8 text-black" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                   <path clipRule="evenodd" d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z" fill="currentColor" fillRule="evenodd"></path>
                 </svg>
-                <h2 className="text-xl font-bold tracking-tight text-white">Stitches X</h2>
+                <h2 className="text-xl font-bold tracking-tight text-white">InvoicePro</h2>
               </div>
               <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
                 <a className="relative group text-white hover:text-white transition-colors" href="/dashboard">
@@ -611,7 +621,7 @@ export default function Home() {
                         <input 
                           name="companyName" 
                           className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} 
-                          placeholder="Stitches X" 
+                          placeholder="Company name" 
                           type="text" 
                           aria-label="Company Name" 
                           required
@@ -1054,7 +1064,7 @@ export default function Home() {
                         }
                         
                         const pdfData: InvoiceData = {
-                          companyName: invoiceData.companyName || 'Stitches X',
+                          companyName: invoiceData.companyName || 'InvoicePro',
                           companyAddress: invoiceData.companyAddress || 'Your Business Address',
                           companyContact: invoiceData.companyContact || 'stitchesx.service@gmail.com',
                           logo: logo || undefined,
@@ -1461,7 +1471,7 @@ export default function Home() {
             <div className="relative overflow-hidden text-white rounded-2xl">
               <div className="absolute inset-0 bg-gradient-to-r from-gray-800/40 via-gray-700/30 to-gray-800/40"></div>
               <div className="relative text-center pt-12 pr-8 pb-12 pl-8">
-                <h2 className="text-3xl font-serif font-medium mb-4">Join the Stitches X Experience</h2>
+                <h2 className="text-3xl font-serif font-medium mb-4">Join the InvoicePro Experience</h2>
                 <p className="text-lg opacity-90 mb-6 max-w-xl mx-auto">Be the first to discover new features, exclusive templates, and member-only benefits.</p>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-4">
                   <input 
@@ -1493,7 +1503,7 @@ export default function Home() {
               <a className="hover:text-white transition-colors" href="/privacy">Privacy Policy</a>
               <a className="hover:text-white transition-colors" href="/contacts">Contact Us</a>
             </div>
-            <p className="mt-4">© 2025 Stitches X. All rights reserved.</p>
+            <p className="mt-4">© 2025 InvoicePro. All rights reserved.</p>
           </div>
       </footer>
       </div>
