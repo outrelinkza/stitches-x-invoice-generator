@@ -1,10 +1,17 @@
 'use client';
 
+import { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { AuthModal } from '@/components/AuthModal';
+
 interface NavHeaderProps {
   currentPage?: string;
 }
 
 export default function NavHeader({ currentPage }: NavHeaderProps) {
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
+  const { user, signOut } = useAuth();
   const navItems = [
     { href: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
     { href: '/invoices', label: 'Invoices', icon: 'receipt_long' },
@@ -43,11 +50,49 @@ export default function NavHeader({ currentPage }: NavHeaderProps) {
             ))}
           </nav>
           <div className="flex items-center gap-4">
-            <a href="#" className="text-white/80 hover:text-white transition-colors text-sm font-medium">Sign in</a>
-            <a href="#" className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-white/30">Sign up</a>
+            {user ? (
+              <div className="flex items-center gap-4">
+                <span className="text-white/80 text-sm">Welcome, {user.user_metadata?.full_name || user.email}</span>
+                <button 
+                  onClick={() => signOut()}
+                  className="text-white/80 hover:text-white transition-colors text-sm font-medium"
+                >
+                  Sign out
+                </button>
+              </div>
+            ) : (
+              <>
+                <button 
+                  onClick={() => {
+                    setAuthMode('signin');
+                    setAuthModalOpen(true);
+                  }}
+                  className="text-white/80 hover:text-white transition-colors text-sm font-medium"
+                >
+                  Sign in
+                </button>
+                <button 
+                  onClick={() => {
+                    setAuthMode('signup');
+                    setAuthModalOpen(true);
+                  }}
+                  className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-white/30"
+                >
+                  Sign up
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
+      
+      {/* Auth Modal */}
+      <AuthModal 
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+        mode={authMode}
+        onModeChange={setAuthMode}
+      />
     </header>
   );
 }

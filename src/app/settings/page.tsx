@@ -160,11 +160,17 @@ export default function Settings() {
       loadingMsg.innerHTML = '📦 Preparing your data export...';
       document.body.appendChild(loadingMsg);
 
-      // Call Supabase function to export user data
-      const { data, error } = await supabase.rpc('request_data_export');
+      // Call our API route to export user data
+      const response = await fetch('/api/export-data', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-      if (error) {
-        throw error;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to export data');
       }
 
       // Remove loading message
@@ -172,13 +178,19 @@ export default function Settings() {
         document.body.removeChild(loadingMsg);
       }
 
-      // Create and download the JSON file
-      const exportData = data;
+      // Get the filename from the response headers
+      const contentDisposition = response.headers.get('Content-Disposition');
+      const filename = contentDisposition 
+        ? contentDisposition.split('filename=')[1].replace(/"/g, '')
+        : `stitches-x-data-export-${new Date().toISOString().split('T')[0]}.json`;
+
+      // Create and download the file
+      const exportData = await response.json();
       const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `stitches-x-data-export-${new Date().toISOString().split('T')[0]}.json`;
+      a.download = filename;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -227,12 +239,20 @@ export default function Settings() {
       loadingMsg.innerHTML = '🗑️ Deleting all your data...';
       document.body.appendChild(loadingMsg);
 
-      // Call Supabase function to delete user data
-      const { data, error } = await supabase.rpc('delete_user_data');
+      // Call our API route to delete user data
+      const response = await fetch('/api/delete-user-data', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-      if (error) {
-        throw error;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to delete user data');
       }
+
+      const result = await response.json();
 
       // Remove loading message
       if (document.body.contains(loadingMsg)) {
@@ -242,7 +262,7 @@ export default function Settings() {
       // Show success message and redirect
       const successMsg = document.createElement('div');
       successMsg.className = 'fixed top-20 right-4 bg-green-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
-      successMsg.innerHTML = '✅ All data deleted successfully. Redirecting...';
+      successMsg.innerHTML = `✅ ${result.message || 'All data deleted successfully'}. Redirecting...`;
       document.body.appendChild(successMsg);
       
       setTimeout(() => {
