@@ -64,14 +64,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         // Handle successful sign in (only show notification for actual sign-in events, not page loads)
         if (event === 'SIGNED_IN' && session?.user) {
-          // Only show notification if this is a fresh sign-in (not a page refresh)
-          const isPageRefresh = sessionStorage.getItem('auth-notification-shown');
-          if (!isPageRefresh) {
+          // Only show notification if this is a fresh sign-in (not a page refresh or navigation)
+          const lastSignInTime = sessionStorage.getItem('last-signin-time');
+          const currentTime = Date.now();
+          
+          // Only show notification if it's been more than 5 seconds since last sign-in
+          // This prevents showing on page refreshes and navigation
+          if (!lastSignInTime || (currentTime - parseInt(lastSignInTime)) > 5000) {
             // Show success message using centralized notification system
             showSuccess('Successfully signed in!');
             
-            // Mark that we've shown the notification
-            sessionStorage.setItem('auth-notification-shown', 'true');
+            // Mark the current sign-in time
+            sessionStorage.setItem('last-signin-time', currentTime.toString());
           }
         }
 
@@ -82,8 +86,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             localStorage.removeItem('savedInvoices');
             localStorage.removeItem('userSettings');
             localStorage.removeItem('selectedTemplate');
-            // Clear the notification flag so it can show again on next sign-in
-            sessionStorage.removeItem('auth-notification-shown');
+            // Clear the sign-in timestamp so it can show again on next sign-in
+            sessionStorage.removeItem('last-signin-time');
           }
         }
       }
