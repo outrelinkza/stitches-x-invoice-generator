@@ -279,14 +279,14 @@ export default function Home() {
       // Show error notification
       const errorMsg = document.createElement('div');
       errorMsg.className = 'fixed top-20 right-4 bg-red-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
-      errorMsg.innerHTML = '❌ Failed to save draft. Please try again.';
+      errorMsg.innerHTML = '❌ Failed to save draft. Please check your connection and try again.';
       document.body.appendChild(errorMsg);
       
       setTimeout(() => {
         if (document.body.contains(errorMsg)) {
           document.body.removeChild(errorMsg);
         }
-      }, 3000);
+      }, 5000);
     }
   }, [user]);
 
@@ -322,27 +322,8 @@ export default function Home() {
 
   // Auto-generate invoice number on component mount
   React.useEffect(() => {
-    if (typeof window !== 'undefined') {
-      // Check if editing an existing invoice
-      const editInvoice = localStorage.getItem('editInvoice');
-      if (editInvoice) {
-        const invoiceData = JSON.parse(editInvoice);
-        // Pre-fill form with invoice data
-        setTimeout(() => {
-          Object.keys(invoiceData).forEach(key => {
-            const input = document.querySelector(`[name="${key}"]`) as HTMLInputElement;
-            if (input && invoiceData[key]) {
-              input.value = invoiceData[key];
-            }
-          });
-          setInvoiceNumber(invoiceData.invoiceNumber || '');
-          setInvoiceType(invoiceData.invoiceType || 'product_sales');
-        }, 100);
-        // Clear edit data
-        localStorage.removeItem('editInvoice');
-      } else if (!invoiceNumber) {
-        generateInvoiceNumber().then(number => setInvoiceNumber(number));
-      }
+    if (typeof window !== 'undefined' && !invoiceNumber) {
+      generateInvoiceNumber().then(number => setInvoiceNumber(number));
     }
   }, [user, invoiceNumber, generateInvoiceNumber]);
 
@@ -557,17 +538,17 @@ export default function Home() {
                     <div className="space-y-4 flex-1">
                       <label className="block">
                         <span className="text-sm font-medium text-white/90">Company Name</span>
-                        <input name="companyName" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="Your Company Name" type="text" aria-label="Company Name" required/>
+                        <input name="companyName" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="Stitches X" type="text" aria-label="Company Name" required/>
                       </label>
                       <label className="block">
                         <span className="text-sm font-medium text-white/90">Email/Phone</span>
-                        <input name="companyContact" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="your@email.com" type="text" aria-label="Company Contact" required/>
+                        <input name="companyContact" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="stitchesx.service@gmail.com" type="text" aria-label="Company Contact" required/>
                       </label>
                     </div>
                   </div>
                   <label className="block">
                     <span className="text-sm font-medium text-white/90">Address</span>
-                    <textarea name="companyAddress" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="Your Business Address" rows={2} aria-label="Company Address" required></textarea>
+                    <textarea name="companyAddress" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="123 Business Street, City, State 12345" rows={2} aria-label="Company Address" required></textarea>
                   </label>
                 </section>
 
@@ -657,7 +638,7 @@ export default function Home() {
                     </label>
                     <label className="block">
                       <span className="text-sm font-medium text-white/90">Email/Phone</span>
-                      <input name="clientContact" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="client@email.com" type="text"/>
+                      <input name="clientContact" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="client@example.com" type="text"/>
                     </label>
                   </div>
                 </section>

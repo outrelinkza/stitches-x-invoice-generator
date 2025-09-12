@@ -265,7 +265,7 @@ export default function Contacts() {
                       id="email"
                       name="email"
                       type="email"
-                      placeholder="your@email.com"
+                      placeholder="stitchesx.service@gmail.com"
                       value={formData.email}
                       onChange={handleInputChange}
                       required
