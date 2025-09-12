@@ -95,22 +95,6 @@ export default function Feedback() {
               <p className="mt-2 text-base text-gray-600">Your insights help us build a better experience for everyone.</p>
             </div>
 
-            {/* Rating Display */}
-            <div className="bg-white/50 rounded-xl p-6 border border-white/60">
-              <div className="flex items-center justify-center mb-4">
-                <div className="flex text-yellow-400 space-x-1">
-                  <span className="material-symbols-outlined text-4xl">star</span>
-                  <span className="material-symbols-outlined text-4xl">star</span>
-                  <span className="material-symbols-outlined text-4xl">star</span>
-                  <span className="material-symbols-outlined text-4xl">star</span>
-                  <span className="material-symbols-outlined text-4xl">star_half</span>
-                </div>
-              </div>
-              <div className="flex flex-col gap-2">
-                <p className="text-center text-5xl font-bold text-gray-900">4.5</p>
-                <p className="text-center text-sm font-medium text-gray-500">Based on 120 reviews</p>
-              </div>
-            </div>
 
             {/* Feedback Form */}
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -192,12 +176,12 @@ export default function Feedback() {
               </div>
             </form>
 
-            {/* App Store Link */}
+            {/* Contact Link */}
             <div className="text-center">
               <p className="text-sm text-gray-500">
-                Love the app?{' '}
+                Have questions?{' '}
                 <a className="font-medium text-[var(--primary-color)] hover:underline" href="/contacts" rel="noopener noreferrer">
-                  Rate us on the App Store
+                  Contact us
                 </a>
               </p>
             </div>
