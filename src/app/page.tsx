@@ -615,17 +615,17 @@ export default function Home() {
                     <div className="space-y-4 flex-1">
                       <label className="block">
                         <span className="text-sm font-medium text-white/90">Company Name</span>
-                        <input name="companyName" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="Acme Inc." type="text" aria-label="Company Name" required/>
+                        <input name="companyName" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="Your Company Name" type="text" aria-label="Company Name" required/>
                       </label>
                       <label className="block">
                         <span className="text-sm font-medium text-white/90">Email/Phone</span>
-                        <input name="companyContact" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="contact@acme.com" type="text" aria-label="Company Contact" required/>
+                        <input name="companyContact" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="your@email.com" type="text" aria-label="Company Contact" required/>
                       </label>
                     </div>
                   </div>
                   <label className="block">
                     <span className="text-sm font-medium text-white/90">Address</span>
-                    <textarea name="companyAddress" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="123 Main St, Anytown, USA" rows={2} aria-label="Company Address" required></textarea>
+                    <textarea name="companyAddress" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="Your Business Address" rows={2} aria-label="Company Address" required></textarea>
                   </label>
                 </section>
 
@@ -687,7 +687,7 @@ export default function Home() {
                       <input 
                         name="clientName" 
                         className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} 
-                        placeholder="John Doe" aria-label="Client Name" required 
+                        placeholder="Client Name" aria-label="Client Name" required 
                         type="text"
                         list="clientNames"
                         onChange={(e) => {
@@ -711,11 +711,11 @@ export default function Home() {
                     </label>
                     <label className="block">
                       <span className="text-sm font-medium text-white/90">Address</span>
-                      <textarea name="clientAddress" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="456 Oak Ave, Somecity, USA" rows={2}></textarea>
+                      <textarea name="clientAddress" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="Client Address" rows={2}></textarea>
                     </label>
                     <label className="block">
                       <span className="text-sm font-medium text-white/90">Email/Phone</span>
-                      <input name="clientContact" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="john.doe@example.com" type="text"/>
+                      <input name="clientContact" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="client@email.com" type="text"/>
                     </label>
                   </div>
                 </section>
@@ -1085,9 +1085,9 @@ export default function Home() {
                     
                     // Generate real PDF invoice
                     const pdfData: InvoiceData = {
-                      companyName: invoiceData.companyName || 'Your Company',
-                      companyAddress: invoiceData.companyAddress || '123 Business St, City, State 12345',
-                      companyContact: invoiceData.companyContact || 'contact@company.com',
+                      companyName: invoiceData.companyName || 'Stitches X',
+                      companyAddress: invoiceData.companyAddress || 'Your Business Address',
+                      companyContact: invoiceData.companyContact || 'hello@stitchesx.com',
                       logo: logo || undefined,
                       clientName: invoiceData.clientName || 'Client Name',
                       clientAddress: invoiceData.clientAddress || 'Client Address',
@@ -1179,9 +1179,9 @@ export default function Home() {
                     
                     // Generate real PDF invoice for payment
                     const pdfData: InvoiceData = {
-                      companyName: invoiceData.companyName || 'Your Company',
-                      companyAddress: invoiceData.companyAddress || '123 Business St, City, State 12345',
-                      companyContact: invoiceData.companyContact || 'contact@company.com',
+                      companyName: invoiceData.companyName || 'Stitches X',
+                      companyAddress: invoiceData.companyAddress || 'Your Business Address',
+                      companyContact: invoiceData.companyContact || 'hello@stitchesx.com',
                       logo: logo || undefined,
                       clientName: invoiceData.clientName || 'Client Name',
                       clientAddress: invoiceData.clientAddress || 'Client Address',

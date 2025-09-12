@@ -52,7 +52,7 @@ export default function Privacy() {
 
                     <h3 className="text-xl font-semibold text-white mt-8">2. Data Controller</h3>
                     <p>
-                      Stitches X is the data controller for the personal data we collect and process. For any privacy-related questions, contact us at: <a href="mailto:stitchesx.service@gmail.com" className="text-blue-400 hover:text-blue-300">stitchesx.service@gmail.com</a>
+                      Stitches X is the data controller for the personal data we collect and process. For any privacy-related questions, contact us at: <a href="mailto:hello@stitchesx.com" className="text-blue-400 hover:text-blue-300">hello@stitchesx.com</a>
                     </p>
 
                     <h3 className="text-xl font-semibold text-white mt-8">3. Information We Collect</h3>
@@ -144,7 +144,7 @@ export default function Privacy() {
 
                     <h3 className="text-xl font-semibold text-white mt-8">14. Contact Us</h3>
                     <p>
-                      For any questions about this Privacy Policy or to exercise your rights, please contact us at: <a href="mailto:stitchesx.service@gmail.com" className="text-blue-400 hover:text-blue-300">stitchesx.service@gmail.com</a>
+                      For any questions about this Privacy Policy or to exercise your rights, please contact us at: <a href="mailto:hello@stitchesx.com" className="text-blue-400 hover:text-blue-300">hello@stitchesx.com</a>
                     </p>
                     <p className="mt-4">
                       You also have the right to lodge a complaint with your local data protection authority if you believe we have not handled your personal data in accordance with applicable law.

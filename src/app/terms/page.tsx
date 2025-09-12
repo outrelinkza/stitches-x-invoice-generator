@@ -110,7 +110,7 @@ export default function Terms() {
 
                     <h3 className="text-xl font-semibold text-white mt-8">11. Contact Information</h3>
                     <p>
-                      For questions about these Terms of Service, please contact us at: <a href="mailto:stitchesx.service@gmail.com" className="text-blue-400 hover:text-blue-300">stitchesx.service@gmail.com</a>
+                      For questions about these Terms of Service, please contact us at: <a href="mailto:hello@stitchesx.com" className="text-blue-400 hover:text-blue-300">hello@stitchesx.com</a>
                     </p>
                   </div>
                 </div>

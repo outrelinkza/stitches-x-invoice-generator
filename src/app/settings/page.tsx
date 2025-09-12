@@ -6,11 +6,15 @@ import FloatingCalculator from '@/components/FloatingCalculator';
 import { AuthGuard } from '@/components/AuthGuard';
 import { supabase } from '@/lib/supabase';
 import NavHeader from '@/components/NavHeader';
-import { useUserProfile, UserProfileProvider } from '@/contexts/UserProfileContext';
+// import { useUserProfile } from '@/contexts/UserProfileContext';
 
-function SettingsContent() {
+export default function Settings() {
   const [currentSection, setCurrentSection] = useState('company');
-  const { profile, settings, updateProfile, updateSettings } = useUserProfile();
+  // Temporarily disabled to prevent 406 errors
+  const profile = null;
+  const settings = null;
+  const updateProfile = async () => ({ success: false, error: 'Feature temporarily disabled' });
+  const updateSettings = async () => ({ success: false, error: 'Feature temporarily disabled' });
   
   // Invoice & Template Settings
   const [templateName, setTemplateName] = useState('Standard Template');
@@ -18,16 +22,16 @@ function SettingsContent() {
   const [paymentTerms, setPaymentTerms] = useState('Net 15');
   const [currency, setCurrency] = useState('USD - United States Dollar');
   const [invoiceNumber, setInvoiceNumber] = useState('INV-001');
-  const [companyName, setCompanyName] = useState('Your Company Name');
-  const [companyAddress, setCompanyAddress] = useState('123 Business St, City, State 12345');
-  const [companyEmail, setCompanyEmail] = useState('billing@yourcompany.com');
+  const [companyName, setCompanyName] = useState('Stitches X');
+  const [companyAddress, setCompanyAddress] = useState('Your Business Address');
+  const [companyEmail, setCompanyEmail] = useState('hello@stitchesx.com');
   const [companyPhone, setCompanyPhone] = useState('+1 (555) 123-4567');
 
   // User Profile Settings
-  const [userName, setUserName] = useState('John Doe');
-  const [userEmail, setUserEmail] = useState('john@example.com');
+  const [userName, setUserName] = useState('Your Name');
+  const [userEmail, setUserEmail] = useState('your@email.com');
   const [userPhone, setUserPhone] = useState('+1 (555) 987-6543');
-  const [userTitle, setUserTitle] = useState('Freelancer');
+  const [userTitle, setUserTitle] = useState('Business Owner');
 
   // Notification Settings
   const [emailNotifications, setEmailNotifications] = useState(true);
@@ -58,14 +62,14 @@ function SettingsContent() {
         setPaymentTerms(settings.paymentTerms || 'Net 15');
         setCurrency(settings.currency || 'USD - United States Dollar');
         setInvoiceNumber(settings.invoiceNumber || 'INV-001');
-        setCompanyName(settings.companyName || 'Your Company Name');
-        setCompanyAddress(settings.companyAddress || '123 Business St, City, State 12345');
-        setCompanyEmail(settings.companyEmail || 'billing@yourcompany.com');
+        setCompanyName(settings.companyName || 'Stitches X');
+        setCompanyAddress(settings.companyAddress || 'Your Business Address');
+        setCompanyEmail(settings.companyEmail || 'hello@stitchesx.com');
         setCompanyPhone(settings.companyPhone || '+1 (555) 123-4567');
-        setUserName(settings.userName || 'John Doe');
-        setUserEmail(settings.userEmail || 'john@example.com');
+        setUserName(settings.userName || 'Your Name');
+        setUserEmail(settings.userEmail || 'your@email.com');
         setUserPhone(settings.userPhone || '+1 (555) 987-6543');
-        setUserTitle(settings.userTitle || 'Freelancer');
+        setUserTitle(settings.userTitle || 'Business Owner');
         setEmailNotifications(settings.emailNotifications !== undefined ? settings.emailNotifications : true);
         setInvoiceReminders(settings.invoiceReminders !== undefined ? settings.invoiceReminders : true);
         setPaymentAlerts(settings.paymentAlerts !== undefined ? settings.paymentAlerts : false);
@@ -386,8 +390,8 @@ function SettingsContent() {
                     className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-white/10 text-white placeholder-white/60"
                     id="user-name"
                     type="text"
-                    defaultValue={profile?.full_name || ''}
-                    onChange={(e) => updateProfile({ full_name: e.target.value })}
+                    defaultValue={userName}
+                    onChange={(e) => setUserName(e.target.value)}
                   />
                 </div>
                 <div>
@@ -409,7 +413,7 @@ function SettingsContent() {
                     className="w-full px-4 py-2 border border-white/10 rounded-lg bg-white/5 text-white/70 cursor-not-allowed"
                     id="user-email"
                     type="email"
-                    value={profile?.email || ''}
+                    value={userEmail}
                     disabled
                   />
                   <p className="text-xs text-white/50 mt-1">Email cannot be changed</p>
@@ -732,13 +736,5 @@ function SettingsContent() {
         )}
       </div>
     </AuthGuard>
-  );
-}
-
-export default function Settings() {
-  return (
-    <UserProfileProvider>
-      <SettingsContent />
-    </UserProfileProvider>
   );
 }

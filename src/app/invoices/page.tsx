@@ -23,8 +23,11 @@ export default function Invoices() {
       }
 
       try {
-        const userInvoices = await InvoiceService.getUserInvoices();
-        setInvoices(userInvoices);
+        // Temporarily disabled to prevent 406 errors - using localStorage fallback
+        if (typeof window !== 'undefined') {
+          const savedInvoices = JSON.parse(localStorage.getItem('savedInvoices') || '[]');
+          setInvoices(savedInvoices);
+        }
       } catch (error) {
         console.error('Failed to load invoices:', error);
         // Fallback to localStorage
