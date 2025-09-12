@@ -37,12 +37,7 @@ export default function Home() {
   const logoInputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
-  // Redirect authenticated users to dashboard
-  useEffect(() => {
-    if (user && user.email_confirmed_at) {
-      router.push('/dashboard');
-    }
-  }, [user, router]);
+  // No redirect - let authenticated users stay on invoice page
 
   // Load selected template on component mount
   useEffect(() => {
@@ -183,9 +178,7 @@ export default function Home() {
       }
       
       // Remove loading message
-      if (document.body.contains(checkoutMsg)) {
-        document.body.removeChild(checkoutMsg);
-      }
+      hideNotification();
       
       if (!success) {
         throw new Error('Payment processing failed');

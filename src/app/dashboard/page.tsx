@@ -160,13 +160,13 @@ export default function Dashboard() {
             </div>
             
             <div className="glass-effect bg-white/10 rounded-2xl p-6 animate-enter" style={{animationDelay: '600ms'}}>
-              <p className="text-white/70 text-sm font-medium">Invoice Types</p>
-              <p className="text-white text-3xl font-bold tracking-tight">3 Types</p>
-                <p className="text-green-400 text-sm font-medium flex items-center gap-1">
-                  <span className="material-symbols-outlined text-base">arrow_upward</span> 
-                  <span>20%</span>
-                </p>
-              </div>
+              <p className="text-white/70 text-sm font-medium">Draft Invoices</p>
+              <p className="text-white text-3xl font-bold tracking-tight">{draftInvoices}</p>
+              <p className="text-yellow-400 text-sm font-medium flex items-center gap-1">
+                <span className="material-symbols-outlined text-base">edit</span> 
+                <span>In Progress</span>
+              </p>
+            </div>
             </div>
 
             {/* Charts Grid */}
