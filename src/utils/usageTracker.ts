@@ -175,6 +175,8 @@ export class UsageTracker {
         return this.getDefaultUsage();
       }
 
+      console.log('UsageTracker: Querying user_usage table with userId:', userId, 'email:', email);
+
       let query = supabase.from('user_usage').select('*');
       
       if (userId) {
@@ -184,6 +186,8 @@ export class UsageTracker {
       }
 
       const { data, error } = await query.single();
+      
+      console.log('UsageTracker: Query result - data:', data, 'error:', error);
 
       // Handle 406 error specifically (RLS policy issues)
       if (error && error.code === '406') {

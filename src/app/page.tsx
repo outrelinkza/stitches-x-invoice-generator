@@ -511,10 +511,12 @@ export default function Home() {
   React.useEffect(() => {
     const loadUsage = async () => {
       try {
+        console.log('Loading usage for user:', user?.id, 'email:', user?.email, 'isGuestMode:', isGuestMode);
         const currentUsage = await UsageTracker.getCurrentUsage(
           user?.id,
           user?.email || (isGuestMode ? 'guest@example.com' : undefined)
         );
+        console.log('Usage loaded successfully:', currentUsage);
         setUsage(currentUsage);
       } catch (error) {
         console.error('Failed to load usage:', error);
