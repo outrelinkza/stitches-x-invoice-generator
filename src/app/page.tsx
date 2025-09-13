@@ -212,7 +212,7 @@ export default function Home() {
   // Get custom input styles for custom template
   const getCustomInputStyles = () => {
     if (selectedTemplate === 'custom') {
-      console.log('🎨 Applying custom template styles:', {
+      console.log('Applying custom template styles:', {
         selectedTemplate,
         fontFamily: customTemplate.fontFamily,
         fontSize: customTemplate.fontSize,
@@ -229,6 +229,17 @@ export default function Home() {
       };
     }
     return {};
+  };
+
+  // Get template-specific input classes
+  const getTemplateInputClasses = () => {
+    if (selectedTemplate === 'legal') {
+      return 'text-gray-900 placeholder-gray-500 bg-white border-gray-300';
+    } else if (selectedTemplate === 'restaurant') {
+      return 'text-orange-900 placeholder-orange-500 bg-orange-50 border-orange-300';
+    } else {
+      return 'text-white placeholder-white/60';
+    }
   };
 
   // Get template-specific features
@@ -696,8 +707,8 @@ export default function Home() {
               selectedTemplate === 'modern-tech' ? 'bg-gradient-to-br from-cyan-900/30 to-blue-900/30 border border-cyan-500/20' :
               selectedTemplate === 'elegant-luxury' ? 'bg-gradient-to-br from-amber-900/30 to-yellow-900/30 border border-amber-500/20' :
               selectedTemplate === 'healthcare' ? 'bg-gradient-to-br from-emerald-900/30 to-green-900/30 border border-emerald-500/20' :
-              selectedTemplate === 'legal' ? 'bg-gradient-to-br from-slate-900/40 to-gray-900/40 border border-slate-500/20' :
-              selectedTemplate === 'restaurant' ? 'bg-gradient-to-br from-orange-900/30 to-red-900/30 border border-orange-500/20' :
+              selectedTemplate === 'legal' ? 'bg-white/95 text-gray-900 border-2 border-gray-300 shadow-2xl' :
+              selectedTemplate === 'restaurant' ? 'bg-gradient-to-br from-orange-50/95 to-red-50/95 text-orange-900 border-2 border-orange-300 shadow-2xl' :
               'glass-effect'
             }`} style={{animationDelay: '300ms'}}>
               {/* Guest Mode Banner */}
@@ -728,7 +739,11 @@ export default function Home() {
                 {/* Company Info Section */}
                 <section className="space-y-6">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold text-white">Your Company Info</h3>
+                    <h3 className={`text-lg font-semibold ${
+                      selectedTemplate === 'legal' ? 'text-gray-900' :
+                      selectedTemplate === 'restaurant' ? 'text-orange-900' :
+                      'text-white'
+                    }`}>Your Company Info</h3>
                   </div>
                   <div className="flex items-center space-x-6">
                     <div className="flex-shrink-0">
@@ -767,10 +782,14 @@ export default function Home() {
                     </div>
                     <div className="space-y-4 flex-1">
                       <label className="block">
-                        <span className="text-sm font-medium text-white/90">Company Name</span>
+                        <span className={`text-sm font-medium ${
+                          selectedTemplate === 'legal' ? 'text-gray-700' :
+                          selectedTemplate === 'restaurant' ? 'text-orange-700' :
+                          'text-white/90'
+                        }`}>Company Name</span>
                         <input 
                           name="companyName" 
-                          className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} 
+                          className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 ${getTemplateInputClasses()} ${getInputStyles()}`} 
                           style={getCustomInputStyles()}
                           placeholder="Company name" 
                           type="text" 
@@ -809,7 +828,11 @@ export default function Home() {
                 {/* Client Info Section */}
                 <section className="space-y-6">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold text-white">Client Info</h3>
+                    <h3 className={`text-lg font-semibold ${
+                      selectedTemplate === 'legal' ? 'text-gray-900' :
+                      selectedTemplate === 'restaurant' ? 'text-orange-900' :
+                      'text-white'
+                    }`}>Client Info</h3>
                   </div>
                   <div className="space-y-4">
                     <label className="block">
@@ -2354,11 +2377,11 @@ export default function Home() {
                   <button
                     onClick={() => {
                       // Save custom template to localStorage
-                      console.log('💾 Saving custom template:', customTemplate);
+                      console.log('Saving custom template:', customTemplate);
                       localStorage.setItem('customTemplate', JSON.stringify(customTemplate));
                       setSelectedTemplate('custom');
                       setShowCustomBuilder(false);
-                      console.log('✅ Custom template saved and applied');
+                      console.log('Custom template saved and applied');
                     }}
                     className="px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-medium rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all"
                   >
