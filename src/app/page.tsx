@@ -1164,7 +1164,13 @@ export default function Home() {
                       </label>
                       <label className="block">
                         <span className="text-sm font-medium text-white/90">Hourly Rate ($)</span>
-                        <input name="hourlyRate" className="mt-1 block w-full rounded-md border-white/20 bg-white/10 shadow-sm focus:ring-0 input-focus-glow text-white placeholder-white/60" placeholder="Hourly rate" type="number"/>
+                        <input 
+                          name="hourlyRate" 
+                          className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} 
+                          style={getCustomInputStyles()}
+                          placeholder="Hourly rate" 
+                          type="number"
+                        />
                       </label>
                     </div>
                     <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10">
@@ -1218,11 +1224,23 @@ export default function Home() {
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                       <label className="block">
                         <span className="text-sm font-medium text-white/90">Description</span>
-                        <input name="itemDescription" className="mt-1 block w-full rounded-md border-white/20 bg-white/10 shadow-sm focus:ring-0 input-focus-glow text-white placeholder-white/60" placeholder="Payment for services rendered" type="text"/>
+                        <input 
+                          name="itemDescription" 
+                          className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} 
+                          style={getCustomInputStyles()}
+                          placeholder="Payment for services rendered" 
+                          type="text"
+                        />
                       </label>
                       <label className="block">
                         <span className="text-sm font-medium text-white/90">Amount</span>
-                        <input name="rate" className="mt-1 block w-full rounded-md border-white/20 bg-white/10 shadow-sm focus:ring-0 input-focus-glow text-white placeholder-white/60" placeholder="Amount" type="number"/>
+                        <input 
+                          name="rate" 
+                          className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} 
+                          style={getCustomInputStyles()}
+                          placeholder="Amount" 
+                          type="number"
+                        />
                       </label>
                     </div>
                   </div>
