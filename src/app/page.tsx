@@ -596,21 +596,6 @@ export default function Home() {
                   </div>
                 ) : user ? (
                   <>
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                        <span className="text-white text-sm font-medium">
-                          {user.user_metadata?.full_name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase()}
-                        </span>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-white text-sm font-medium">
-                          {user.user_metadata?.full_name || 'User'}
-                        </span>
-                        <span className="text-white/60 text-xs">
-                          Personal Account
-                        </span>
-                      </div>
-                    </div>
                     <button 
                       onClick={() => signOut()}
                       className="text-white/70 hover:text-white transition-colors text-sm font-medium cursor-pointer"
