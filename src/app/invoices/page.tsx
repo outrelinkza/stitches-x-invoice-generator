@@ -93,7 +93,7 @@ export default function Invoices() {
   }
 
   return (
-    <AuthGuard>
+    <AuthGuard requireAuth={false}>
       <div className="min-h-screen">
         <NavHeader currentPage="/invoices" />
         {/* Main Content */}

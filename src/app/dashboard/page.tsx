@@ -118,7 +118,7 @@ export default function Dashboard() {
   }
 
   return (
-    <AuthGuard>
+    <AuthGuard requireAuth={false}>
       <div className="min-h-screen">
         <NavHeader currentPage="/dashboard" />
         {/* Main Content */}

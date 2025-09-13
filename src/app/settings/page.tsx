@@ -519,7 +519,7 @@ export default function Settings() {
   };
 
   return (
-    <AuthGuard>
+    <AuthGuard requireAuth={false}>
       <div className="min-h-screen flex flex-col lg:flex-row">
         <NavHeader currentPage="/settings" />
         <SettingsSidebar currentSection={currentSection} onSectionChange={setCurrentSection} />

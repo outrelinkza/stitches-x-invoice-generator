@@ -1186,7 +1186,14 @@ export default function Home() {
                           taxAmount: parseFloat(invoiceData.taxAmount || '0'),
                           total: parseFloat(invoiceData.total || '0'),
                           additionalNotes: invoiceData.additionalNotes || '',
-                          template: selectedTemplate
+                          template: selectedTemplate,
+                          customColors: selectedTemplate === 'custom' ? {
+                            primary: customTemplate.primaryColor,
+                            secondary: customTemplate.secondaryColor,
+                            accent: customTemplate.accentColor,
+                            backgroundColor: customTemplate.backgroundColor,
+                            textColor: customTemplate.textColor
+                          } : undefined
                         };
                         
                         generateInvoicePDF(pdfData);
@@ -1600,34 +1607,36 @@ export default function Home() {
         </section>
 
         {/* Footer */}
-        <footer className="mt-auto py-8 px-4 sm:px-10">
+        <footer className="mt-auto py-8 px-4 sm:px-10 relative">
           <div className="container mx-auto text-center text-sm text-white/60">
             <div className="flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-6">
               <a className="hover:text-white transition-colors" href="/about">About Us</a>
               <a className="hover:text-white transition-colors" href="/terms">Terms of Service</a>
               <a className="hover:text-white transition-colors" href="/privacy">Privacy Policy</a>
               <a className="hover:text-white transition-colors" href="/contacts">Contact Us</a>
-              <button 
-                onClick={() => {
-                  if (typeof window !== 'undefined' && navigator.share) {
-                    navigator.share({
-                      title: 'InvoicePro - Professional Invoice Generator',
-                      text: 'Create beautiful, professional invoices in seconds!',
-                      url: window.location.origin
-                    });
-                  } else if (typeof window !== 'undefined') {
-                    navigator.clipboard.writeText(window.location.origin);
-                    showSuccess('Link copied! Share InvoicePro with others 💙');
-                  }
-                }}
-                className="hover:text-white transition-colors flex items-center gap-1"
-              >
-                <span className="material-symbols-outlined text-sm">share</span>
-                Share
-              </button>
             </div>
             <p className="mt-4">© 2025 InvoicePro. All rights reserved.</p>
           </div>
+          
+          {/* Share Button Bubble */}
+          <button 
+            onClick={() => {
+              if (typeof window !== 'undefined' && navigator.share) {
+                navigator.share({
+                  title: 'InvoicePro - Professional Invoice Generator',
+                  text: 'Create beautiful, professional invoices in seconds!',
+                  url: window.location.origin
+                });
+              } else if (typeof window !== 'undefined') {
+                navigator.clipboard.writeText(window.location.origin);
+                showSuccess('Link copied! Share InvoicePro with others 💙');
+              }
+            }}
+            className="absolute bottom-4 right-4 w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
+            title="Share InvoicePro"
+          >
+            <span className="material-symbols-outlined text-white text-lg">share</span>
+          </button>
       </footer>
       </div>
 

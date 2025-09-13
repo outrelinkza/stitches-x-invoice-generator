@@ -36,6 +36,15 @@ export interface InvoiceData {
   additionalNotes?: string;
   template: string;
   watermark?: string;
+  
+  // Custom Template Colors
+  customColors?: {
+    primary: string;
+    secondary: string;
+    accent: string;
+    backgroundColor: string;
+    textColor: string;
+  };
 }
 
 export const generateInvoicePDF = (data: InvoiceData): void => {
@@ -45,6 +54,15 @@ export const generateInvoicePDF = (data: InvoiceData): void => {
   
   // Set up colors based on template
   const getTemplateColors = (template: string) => {
+    // Use custom colors if available
+    if (template === 'custom' && data.customColors) {
+      return {
+        primary: data.customColors.primary,
+        secondary: data.customColors.secondary,
+        accent: data.customColors.accent
+      };
+    }
+    
     switch (template) {
       case 'minimalist-dark':
         return { primary: '#374151', secondary: '#6B7280', accent: '#9CA3AF' };
