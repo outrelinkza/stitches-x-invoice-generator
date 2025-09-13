@@ -26,7 +26,7 @@ import { showSuccess, showError, showInfo, showLoading, hideNotification } from 
 import NavHeader from '@/components/NavHeader';
 
 export default function Home() {
-  console.log('🎉 NEW CODE RUNNING - FINAL COLOR FIX - VERSION 12.0 - CACHE BUST: ' + Date.now() + ' - ALL TEMPLATES COMPLETELY STANDARDIZED');
+  console.log('🎉 NEW CODE RUNNING - LAYOUT FIXES - VERSION 13.0 - CACHE BUST: ' + Date.now() + ' - LOGO MOVED LEFT, PRICING ADJUSTED');
   const [invoiceType, setInvoiceType] = useState('product_sales');
   const [logo, setLogo] = useState<string | null>(null);
   const [isFormValid, setIsFormValid] = useState(false);
@@ -1684,7 +1684,7 @@ export default function Home() {
 
         {/* Pricing Section */}
         <section className="mb-16">
-          <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
+          <div className="max-w-7xl mx-auto px-1 sm:px-2 lg:px-4">
             <div className="text-center mb-12">
               <h2 className="text-4xl font-bold text-white mb-4">Choose Your Plan</h2>
               <p className="text-xl text-white/80 max-w-2xl mx-auto">
@@ -1718,7 +1718,7 @@ export default function Home() {
               </div>
             </div>
             
-            <div className="grid md:grid-cols-3 gap-6 max-w-7xl mx-auto">
+            <div className="grid md:grid-cols-3 gap-4 max-w-full mx-auto">
               {/* Pay Per Invoice Plans */}
               {pricingMode === 'per-invoice' ? (
                 <>

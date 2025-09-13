@@ -22,9 +22,9 @@ export default function NavHeader({ currentPage }: NavHeaderProps) {
 
   return (
     <header className="fixed top-0 w-full bg-black/20 backdrop-blur-xl border-b border-white/10 z-40 animate-enter" style={{animationDelay: '50ms'}}>
-      <div className="container mx-auto px-2 sm:px-4 lg:px-6">
+      <div className="container mx-auto px-1 sm:px-2 lg:px-4">
         <div className="flex items-center justify-between py-4">
-          <a href="/" className="flex items-center gap-2 sm:gap-3 text-white hover:opacity-80 transition-opacity -ml-2 sm:-ml-1">
+          <a href="/" className="flex items-center gap-2 sm:gap-3 text-white hover:opacity-80 transition-opacity -ml-4 sm:-ml-3">
             <svg className="h-6 w-6 sm:h-8 sm:w-8 text-white" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
               <path clipRule="evenodd" d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z" fill="currentColor" fillRule="evenodd"></path>
             </svg>
