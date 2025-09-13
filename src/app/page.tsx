@@ -212,6 +212,13 @@ export default function Home() {
   // Get custom input styles for custom template
   const getCustomInputStyles = () => {
     if (selectedTemplate === 'custom') {
+      console.log('🎨 Applying custom template styles:', {
+        selectedTemplate,
+        fontFamily: customTemplate.fontFamily,
+        fontSize: customTemplate.fontSize,
+        fontWeight: customTemplate.fontWeight,
+        primaryColor: customTemplate.primaryColor
+      });
       return {
         borderColor: hexToRgba(customTemplate.primaryColor, 0.3),
         backgroundColor: hexToRgba(customTemplate.primaryColor, 0.1),
@@ -1970,9 +1977,12 @@ export default function Home() {
                           onChange={(e) => setCustomTemplate({...customTemplate, fontWeight: e.target.value})}
                           className="w-full px-2 py-2 bg-white/10 border border-white/20 rounded text-white text-sm focus:border-white/40 focus:outline-none"
                         >
-                          <option value="normal" className="bg-gray-800">Normal</option>
-                          <option value="bold" className="bg-gray-800">Bold</option>
-                          <option value="italic" className="bg-gray-800">Italic</option>
+                          <option value="300" className="bg-gray-800">Light (300)</option>
+                          <option value="400" className="bg-gray-800">Normal (400)</option>
+                          <option value="500" className="bg-gray-800">Medium (500)</option>
+                          <option value="600" className="bg-gray-800">Semi Bold (600)</option>
+                          <option value="700" className="bg-gray-800">Bold (700)</option>
+                          <option value="800" className="bg-gray-800">Extra Bold (800)</option>
                         </select>
                       </div>
                     </div>
@@ -2344,9 +2354,11 @@ export default function Home() {
                   <button
                     onClick={() => {
                       // Save custom template to localStorage
+                      console.log('💾 Saving custom template:', customTemplate);
                       localStorage.setItem('customTemplate', JSON.stringify(customTemplate));
                       setSelectedTemplate('custom');
                       setShowCustomBuilder(false);
+                      console.log('✅ Custom template saved and applied');
                     }}
                     className="px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-medium rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all"
                   >
