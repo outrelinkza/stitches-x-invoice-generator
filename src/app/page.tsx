@@ -940,6 +940,234 @@ export default function Home() {
                 </section>
               </div>
 
+              {/* Legal Template Specific Section */}
+              {selectedTemplate === 'legal' && (
+                <section className="space-y-6 p-6 bg-gray-50/95 rounded-lg border border-gray-300">
+                  <h3 className="text-lg font-semibold text-gray-900">Legal Case Details</h3>
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <label className="block">
+                      <span className="text-sm font-medium text-gray-700">Case Number</span>
+                      <input 
+                        type="text" 
+                        className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-gray-900 placeholder-gray-500 bg-white border-gray-300" 
+                        placeholder="Case #2024-001"
+                      />
+                    </label>
+                    <label className="block">
+                      <span className="text-sm font-medium text-gray-700">Matter Type</span>
+                      <select className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-gray-900 bg-white border-gray-300">
+                        <option value="litigation">Litigation</option>
+                        <option value="corporate">Corporate Law</option>
+                        <option value="real-estate">Real Estate</option>
+                        <option value="family">Family Law</option>
+                        <option value="criminal">Criminal Defense</option>
+                        <option value="immigration">Immigration</option>
+                        <option value="patent">Patent Law</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </label>
+                    <label className="block">
+                      <span className="text-sm font-medium text-gray-700">Court/Jurisdiction</span>
+                      <input 
+                        type="text" 
+                        className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-gray-900 placeholder-gray-500 bg-white border-gray-300" 
+                        placeholder="Superior Court of California"
+                      />
+                    </label>
+                    <label className="block">
+                      <span className="text-sm font-medium text-gray-700">Billing Period</span>
+                      <input 
+                        type="text" 
+                        className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-gray-900 placeholder-gray-500 bg-white border-gray-300" 
+                        placeholder="March 1-31, 2024"
+                      />
+                    </label>
+                  </div>
+                  <div className="space-y-4">
+                    <h4 className="text-md font-semibold text-gray-800">Legal Services</h4>
+                    <div className="grid grid-cols-12 gap-4">
+                      <div className="col-span-5"><span className="text-sm font-medium text-gray-700">Service Description</span></div>
+                      <div className="col-span-2"><span className="text-sm font-medium text-gray-700">Hours</span></div>
+                      <div className="col-span-2"><span className="text-sm font-medium text-gray-700">Rate ($)</span></div>
+                      <div className="col-span-2"><span className="text-sm font-medium text-gray-700">Total</span></div>
+                    </div>
+                    <div className="grid grid-cols-12 gap-4 items-center">
+                      <input 
+                        type="text" 
+                        className="col-span-5 block w-full rounded-md shadow-sm focus:ring-0 text-gray-900 placeholder-gray-500 bg-white border-gray-300" 
+                        placeholder="Legal research and case preparation"
+                      />
+                      <input 
+                        type="number" 
+                        className="col-span-2 block w-full rounded-md shadow-sm focus:ring-0 text-gray-900 placeholder-gray-500 bg-white border-gray-300" 
+                        placeholder="2.5"
+                      />
+                      <input 
+                        type="number" 
+                        className="col-span-2 block w-full rounded-md shadow-sm focus:ring-0 text-gray-900 placeholder-gray-500 bg-white border-gray-300" 
+                        placeholder="350"
+                      />
+                      <span className="col-span-2 text-sm text-gray-900">$875.00</span>
+                    </div>
+                    <button type="button" className="text-sm font-medium text-gray-600 hover:text-gray-800 transition-colors">+ Add Legal Service</button>
+                  </div>
+                </section>
+              )}
+
+              {/* Restaurant Template Specific Section */}
+              {selectedTemplate === 'restaurant' && (
+                <section className="space-y-6 p-6 bg-orange-50/95 rounded-lg border border-orange-300">
+                  <h3 className="text-lg font-semibold text-orange-900">Restaurant Order Details</h3>
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <label className="block">
+                      <span className="text-sm font-medium text-orange-700">Table Number</span>
+                      <input 
+                        type="text" 
+                        className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-orange-900 placeholder-orange-500 bg-orange-50 border-orange-300" 
+                        placeholder="Table 12"
+                      />
+                    </label>
+                    <label className="block">
+                      <span className="text-sm font-medium text-orange-700">Server Name</span>
+                      <input 
+                        type="text" 
+                        className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-orange-900 placeholder-orange-500 bg-orange-50 border-orange-300" 
+                        placeholder="Sarah Johnson"
+                      />
+                    </label>
+                    <label className="block">
+                      <span className="text-sm font-medium text-orange-700">Order Time</span>
+                      <input 
+                        type="time" 
+                        className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-orange-900 bg-orange-50 border-orange-300"
+                      />
+                    </label>
+                    <label className="block">
+                      <span className="text-sm font-medium text-orange-700">Party Size</span>
+                      <input 
+                        type="number" 
+                        className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-orange-900 placeholder-orange-500 bg-orange-50 border-orange-300" 
+                        placeholder="4"
+                      />
+                    </label>
+                  </div>
+                  <div className="space-y-4">
+                    <h4 className="text-md font-semibold text-orange-800">Menu Items</h4>
+                    <div className="grid grid-cols-12 gap-4">
+                      <div className="col-span-5"><span className="text-sm font-medium text-orange-700">Item Name</span></div>
+                      <div className="col-span-2"><span className="text-sm font-medium text-orange-700">Qty</span></div>
+                      <div className="col-span-2"><span className="text-sm font-medium text-orange-700">Price</span></div>
+                      <div className="col-span-2"><span className="text-sm font-medium text-orange-700">Total</span></div>
+                    </div>
+                    <div className="grid grid-cols-12 gap-4 items-center">
+                      <input 
+                        type="text" 
+                        className="col-span-5 block w-full rounded-md shadow-sm focus:ring-0 text-orange-900 placeholder-orange-500 bg-orange-50 border-orange-300" 
+                        placeholder="Grilled Salmon with Rice"
+                      />
+                      <input 
+                        type="number" 
+                        className="col-span-2 block w-full rounded-md shadow-sm focus:ring-0 text-orange-900 placeholder-orange-500 bg-orange-50 border-orange-300" 
+                        placeholder="2"
+                      />
+                      <input 
+                        type="number" 
+                        className="col-span-2 block w-full rounded-md shadow-sm focus:ring-0 text-orange-900 placeholder-orange-500 bg-orange-50 border-orange-300" 
+                        placeholder="24.99"
+                      />
+                      <span className="col-span-2 text-sm text-orange-900">$49.98</span>
+                    </div>
+                    <button type="button" className="text-sm font-medium text-orange-600 hover:text-orange-800 transition-colors">+ Add Menu Item</button>
+                  </div>
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <label className="block">
+                      <span className="text-sm font-medium text-orange-700">Service Charge (%)</span>
+                      <input 
+                        type="number" 
+                        className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-orange-900 placeholder-orange-500 bg-orange-50 border-orange-300" 
+                        placeholder="18"
+                      />
+                    </label>
+                    <label className="block">
+                      <span className="text-sm font-medium text-orange-700">Tax Rate (%)</span>
+                      <input 
+                        type="number" 
+                        className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-orange-900 placeholder-orange-500 bg-orange-50 border-orange-300" 
+                        placeholder="8.5"
+                      />
+                    </label>
+                  </div>
+                </section>
+              )}
+
+              {/* Healthcare Template Specific Section */}
+              {selectedTemplate === 'healthcare' && (
+                <section className="space-y-6 p-6 bg-emerald-50/95 rounded-lg border border-emerald-300">
+                  <h3 className="text-lg font-semibold text-emerald-900">Medical Services</h3>
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <label className="block">
+                      <span className="text-sm font-medium text-emerald-700">Patient ID</span>
+                      <input 
+                        type="text" 
+                        className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-emerald-900 placeholder-emerald-500 bg-emerald-50 border-emerald-300" 
+                        placeholder="PAT-2024-001"
+                      />
+                    </label>
+                    <label className="block">
+                      <span className="text-sm font-medium text-emerald-700">Insurance Provider</span>
+                      <input 
+                        type="text" 
+                        className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-emerald-900 placeholder-emerald-500 bg-emerald-50 border-emerald-300" 
+                        placeholder="Blue Cross Blue Shield"
+                      />
+                    </label>
+                    <label className="block">
+                      <span className="text-sm font-medium text-emerald-700">Policy Number</span>
+                      <input 
+                        type="text" 
+                        className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-emerald-900 placeholder-emerald-500 bg-emerald-50 border-emerald-300" 
+                        placeholder="BC123456789"
+                      />
+                    </label>
+                    <label className="block">
+                      <span className="text-sm font-medium text-emerald-700">Date of Service</span>
+                      <input 
+                        type="date" 
+                        className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-emerald-900 bg-emerald-50 border-emerald-300"
+                      />
+                    </label>
+                  </div>
+                  <div className="space-y-4">
+                    <h4 className="text-md font-semibold text-emerald-800">Medical Procedures</h4>
+                    <div className="grid grid-cols-12 gap-4">
+                      <div className="col-span-4"><span className="text-sm font-medium text-emerald-700">Procedure Code</span></div>
+                      <div className="col-span-4"><span className="text-sm font-medium text-emerald-700">Description</span></div>
+                      <div className="col-span-2"><span className="text-sm font-medium text-emerald-700">Amount</span></div>
+                      <div className="col-span-2"><span className="text-sm font-medium text-emerald-700">Total</span></div>
+                    </div>
+                    <div className="grid grid-cols-12 gap-4 items-center">
+                      <input 
+                        type="text" 
+                        className="col-span-4 block w-full rounded-md shadow-sm focus:ring-0 text-emerald-900 placeholder-emerald-500 bg-emerald-50 border-emerald-300" 
+                        placeholder="99213"
+                      />
+                      <input 
+                        type="text" 
+                        className="col-span-4 block w-full rounded-md shadow-sm focus:ring-0 text-emerald-900 placeholder-emerald-500 bg-emerald-50 border-emerald-300" 
+                        placeholder="Office visit, established patient"
+                      />
+                      <input 
+                        type="number" 
+                        className="col-span-2 block w-full rounded-md shadow-sm focus:ring-0 text-emerald-900 placeholder-emerald-500 bg-emerald-50 border-emerald-300" 
+                        placeholder="150.00"
+                      />
+                      <span className="col-span-2 text-sm text-emerald-900">$150.00</span>
+                    </div>
+                    <button type="button" className="text-sm font-medium text-emerald-600 hover:text-emerald-800 transition-colors">+ Add Procedure</button>
+                  </div>
+                </section>
+              )}
+
               {/* Template-Specific Sections */}
               {getTemplateFeatures().showSubscriptionFields && (
                 <section className="space-y-6 p-6 bg-blue-900/20 rounded-lg border border-blue-500/20">
