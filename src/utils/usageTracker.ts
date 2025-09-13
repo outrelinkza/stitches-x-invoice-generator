@@ -185,8 +185,15 @@ export class UsageTracker {
 
       const { data, error } = await query.single();
 
+      // Handle 406 error specifically (RLS policy issues)
+      if (error && error.code === '406') {
+        console.warn('RLS policy error (406) - falling back to LocalStorage only');
+        return this.getDefaultUsage();
+      }
+
       if (error && error.code !== 'PGRST116') { // PGRST116 = no rows found
-        throw error;
+        console.warn('Supabase query error:', error);
+        return this.getDefaultUsage();
       }
 
       if (data) {
@@ -233,6 +240,12 @@ export class UsageTracker {
 
       const { data: existing, error: selectError } = await query.single();
 
+      // Handle 406 error specifically (RLS policy issues)
+      if (selectError && selectError.code === '406') {
+        console.warn('RLS policy error (406) - falling back to LocalStorage only');
+        return this.getDefaultUsage();
+      }
+
       if (existing && !selectError) {
         // Update existing record
         const { data, error } = await supabase
@@ -247,7 +260,13 @@ export class UsageTracker {
           .select()
           .single();
 
-        if (error) throw error;
+        if (error) {
+          if (error.code === '406') {
+            console.warn('RLS policy error (406) - falling back to LocalStorage only');
+            return this.getDefaultUsage();
+          }
+          throw error;
+        }
 
         return {
           downloads_this_month: data.downloads_this_month,
@@ -269,7 +288,13 @@ export class UsageTracker {
           .select()
           .single();
 
-        if (error) throw error;
+        if (error) {
+          if (error.code === '406') {
+            console.warn('RLS policy error (406) - falling back to LocalStorage only');
+            return this.getDefaultUsage();
+          }
+          throw error;
+        }
 
         return {
           downloads_this_month: data.downloads_this_month,
