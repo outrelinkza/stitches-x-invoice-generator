@@ -233,12 +233,79 @@ export default function Home() {
 
   // Get template-specific input classes
   const getTemplateInputClasses = () => {
-    if (selectedTemplate === 'legal') {
-      return 'text-gray-900 placeholder-gray-500 bg-white border-gray-300';
-    } else if (selectedTemplate === 'restaurant') {
-      return 'text-orange-900 placeholder-orange-500 bg-orange-50 border-orange-300';
-    } else {
-      return 'text-white placeholder-white/60';
+    switch (selectedTemplate) {
+      case 'legal':
+        return 'text-gray-900 placeholder-gray-500 bg-white border-gray-300';
+      case 'restaurant':
+        return 'text-orange-900 placeholder-orange-500 bg-orange-50 border-orange-300';
+      case 'healthcare':
+        return 'text-emerald-900 placeholder-emerald-500 bg-emerald-50 border-emerald-300';
+      case 'elegant-luxury':
+        return 'text-amber-900 placeholder-amber-500 bg-amber-50 border-amber-300';
+      case 'modern-tech':
+        return 'text-cyan-900 placeholder-cyan-500 bg-cyan-50 border-cyan-300';
+      case 'creative-agency':
+        return 'text-pink-900 placeholder-pink-500 bg-pink-50 border-pink-300';
+      case 'consulting':
+        return 'text-gray-900 placeholder-gray-500 bg-gray-50 border-gray-300';
+      case 'recurring-clients':
+        return 'text-blue-900 placeholder-blue-500 bg-blue-50 border-blue-300';
+      case 'minimalist-dark':
+        return 'text-white placeholder-white/60 bg-black/20 border-white/20';
+      default:
+        return 'text-white placeholder-white/60';
+    }
+  };
+
+  // Get template-specific text colors
+  const getTemplateTextColor = () => {
+    switch (selectedTemplate) {
+      case 'legal':
+        return 'text-gray-900';
+      case 'restaurant':
+        return 'text-orange-900';
+      case 'healthcare':
+        return 'text-emerald-900';
+      case 'elegant-luxury':
+        return 'text-amber-900';
+      case 'modern-tech':
+        return 'text-cyan-900';
+      case 'creative-agency':
+        return 'text-pink-900';
+      case 'consulting':
+        return 'text-gray-900';
+      case 'recurring-clients':
+        return 'text-blue-900';
+      case 'minimalist-dark':
+        return 'text-white';
+      default:
+        return 'text-white';
+    }
+  };
+
+  // Get template-specific label colors
+  const getTemplateLabelColor = () => {
+    switch (selectedTemplate) {
+      case 'legal':
+        return 'text-gray-700';
+      case 'restaurant':
+        return 'text-orange-700';
+      case 'healthcare':
+        return 'text-emerald-700';
+      case 'elegant-luxury':
+        return 'text-amber-700';
+      case 'modern-tech':
+        return 'text-cyan-700';
+      case 'creative-agency':
+        return 'text-pink-700';
+      case 'consulting':
+        return 'text-gray-700';
+      case 'recurring-clients':
+        return 'text-blue-700';
+      case 'minimalist-dark':
+        return '${getTemplateLabelColor()}';
+      default:
+        return '${getTemplateLabelColor()}';
     }
   };
 
@@ -660,7 +727,7 @@ export default function Home() {
               
               {/* Mobile-Optimized CTA */}
               <div className="mt-6 p-4 rounded-lg bg-gradient-to-r from-green-500/20 to-blue-500/20 border border-green-400/30 animate-enter" style={{animationDelay: '200ms'}}>
-                <p className="text-white/90 text-sm font-medium text-center">
+                <p className="${getTemplateLabelColor()} text-sm font-medium text-center">
                   📱 <strong>Mobile-Friendly:</strong> Create invoices on your phone, tablet, or desktop. Perfect for freelancers on the go!
                 </p>
               </div>
@@ -700,13 +767,13 @@ export default function Home() {
             <form ref={formRef} onChange={handleFormChange} className={`rounded-2xl shadow-lg p-8 space-y-8 animate-enter ${
               selectedTemplate === 'standard' ? 'glass-effect' :
               selectedTemplate === 'minimalist-dark' ? 'bg-black/40 border border-white/10' :
-              selectedTemplate === 'recurring-clients' ? 'bg-gradient-to-br from-blue-900/30 to-purple-900/30 border border-blue-500/20' :
-              selectedTemplate === 'creative-agency' ? 'bg-gradient-to-br from-pink-900/30 to-orange-900/30 border border-pink-500/20' :
-              selectedTemplate === 'consulting' ? 'bg-gradient-to-br from-gray-900/40 to-slate-900/40 border border-gray-500/20' :
+              selectedTemplate === 'recurring-clients' ? 'bg-gradient-to-br from-blue-50/95 to-purple-50/95 text-blue-900 border-2 border-blue-300 shadow-2xl' :
+              selectedTemplate === 'creative-agency' ? 'bg-gradient-to-br from-pink-50/95 to-orange-50/95 text-pink-900 border-2 border-pink-300 shadow-2xl' :
+              selectedTemplate === 'consulting' ? 'bg-gradient-to-br from-gray-50/95 to-slate-50/95 text-gray-900 border-2 border-gray-300 shadow-2xl' :
               selectedTemplate === 'custom' ? 'bg-gradient-to-br from-purple-900/30 to-indigo-900/30 border border-purple-500/20' :
-              selectedTemplate === 'modern-tech' ? 'bg-gradient-to-br from-cyan-900/30 to-blue-900/30 border border-cyan-500/20' :
-              selectedTemplate === 'elegant-luxury' ? 'bg-gradient-to-br from-amber-900/30 to-yellow-900/30 border border-amber-500/20' :
-              selectedTemplate === 'healthcare' ? 'bg-gradient-to-br from-emerald-900/30 to-green-900/30 border border-emerald-500/20' :
+              selectedTemplate === 'modern-tech' ? 'bg-gradient-to-br from-cyan-50/95 to-blue-50/95 text-cyan-900 border-2 border-cyan-300 shadow-2xl' :
+              selectedTemplate === 'elegant-luxury' ? 'bg-gradient-to-br from-amber-50/95 to-yellow-50/95 text-amber-900 border-2 border-amber-300 shadow-2xl' :
+              selectedTemplate === 'healthcare' ? 'bg-gradient-to-br from-emerald-50/95 to-green-50/95 text-emerald-900 border-2 border-emerald-300 shadow-2xl' :
               selectedTemplate === 'legal' ? 'bg-white/95 text-gray-900 border-2 border-gray-300 shadow-2xl' :
               selectedTemplate === 'restaurant' ? 'bg-gradient-to-br from-orange-50/95 to-red-50/95 text-orange-900 border-2 border-orange-300 shadow-2xl' :
               'glass-effect'
@@ -739,11 +806,7 @@ export default function Home() {
                 {/* Company Info Section */}
                 <section className="space-y-6">
                   <div className="flex items-center justify-between">
-                    <h3 className={`text-lg font-semibold ${
-                      selectedTemplate === 'legal' ? 'text-gray-900' :
-                      selectedTemplate === 'restaurant' ? 'text-orange-900' :
-                      'text-white'
-                    }`}>Your Company Info</h3>
+                    <h3 className={`text-lg font-semibold ${getTemplateTextColor()}`}>Your Company Info</h3>
                   </div>
                   <div className="flex items-center space-x-6">
                     <div className="flex-shrink-0">
@@ -782,11 +845,7 @@ export default function Home() {
                     </div>
                     <div className="space-y-4 flex-1">
                       <label className="block">
-                        <span className={`text-sm font-medium ${
-                          selectedTemplate === 'legal' ? 'text-gray-700' :
-                          selectedTemplate === 'restaurant' ? 'text-orange-700' :
-                          'text-white/90'
-                        }`}>Company Name</span>
+                        <span className={`text-sm font-medium ${getTemplateLabelColor()}`}>Company Name</span>
                         <input 
                           name="companyName" 
                           className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 ${getTemplateInputClasses()} ${getInputStyles()}`} 
@@ -798,10 +857,10 @@ export default function Home() {
                         />
                       </label>
                       <label className="block">
-                        <span className="text-sm font-medium text-white/90">Email/Phone</span>
+                        <span className="text-sm font-medium ${getTemplateLabelColor()}">Email/Phone</span>
                         <input 
                           name="companyContact" 
-                          className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} 
+                          className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 ${getTemplateInputClasses()} ${getInputStyles()}`} 
                           style={getCustomInputStyles()}
                           placeholder="Company email" 
                           type="text" 
@@ -812,10 +871,10 @@ export default function Home() {
                     </div>
                   </div>
                   <label className="block">
-                    <span className="text-sm font-medium text-white/90">Address</span>
+                    <span className="text-sm font-medium ${getTemplateLabelColor()}">Address</span>
                     <textarea 
                       name="companyAddress" 
-                      className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} 
+                      className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 ${getTemplateInputClasses()} ${getInputStyles()}`} 
                       style={getCustomInputStyles()}
                       placeholder="Company address" 
                       rows={2} 
@@ -828,38 +887,34 @@ export default function Home() {
                 {/* Client Info Section */}
                 <section className="space-y-6">
                   <div className="flex items-center justify-between">
-                    <h3 className={`text-lg font-semibold ${
-                      selectedTemplate === 'legal' ? 'text-gray-900' :
-                      selectedTemplate === 'restaurant' ? 'text-orange-900' :
-                      'text-white'
-                    }`}>Client Info</h3>
+                    <h3 className={`text-lg font-semibold ${getTemplateTextColor()}`}>Client Info</h3>
                   </div>
                   <div className="space-y-4">
                     <label className="block">
-                      <span className="text-sm font-medium text-white/90">Client Name</span>
+                      <span className="text-sm font-medium ${getTemplateLabelColor()}">Client Name</span>
                       <input 
                         name="clientName" 
-                        className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} 
+                        className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 ${getTemplateInputClasses()} ${getInputStyles()}`} 
                         style={getCustomInputStyles()}
                         placeholder="Client Name" aria-label="Client Name" required 
                         type="text"
                       />
                     </label>
                     <label className="block">
-                      <span className="text-sm font-medium text-white/90">Address</span>
+                      <span className="text-sm font-medium ${getTemplateLabelColor()}">Address</span>
                       <textarea 
                         name="clientAddress" 
-                        className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} 
+                        className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 ${getTemplateInputClasses()} ${getInputStyles()}`} 
                         style={getCustomInputStyles()}
                         placeholder="Client Address" 
                         rows={2}
                       ></textarea>
                     </label>
                     <label className="block">
-                      <span className="text-sm font-medium text-white/90">Email/Phone</span>
+                      <span className="text-sm font-medium ${getTemplateLabelColor()}">Email/Phone</span>
                       <input 
                         name="clientContact" 
-                        className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} 
+                        className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 ${getTemplateInputClasses()} ${getInputStyles()}`} 
                         style={getCustomInputStyles()}
                         placeholder="Client email" 
                         type="text"
@@ -905,7 +960,7 @@ export default function Home() {
                     </label>
                     <label className="block">
                       <span className="text-sm font-medium text-pink-200">Project Timeline</span>
-                      <input type="text" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="Timeline" />
+                      <input type="text" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 ${getTemplateInputClasses()} ${getInputStyles()}`} placeholder="Timeline" />
                     </label>
                   </div>
                 </section>
@@ -926,7 +981,7 @@ export default function Home() {
                     </label>
                     <label className="block">
                       <span className="text-sm font-medium text-gray-200">Hourly Rate</span>
-                      <input type="number" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="Hours" />
+                      <input type="number" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 ${getTemplateInputClasses()} ${getInputStyles()}`} placeholder="Hours" />
                     </label>
                   </div>
                 </section>
@@ -937,18 +992,18 @@ export default function Home() {
                 <h3 className="text-lg font-semibold text-white">Invoice Details</h3>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
                   <label className="block">
-                    <span className="text-sm font-medium text-white/90">Invoice Number</span>
+                    <span className="text-sm font-medium ${getTemplateLabelColor()}">Invoice Number</span>
                     <input 
                       name="invoiceNumber" 
                       value={invoiceNumber}
                       onChange={(e) => setInvoiceNumber(e.target.value)}
-                      className="mt-1 block w-full rounded-md border-white/20 bg-white/10 shadow-sm focus:ring-0 input-focus-glow text-white placeholder-white/60" 
+                      className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 input-focus-glow ${getTemplateInputClasses()}" 
                       placeholder="Invoice number" 
                       type="text"
                     />
                   </label>
                   <label className="block">
-                    <span className="text-sm font-medium text-white/90">Invoice Date</span>
+                    <span className="text-sm font-medium ${getTemplateLabelColor()}">Invoice Date</span>
                     <input 
                       name="date" 
                       className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white ${getInputStyles()}`} 
@@ -958,7 +1013,7 @@ export default function Home() {
                     />
                   </label>
                 <label className="block">
-                  <span className="text-sm font-medium text-white/90">Due Date</span>
+                  <span className="text-sm font-medium ${getTemplateLabelColor()}">Due Date</span>
                   <input 
                     name="dueDate" 
                     className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white ${getInputStyles()}`} 
@@ -968,7 +1023,7 @@ export default function Home() {
                   />
                 </label>
                   <label className="block">
-                    <span className="text-sm font-medium text-white/90">Invoice Type</span>
+                    <span className="text-sm font-medium ${getTemplateLabelColor()}">Invoice Type</span>
                     <select 
                       name="invoiceType"
                       className="mt-1 block w-full rounded-md border-white/20 bg-white/10 shadow-sm focus:ring-0 input-focus-glow text-white" 
@@ -991,16 +1046,16 @@ export default function Home() {
                   <h3 className="text-lg font-semibold text-white">Line Items</h3>
                   <div className="space-y-4">
                     <div className="grid grid-cols-12 gap-4">
-                      <div className="col-span-5"><span className="text-sm font-medium text-white/90">Item Description</span></div>
-                      <div className="col-span-2"><span className="text-sm font-medium text-white/90">Quantity</span></div>
-                      <div className="col-span-2"><span className="text-sm font-medium text-white/90">Price</span></div>
-                      <div className="col-span-2"><span className="text-sm font-medium text-white/90">Total</span></div>
+                      <div className="col-span-5"><span className="text-sm font-medium ${getTemplateLabelColor()}">Item Description</span></div>
+                      <div className="col-span-2"><span className="text-sm font-medium ${getTemplateLabelColor()}">Quantity</span></div>
+                      <div className="col-span-2"><span className="text-sm font-medium ${getTemplateLabelColor()}">Price</span></div>
+                      <div className="col-span-2"><span className="text-sm font-medium ${getTemplateLabelColor()}">Total</span></div>
                     </div>
                     {lineItems.map((item) => (
                       <div key={item.id} className="grid grid-cols-12 gap-4 items-center" data-line-item>
                         <input 
                           name="itemDescription" 
-                          className={`col-span-5 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} 
+                          className={`col-span-5 block w-full rounded-md shadow-sm focus:ring-0 ${getTemplateInputClasses()} ${getInputStyles()}`} 
                           style={getCustomInputStyles()}
                           placeholder="e.g., iPhone 15 Pro" 
                           type="text"
@@ -1009,7 +1064,7 @@ export default function Home() {
                         />
                         <input 
                           name="quantity" 
-                          className={`col-span-2 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} 
+                          className={`col-span-2 block w-full rounded-md shadow-sm focus:ring-0 ${getTemplateInputClasses()} ${getInputStyles()}`} 
                           style={getCustomInputStyles()}
                           placeholder="1" 
                           type="number" 
@@ -1018,7 +1073,7 @@ export default function Home() {
                         />
                         <input 
                           name="rate" 
-                          className={`col-span-2 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} 
+                          className={`col-span-2 block w-full rounded-md shadow-sm focus:ring-0 ${getTemplateInputClasses()} ${getInputStyles()}`} 
                           style={getCustomInputStyles()}
                           placeholder="Rate" 
                           type="number" 
@@ -1048,16 +1103,16 @@ export default function Home() {
                   <h3 className="text-lg font-semibold text-white">Services</h3>
                   <div className="space-y-4">
                     <div className="grid grid-cols-12 gap-4">
-                      <div className="col-span-5"><span className="text-sm font-medium text-white/90">Service Description</span></div>
-                      <div className="col-span-2"><span className="text-sm font-medium text-white/90">Hours</span></div>
-                      <div className="col-span-2"><span className="text-sm font-medium text-white/90">Rate</span></div>
-                      <div className="col-span-2"><span className="text-sm font-medium text-white/90">Total</span></div>
+                      <div className="col-span-5"><span className="text-sm font-medium ${getTemplateLabelColor()}">Service Description</span></div>
+                      <div className="col-span-2"><span className="text-sm font-medium ${getTemplateLabelColor()}">Hours</span></div>
+                      <div className="col-span-2"><span className="text-sm font-medium ${getTemplateLabelColor()}">Rate</span></div>
+                      <div className="col-span-2"><span className="text-sm font-medium ${getTemplateLabelColor()}">Total</span></div>
                     </div>
                     {lineItems.map((item) => (
                       <div key={item.id} className="grid grid-cols-12 gap-4 items-center" data-line-item>
                         <input 
                           name="serviceDescription" 
-                          className={`col-span-5 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} 
+                          className={`col-span-5 block w-full rounded-md shadow-sm focus:ring-0 ${getTemplateInputClasses()} ${getInputStyles()}`} 
                           style={getCustomInputStyles()}
                           placeholder="e.g., UI/UX Design" 
                           type="text"
@@ -1066,7 +1121,7 @@ export default function Home() {
                         />
                         <input 
                           name="quantity" 
-                          className={`col-span-2 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} 
+                          className={`col-span-2 block w-full rounded-md shadow-sm focus:ring-0 ${getTemplateInputClasses()} ${getInputStyles()}`} 
                           style={getCustomInputStyles()}
                           placeholder="Qty" 
                           type="number" 
@@ -1075,7 +1130,7 @@ export default function Home() {
                         />
                         <input 
                           name="rate" 
-                          className={`col-span-2 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} 
+                          className={`col-span-2 block w-full rounded-md shadow-sm focus:ring-0 ${getTemplateInputClasses()} ${getInputStyles()}`} 
                           style={getCustomInputStyles()}
                           placeholder="Rate" 
                           type="number" 
@@ -1106,18 +1161,18 @@ export default function Home() {
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                       <label className="block">
-                        <span className="text-sm font-medium text-white/90">Start Time</span>
+                        <span className="text-sm font-medium ${getTemplateLabelColor()}">Start Time</span>
                         <input className="mt-1 block w-full rounded-md border-white/20 bg-white/10 shadow-sm focus:ring-0 input-focus-glow text-white" type="time"/>
                       </label>
                       <label className="block">
-                        <span className="text-sm font-medium text-white/90">End Time</span>
+                        <span className="text-sm font-medium ${getTemplateLabelColor()}">End Time</span>
                         <input className="mt-1 block w-full rounded-md border-white/20 bg-white/10 shadow-sm focus:ring-0 input-focus-glow text-white" type="time"/>
                       </label>
                       <label className="block">
-                        <span className="text-sm font-medium text-white/90">Hourly Rate ($)</span>
+                        <span className="text-sm font-medium ${getTemplateLabelColor()}">Hourly Rate ($)</span>
                         <input 
                           name="hourlyRate" 
-                          className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} 
+                          className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 ${getTemplateInputClasses()} ${getInputStyles()}`} 
                           style={getCustomInputStyles()}
                           placeholder="Hourly rate" 
                           type="number"
@@ -1126,11 +1181,11 @@ export default function Home() {
                     </div>
                     <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10">
                       <div>
-                        <span className="text-sm font-medium text-white/90">Total Hours:</span>
+                        <span className="text-sm font-medium ${getTemplateLabelColor()}">Total Hours:</span>
                         <span className="ml-2 text-white font-semibold">8.5 hours</span>
                       </div>
                       <div>
-                        <span className="text-sm font-medium text-white/90">Total Amount:</span>
+                        <span className="text-sm font-medium ${getTemplateLabelColor()}">Total Amount:</span>
                         <span className="ml-2 text-white font-semibold">$637.50</span>
                       </div>
                       <button 
@@ -1159,8 +1214,8 @@ export default function Home() {
                     </div>
                     <div className="space-y-3">
                       <label className="block">
-                        <span className="text-sm font-medium text-white/90">Work Description</span>
-                        <textarea className="mt-1 block w-full rounded-md border-white/20 bg-white/10 shadow-sm focus:ring-0 input-focus-glow text-white placeholder-white/60" placeholder="Describe the work performed..." rows={3}></textarea>
+                        <span className="text-sm font-medium ${getTemplateLabelColor()}">Work Description</span>
+                        <textarea className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 input-focus-glow ${getTemplateInputClasses()}" placeholder="Describe the work performed..." rows={3}></textarea>
                       </label>
                     </div>
                   </div>
@@ -1174,20 +1229,20 @@ export default function Home() {
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                       <label className="block">
-                        <span className="text-sm font-medium text-white/90">Description</span>
+                        <span className="text-sm font-medium ${getTemplateLabelColor()}">Description</span>
                         <input 
                           name="itemDescription" 
-                          className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} 
+                          className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 ${getTemplateInputClasses()} ${getInputStyles()}`} 
                           style={getCustomInputStyles()}
                           placeholder="Payment for services rendered" 
                           type="text"
                         />
                       </label>
                       <label className="block">
-                        <span className="text-sm font-medium text-white/90">Amount</span>
+                        <span className="text-sm font-medium ${getTemplateLabelColor()}">Amount</span>
                         <input 
                           name="rate" 
-                          className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} 
+                          className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 ${getTemplateInputClasses()} ${getInputStyles()}`} 
                           style={getCustomInputStyles()}
                           placeholder="Amount" 
                           type="number"
@@ -1203,7 +1258,7 @@ export default function Home() {
                 <div className="flex justify-between items-center">
                   <h3 className="text-lg font-semibold text-white">Totals</h3>
                   <label className="flex items-center space-x-2 cursor-pointer">
-                    <span className="text-sm font-medium text-white/90">Show Details</span>
+                    <span className="text-sm font-medium ${getTemplateLabelColor()}">Show Details</span>
                     <div onClick={() => setShowTotals(!showTotals)} className="relative">
                       <input className="sr-only" type="checkbox" checked={showTotals} readOnly/>
                       <div className="block bg-white/20 w-10 h-6 rounded-full"></div>
@@ -1216,7 +1271,7 @@ export default function Home() {
                     <div className="flex justify-end items-center">
                       <div className="w-full md:w-1/2 lg:w-1/3 space-y-3">
                         <div className="flex justify-between items-center">
-                          <span className="text-sm font-medium text-white/90">Subtotal</span>
+                          <span className="text-sm font-medium ${getTemplateLabelColor()}">Subtotal</span>
                           <div className="relative w-24">
                             <input 
                               name="subtotal"
@@ -1229,7 +1284,7 @@ export default function Home() {
                           </div>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="text-sm font-medium text-white/90">Tax (%)</span>
+                          <span className="text-sm font-medium ${getTemplateLabelColor()}">Tax (%)</span>
                           <div className="relative w-24">
                             <input 
                               name="taxRate"
@@ -1262,8 +1317,8 @@ export default function Home() {
               {/* Additional Notes Section */}
               <section>
                 <label className="block">
-                  <span className="text-sm font-medium text-white/90">Additional Notes</span>
-                  <textarea name="additionalNotes" className="mt-1 block w-full rounded-md border-white/20 bg-white/10 shadow-sm focus:ring-0 input-focus-glow text-white placeholder-white/60 px-3 py-2 box-border" placeholder="Thank you for your business." rows={3}></textarea>
+                  <span className="text-sm font-medium ${getTemplateLabelColor()}">Additional Notes</span>
+                  <textarea name="additionalNotes" className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 input-focus-glow ${getTemplateInputClasses()} px-3 py-2 box-border" placeholder="Thank you for your business." rows={3}></textarea>
                 </label>
               </section>
 
