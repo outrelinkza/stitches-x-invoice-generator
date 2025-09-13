@@ -18,8 +18,11 @@ export class UsageTracker {
   static async getCurrentUsage(userId?: string, email?: string): Promise<UsageData> {
     try {
       // Use LocalStorage only (Supabase disabled for testing)
-      console.log('UsageTracker: Using LocalStorage only (Supabase disabled)');
-      return this.getLocalUsage();
+      console.log('UsageTracker: getCurrentUsage called with userId:', userId, 'email:', email);
+      console.log('UsageTracker: Using LocalStorage only (Supabase disabled) - VERSION 2.0');
+      const result = this.getLocalUsage();
+      console.log('UsageTracker: Returning LocalStorage result:', result);
+      return result;
     } catch (error) {
       console.error('Error getting usage:', error);
       // Fallback to default usage
