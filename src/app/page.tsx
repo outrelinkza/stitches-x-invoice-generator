@@ -1478,7 +1478,17 @@ export default function Home() {
                       </ul>
                       
                       <button 
-                        onClick={() => createOneTimePayment(PRICING_PLANS.basic.priceId)}
+                        onClick={async () => {
+                          try {
+                            showLoading('Processing payment...');
+                            const success = await createOneTimePayment(PRICING_PLANS.basic.priceId);
+                            if (!success) {
+                              showError('Payment failed. Please try again.');
+                            }
+                          } catch (error) {
+                            showError('Payment failed. Please try again.');
+                          }
+                        }}
                         className="w-full py-3 px-6 bg-white/10 text-white rounded-lg border border-white/20 hover:bg-white/20 transition-colors"
                       >
                         Pay £1.50 per Invoice
@@ -1530,7 +1540,17 @@ export default function Home() {
                         </ul>
                         
                         <button 
-                          onClick={() => createOneTimePayment(PRICING_PLANS.premium.priceId)}
+                          onClick={async () => {
+                            try {
+                              showLoading('Processing payment...');
+                              const success = await createOneTimePayment(PRICING_PLANS.premium.priceId);
+                              if (!success) {
+                                showError('Payment failed. Please try again.');
+                              }
+                            } catch (error) {
+                              showError('Payment failed. Please try again.');
+                            }
+                          }}
                           className="w-full py-3 px-6 bg-[var(--primary-color)] text-white rounded-lg hover:bg-[var(--primary-color)]/80 transition-colors font-medium"
                         >
                           Pay £3.50 per Invoice
