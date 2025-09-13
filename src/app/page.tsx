@@ -26,7 +26,7 @@ import { showSuccess, showError, showInfo, showLoading, hideNotification } from 
 import NavHeader from '@/components/NavHeader';
 
 export default function Home() {
-  console.log('🎉 NEW CODE RUNNING - ALL TEMPLATES STANDARDIZED - VERSION 11.0 - CACHE BUST: ' + Date.now() + ' - ALL TEMPLATES NOW USE GLASS EFFECT');
+  console.log('🎉 NEW CODE RUNNING - FINAL COLOR FIX - VERSION 12.0 - CACHE BUST: ' + Date.now() + ' - ALL TEMPLATES COMPLETELY STANDARDIZED');
   const [invoiceType, setInvoiceType] = useState('product_sales');
   const [logo, setLogo] = useState<string | null>(null);
   const [isFormValid, setIsFormValid] = useState(false);
@@ -949,9 +949,9 @@ export default function Home() {
                         className="col-span-2 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60" 
                         placeholder="350"
                       />
-                      <span className="col-span-2 text-sm text-gray-900">$875.00</span>
+                      <span className="col-span-2 text-sm text-white">$875.00</span>
                     </div>
-                    <button type="button" className="text-sm font-medium text-white/80 hover:text-gray-900 transition-colors">+ Add Legal Service</button>
+                    <button type="button" className="text-sm font-medium text-white/80 hover:text-white transition-colors">+ Add Legal Service</button>
                   </div>
                 </section>
               )}
@@ -981,7 +981,7 @@ export default function Home() {
                       <span className="text-sm font-medium text-white/80">Order Time</span>
                       <input 
                         type="time" 
-                        className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-gray-900 bg-white border-gray-300"
+                        className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60"
                       />
                     </label>
                     <label className="block">
@@ -1017,9 +1017,9 @@ export default function Home() {
                         className="col-span-2 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60" 
                         placeholder="24.99"
                       />
-                      <span className="col-span-2 text-sm text-orange-900">$49.98</span>
+                      <span className="col-span-2 text-sm text-white">$49.98</span>
                     </div>
-                    <button type="button" className="text-sm font-medium text-orange-600 hover:text-orange-800 transition-colors">+ Add Menu Item</button>
+                    <button type="button" className="text-sm font-medium text-white/80 hover:text-white transition-colors">+ Add Menu Item</button>
                   </div>
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <label className="block">
@@ -1075,7 +1075,7 @@ export default function Home() {
                       <span className="text-sm font-medium text-white/80">Date of Service</span>
                       <input 
                         type="date" 
-                        className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-gray-900 bg-white border-gray-300"
+                        className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60"
                       />
                     </label>
                   </div>
@@ -1103,9 +1103,9 @@ export default function Home() {
                         className="col-span-2 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60" 
                         placeholder="150.00"
                       />
-                      <span className="col-span-2 text-sm text-emerald-900">$150.00</span>
+                      <span className="col-span-2 text-sm text-white">$150.00</span>
                     </div>
-                    <button type="button" className="text-sm font-medium text-emerald-600 hover:text-emerald-800 transition-colors">+ Add Procedure</button>
+                    <button type="button" className="text-sm font-medium text-white/80 hover:text-white transition-colors">+ Add Procedure</button>
                   </div>
                 </section>
               )}
