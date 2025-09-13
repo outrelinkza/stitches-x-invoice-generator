@@ -168,152 +168,247 @@ export const generateInvoicePDF = (data: InvoiceData): void => {
   
   const layoutOptions = getLayoutOptions();
   
+  // Helper function to convert hex color to RGB
+  const hexToRgb = (hex: string) => {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16)
+    } : { r: 0, g: 0, b: 0 };
+  };
+  
+  // Helper function to set font based on typography
+  const setCustomFont = (size?: number, weight?: string) => {
+    const fontSize = size || typography.fontSize;
+    const fontWeight = weight || typography.fontWeight;
+    
+    // Map font families to jsPDF supported fonts
+    let fontFamily = 'helvetica';
+    if (typography.fontFamily.toLowerCase().includes('times')) {
+      fontFamily = 'times';
+    } else if (typography.fontFamily.toLowerCase().includes('courier')) {
+      fontFamily = 'courier';
+    }
+    
+    // Set font style based on weight
+    let fontStyle = 'normal';
+    if (fontWeight === 'bold' || fontWeight === '700' || fontWeight === '900') {
+      fontStyle = 'bold';
+    } else if (fontWeight === 'italic') {
+      fontStyle = 'italic';
+    }
+    
+    doc.setFont(fontFamily, fontStyle);
+    doc.setFontSize(fontSize);
+  };
+  
+  // Helper function to set text color
+  const setTextColor = (color: string) => {
+    const rgb = hexToRgb(color);
+    doc.setTextColor(rgb.r, rgb.g, rgb.b);
+  };
+  
+  // Helper function to set fill color
+  const setFillColor = (color: string) => {
+    const rgb = hexToRgb(color);
+    doc.setFillColor(rgb.r, rgb.g, rgb.b);
+  };
+  
   // Header
-  doc.setFillColor(colors.primary);
-  doc.rect(0, 0, pageWidth, 40, 'F');
+  const headerHeight = data.customTemplate?.headerHeight === 'large' ? 50 : 
+                      data.customTemplate?.headerHeight === 'small' ? 30 : 40;
+  
+  setFillColor(colors.primary);
+  doc.rect(0, 0, pageWidth, headerHeight, 'F');
   
   // Logo placeholder (if logo exists and showLogo is true)
   if (data.logo && layoutOptions.showLogo) {
-    // In a real implementation, you'd convert the logo to base64 and add it
-    doc.setFontSize(16);
-    doc.setTextColor(255, 255, 255);
-    doc.text('LOGO', 20, 25);
+    setCustomFont(16);
+    setTextColor('#FFFFFF');
+    doc.text('LOGO', 20, headerHeight / 2 + 5);
   }
   
   // Company name
-  doc.setFontSize(20);
-  doc.setTextColor(255, 255, 255);
-  doc.text(data.companyName, (data.logo && layoutOptions.showLogo) ? 60 : 20, 25);
+  setCustomFont(20, 'bold');
+  setTextColor('#FFFFFF');
+  doc.text(data.companyName, (data.logo && layoutOptions.showLogo) ? 60 : 20, headerHeight / 2 + 5);
   
   // Invoice title
-  doc.setFontSize(24);
-  doc.setTextColor(colors.primary);
-  doc.text('INVOICE', pageWidth - 60, 25);
+  setCustomFont(24, 'bold');
+  setTextColor('#FFFFFF');
+  doc.text('INVOICE', pageWidth - 60, headerHeight / 2 + 5);
   
-  // Company details
-  doc.setFontSize(10);
-  doc.setTextColor(100, 100, 100);
-  let yPos = 50;
-  doc.text(data.companyAddress, 20, yPos);
-  yPos += 5;
-  doc.text(data.companyContact, 20, yPos);
+  let yPosition = headerHeight + 20;
   
-  // Invoice details box
-  yPos = 50;
-  doc.setFillColor(240, 240, 240);
-  doc.rect(pageWidth - 80, yPos - 10, 70, 30, 'F');
+  // Company details (if showCompanyAddress is true)
+  if (layoutOptions.showCompanyAddress) {
+    setCustomFont(typography.fontSize);
+    setTextColor(colors.secondary);
+    doc.text(data.companyAddress, 20, yPosition);
+    yPosition += 10;
+    doc.text(data.companyContact, 20, yPosition);
+    yPosition += 20;
+  }
   
-  doc.setFontSize(10);
-  doc.setTextColor(colors.primary);
-  doc.text('Invoice #:', pageWidth - 75, yPos);
-  doc.text(data.invoiceNumber, pageWidth - 45, yPos);
-  yPos += 5;
+  // Invoice details section
+  const invoiceDetailsX = pageWidth - 80;
+  let invoiceY = headerHeight + 20;
   
-  doc.text('Date:', pageWidth - 75, yPos);
-  doc.text(data.date, pageWidth - 45, yPos);
-  yPos += 5;
+  if (layoutOptions.showInvoiceNumber) {
+    setCustomFont(typography.fontSize, 'bold');
+    setTextColor(colors.primary);
+    doc.text('Invoice #:', invoiceDetailsX, invoiceY);
+    setCustomFont(typography.fontSize);
+    setTextColor(colors.textColor || '#000000');
+    doc.text(data.invoiceNumber, invoiceDetailsX + 30, invoiceY);
+    invoiceY += 10;
+  }
   
-  doc.text('Due Date:', pageWidth - 75, yPos);
-  doc.text(data.dueDate, pageWidth - 45, yPos);
-  yPos += 5;
+  if (layoutOptions.showInvoiceDate) {
+    setCustomFont(typography.fontSize, 'bold');
+    setTextColor(colors.primary);
+    doc.text('Date:', invoiceDetailsX, invoiceY);
+    setCustomFont(typography.fontSize);
+    setTextColor(colors.textColor || '#000000');
+    doc.text(data.date, invoiceDetailsX + 30, invoiceY);
+    invoiceY += 10;
+  }
   
-  doc.text('Terms:', pageWidth - 75, yPos);
-  doc.text(data.paymentTerms, pageWidth - 45, yPos);
+  if (layoutOptions.showDueDate) {
+    setCustomFont(typography.fontSize, 'bold');
+    setTextColor(colors.primary);
+    doc.text('Due Date:', invoiceDetailsX, invoiceY);
+    setCustomFont(typography.fontSize);
+    setTextColor(colors.textColor || '#000000');
+    doc.text(data.dueDate, invoiceDetailsX + 30, invoiceY);
+    invoiceY += 10;
+  }
   
-  // Bill to section
-  yPos = 90;
-  doc.setFontSize(12);
-  doc.setTextColor(colors.primary);
-  doc.text('Bill To:', 20, yPos);
+  doc.text('Payment Terms:', invoiceDetailsX, invoiceY);
+  setCustomFont(typography.fontSize);
+  setTextColor(colors.textColor || '#000000');
+  doc.text(data.paymentTerms, invoiceDetailsX + 30, invoiceY);
+  invoiceY += 20;
   
-  doc.setFontSize(10);
-  doc.setTextColor(100, 100, 100);
-  yPos += 8;
-  doc.text(data.clientName, 20, yPos);
-  yPos += 5;
-  doc.text(data.clientAddress, 20, yPos);
-  yPos += 5;
-  doc.text(data.clientContact, 20, yPos);
-  
-  // Items table header
-  yPos = 120;
-  doc.setFillColor(colors.secondary);
-  doc.rect(20, yPos - 5, pageWidth - 40, 10, 'F');
-  
-  doc.setFontSize(10);
-  doc.setTextColor(255, 255, 255);
-  doc.text('Description', 25, yPos);
-  doc.text('Qty', pageWidth - 100, yPos);
-  doc.text('Rate', pageWidth - 80, yPos);
-  doc.text('Amount', pageWidth - 40, yPos);
-  
-  // Items
-  yPos += 10;
-  data.items.forEach((item, index) => {
-    if (yPos > pageHeight - 50) {
-      doc.addPage();
-      yPos = 20;
-    }
+  // Client details (if showClientAddress is true)
+  if (layoutOptions.showClientAddress) {
+    setCustomFont(typography.fontSize + 2, 'bold');
+    setTextColor(colors.primary);
+    doc.text('Bill To:', 20, yPosition);
+    yPosition += 15;
     
+    setCustomFont(typography.fontSize);
+    setTextColor(colors.textColor || '#000000');
+    doc.text(data.clientName, 20, yPosition);
+    yPosition += 10;
+    doc.text(data.clientAddress, 20, yPosition);
+    yPosition += 10;
+    doc.text(data.clientContact, 20, yPosition);
+    yPosition += 20;
+  }
+  
+  // Items table
+  setCustomFont(typography.fontSize + 2, 'bold');
+  setTextColor(colors.primary);
+  doc.text('Items', 20, yPosition);
+  yPosition += 15;
+  
+  // Table headers
+  const tableStartY = yPosition;
+  const colWidths = [80, 30, 30, 30];
+  const colPositions = [20, 100, 130, 160];
+  
+  setCustomFont(typography.fontSize, 'bold');
+  setTextColor('#FFFFFF');
+  setFillColor(colors.primary);
+  
+  // Header row
+  doc.rect(20, yPosition - 5, 170, 15, 'F');
+  doc.text('Description', colPositions[0], yPosition);
+  doc.text('Qty', colPositions[1], yPosition);
+  doc.text('Rate', colPositions[2], yPosition);
+  doc.text('Amount', colPositions[3], yPosition);
+  yPosition += 15;
+  
+  // Items rows
+  setCustomFont(typography.fontSize);
+  setTextColor(colors.textColor || '#000000');
+  
+  data.items.forEach((item, index) => {
     // Alternate row colors
     if (index % 2 === 0) {
-      doc.setFillColor(248, 248, 248);
-      doc.rect(20, yPos - 3, pageWidth - 40, 8, 'F');
+      setFillColor('#F8F9FA');
+      doc.rect(20, yPosition - 5, 170, 15, 'F');
     }
     
-    doc.setFontSize(9);
-    doc.setTextColor(100, 100, 100);
-    doc.text(item.description, 25, yPos);
-    doc.text(item.quantity.toString(), pageWidth - 100, yPos);
-    doc.text(`$${item.rate.toFixed(2)}`, pageWidth - 80, yPos);
-    doc.text(`$${item.amount.toFixed(2)}`, pageWidth - 40, yPos);
-    yPos += 8;
+    doc.text(item.description, colPositions[0], yPosition);
+    doc.text(item.quantity.toString(), colPositions[1], yPosition);
+    doc.text(`$${item.rate.toFixed(2)}`, colPositions[2], yPosition);
+    doc.text(`$${item.amount.toFixed(2)}`, colPositions[3], yPosition);
+    yPosition += 15;
   });
   
-  // Totals
-  yPos += 10;
-  doc.setFontSize(10);
-  doc.setTextColor(100, 100, 100);
-  doc.text('Subtotal:', pageWidth - 80, yPos);
-  doc.text(`$${data.subtotal.toFixed(2)}`, pageWidth - 40, yPos);
-  yPos += 8;
+  // Totals section
+  yPosition += 10;
+  const totalsX = pageWidth - 80;
   
-  doc.text(`Tax (${data.taxRate}%):`, pageWidth - 80, yPos);
-  doc.text(`$${data.taxAmount.toFixed(2)}`, pageWidth - 40, yPos);
-  yPos += 8;
+  setCustomFont(typography.fontSize);
+  setTextColor(colors.textColor || '#000000');
+  doc.text('Subtotal:', totalsX, yPosition);
+  doc.text(`$${data.subtotal.toFixed(2)}`, totalsX + 30, yPosition);
+  yPosition += 10;
   
-  doc.setFontSize(12);
-  doc.setTextColor(colors.primary);
-  doc.text('Total:', pageWidth - 80, yPos);
-  doc.text(`$${data.total.toFixed(2)}`, pageWidth - 40, yPos);
-  
-  // Additional notes
-  if (data.additionalNotes) {
-    yPos += 20;
-    doc.setFontSize(10);
-    doc.setTextColor(100, 100, 100);
-    doc.text('Notes:', 20, yPos);
-    yPos += 8;
-    doc.text(data.additionalNotes, 20, yPos);
+  if (layoutOptions.showTaxBreakdown && data.taxRate > 0) {
+    doc.text(`Tax (${data.taxRate}%):`, totalsX, yPosition);
+    doc.text(`$${data.taxAmount.toFixed(2)}`, totalsX + 30, yPosition);
+    yPosition += 10;
   }
   
-  // Footer
-  doc.setFontSize(8);
-  doc.setTextColor(150, 150, 150);
-  doc.text('Thank you for your business!', pageWidth / 2, pageHeight - 20, { align: 'center' });
+  // Total line
+  setCustomFont(typography.fontSize + 2, 'bold');
+  setTextColor(colors.primary);
+  doc.text('Total:', totalsX, yPosition);
+  doc.text(`$${data.total.toFixed(2)}`, totalsX + 30, yPosition);
   
-  // Add watermark if provided
-  if (data.watermark) {
-    doc.setGState(new doc.GState({ opacity: 0.1 }));
-    doc.setFontSize(16);
-    doc.setTextColor(200, 200, 200);
-    doc.text(data.watermark, pageWidth / 2, pageHeight / 2, { 
-      align: 'center',
-      angle: 45 
-    });
-    doc.setGState(new doc.GState({ opacity: 1 }));
+  // Additional notes (if showNotes is true)
+  if (layoutOptions.showNotes && data.additionalNotes) {
+    yPosition += 30;
+    setCustomFont(typography.fontSize, 'bold');
+    setTextColor(colors.primary);
+    doc.text('Notes:', 20, yPosition);
+    yPosition += 10;
+    
+    setCustomFont(typography.fontSize);
+    setTextColor(colors.textColor || '#000000');
+    const splitNotes = doc.splitTextToSize(data.additionalNotes, 150);
+    doc.text(splitNotes, 20, yPosition);
   }
   
-  // Save the PDF
+  // Thank you message (if showThankYouMessage is true)
+  if (layoutOptions.showThankYouMessage) {
+    yPosition += 40;
+    setCustomFont(typography.fontSize + 2, 'bold');
+    setTextColor(colors.primary);
+    doc.text('Thank you for your business!', 20, yPosition);
+  }
+  
+  // Page numbers (if showPageNumbers is true)
+  if (layoutOptions.showPageNumbers) {
+    setCustomFont(typography.fontSize - 2);
+    setTextColor(colors.secondary);
+    doc.text('Page 1', pageWidth - 30, pageHeight - 10);
+  }
+  
+  // Watermark (if showWatermark is true and watermark exists)
+  if (data.customTemplate?.showWatermark && data.watermark) {
+    doc.setGState(new doc.GState({opacity: 0.1}));
+    setCustomFont(48, 'bold');
+    setTextColor(colors.secondary);
+    doc.text(data.watermark, pageWidth / 2, pageHeight / 2, { angle: 45, align: 'center' });
+    doc.setGState(new doc.GState({opacity: 1}));
+  }
+  
+  // Download the PDF
   doc.save(`invoice-${data.invoiceNumber}.pdf`);
 };

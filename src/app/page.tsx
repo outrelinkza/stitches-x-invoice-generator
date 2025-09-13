@@ -1844,12 +1844,15 @@ export default function Home() {
 
                     <div>
                       <label className="block text-white/80 text-sm font-medium mb-2">Typography</label>
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-3 gap-2">
                         <select
                           value={customTemplate.fontFamily}
                           onChange={(e) => setCustomTemplate({...customTemplate, fontFamily: e.target.value})}
                           className="px-2 py-1 bg-white/10 border border-white/20 rounded text-white text-sm focus:border-white/40 focus:outline-none"
                         >
+                          <option value="Helvetica" className="bg-gray-800">Helvetica</option>
+                          <option value="Times" className="bg-gray-800">Times</option>
+                          <option value="Courier" className="bg-gray-800">Courier</option>
                           <option value="Inter" className="bg-gray-800">Inter</option>
                           <option value="Roboto" className="bg-gray-800">Roboto</option>
                           <option value="Poppins" className="bg-gray-800">Poppins</option>
@@ -1860,9 +1863,23 @@ export default function Home() {
                           onChange={(e) => setCustomTemplate({...customTemplate, fontSize: e.target.value})}
                           className="px-2 py-1 bg-white/10 border border-white/20 rounded text-white text-sm focus:border-white/40 focus:outline-none"
                         >
-                          <option value="12px" className="bg-gray-800">Small</option>
-                          <option value="14px" className="bg-gray-800">Normal</option>
-                          <option value="16px" className="bg-gray-800">Large</option>
+                          <option value="10px" className="bg-gray-800">10px</option>
+                          <option value="11px" className="bg-gray-800">11px</option>
+                          <option value="12px" className="bg-gray-800">12px</option>
+                          <option value="13px" className="bg-gray-800">13px</option>
+                          <option value="14px" className="bg-gray-800">14px</option>
+                          <option value="15px" className="bg-gray-800">15px</option>
+                          <option value="16px" className="bg-gray-800">16px</option>
+                          <option value="18px" className="bg-gray-800">18px</option>
+                        </select>
+                        <select
+                          value={customTemplate.fontWeight}
+                          onChange={(e) => setCustomTemplate({...customTemplate, fontWeight: e.target.value})}
+                          className="px-2 py-1 bg-white/10 border border-white/20 rounded text-white text-sm focus:border-white/40 focus:outline-none"
+                        >
+                          <option value="normal" className="bg-gray-800">Normal</option>
+                          <option value="bold" className="bg-gray-800">Bold</option>
+                          <option value="italic" className="bg-gray-800">Italic</option>
                         </select>
                       </div>
                     </div>
@@ -1981,6 +1998,41 @@ export default function Home() {
                       className="h-4 rounded"
                       style={{ backgroundColor: customTemplate.primaryColor, width: '40%' }}
                     ></div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Preview Section */}
+              <div className="mt-8 p-6 bg-white/5 rounded-xl border border-white/10">
+                <h3 className="text-lg font-semibold text-white mb-4">Preview</h3>
+                <div className="bg-white rounded-lg p-6 shadow-lg">
+                  <div 
+                    className="text-center"
+                    style={{
+                      fontFamily: customTemplate.fontFamily,
+                      fontSize: customTemplate.fontSize,
+                      fontWeight: customTemplate.fontWeight,
+                      color: customTemplate.textColor
+                    }}
+                  >
+                    <div 
+                      className="font-bold mb-2"
+                      style={{ 
+                        color: customTemplate.primaryColor,
+                        fontSize: '20px'
+                      }}
+                    >
+                      {customTemplate.name}
+                    </div>
+                    <div className="text-sm opacity-75">
+                      Sample Invoice Text
+                    </div>
+                    <div 
+                      className="mt-2 text-xs"
+                      style={{ color: customTemplate.secondaryColor }}
+                    >
+                      This is how your invoice will look
+                    </div>
                   </div>
                 </div>
               </div>
