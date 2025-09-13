@@ -40,7 +40,7 @@ export default function Home() {
   const [savedDrafts, setSavedDrafts] = useState<any[]>([]);
   const [invoiceNumber, setInvoiceNumber] = useState('');
   const [currentTotal, setCurrentTotal] = useState('0.00');
-  const [pricingMode, setPricingMode] = useState<'per-invoice' | 'subscription'>('per-invoice');
+  const [pricingMode, setPricingMode] = useState<'per-invoice' | 'subscription'>('subscription');
   const [selectedTemplate, setSelectedTemplate] = useState('standard');
   const [showCustomBuilder, setShowCustomBuilder] = useState(false);
   const [customTemplate, setCustomTemplate] = useState({
@@ -1270,6 +1270,16 @@ export default function Home() {
             <div className="flex justify-center mb-8">
               <div className="glass-effect rounded-full p-1 flex">
                 <button 
+                  onClick={() => setPricingMode('subscription')}
+                  className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
+                    pricingMode === 'subscription' 
+                      ? 'bg-[var(--primary-color)] text-white' 
+                      : 'text-white/70 hover:text-white'
+                  }`}
+                >
+                  Monthly
+                </button>
+                <button 
                   onClick={() => setPricingMode('per-invoice')}
                   className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
                     pricingMode === 'per-invoice' 
@@ -1279,21 +1289,11 @@ export default function Home() {
                 >
                   Pay Per Invoice
                 </button>
-                <button 
-                  onClick={() => setPricingMode('subscription')}
-                  className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
-                    pricingMode === 'subscription' 
-                      ? 'bg-[var(--primary-color)] text-white' 
-                      : 'text-white/70 hover:text-white'
-                  }`}
-                >
-                  Monthly Subscription
-                </button>
               </div>
             </div>
             
-            <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-              {/* Pay Per Invoice Plans */}
+            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+              {/* Simplified Pricing Plans */}
               {pricingMode === 'per-invoice' ? (
                 <>
                   {/* Basic Per Invoice */}

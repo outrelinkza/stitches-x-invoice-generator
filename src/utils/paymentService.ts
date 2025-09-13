@@ -154,74 +154,34 @@ export const redirectToCustomerPortal = async (customerId: string): Promise<bool
   }
 };
 
-// Pricing configuration using your actual Stripe Price IDs
+// Simplified pricing configuration - easy to manage as one-person business
 export const PRICING_PLANS = {
-  basic: {
-    name: 'Basic Per Invoice',
-    price: 1.50,
-    currency: 'gbp',
-    interval: 'one-time',
-    priceId: process.env.STRIPE_BASIC_PER_INVOICE_PRICE_ID || 'price_1S5zEjL3DcLmHFw9IffjgNLA',
-    features: [
-      'Basic invoice templates',
-      'PDF generation',
-      'Email support',
-      'Perfect for small businesses',
-    ],
-  },
-  premium: {
-    name: 'Premium Per Invoice',
-    price: 3.50,
-    currency: 'gbp',
-    interval: 'one-time',
-    priceId: process.env.STRIPE_PREMIUM_PER_INVOICE_PRICE_ID || 'price_1S5zEjL3DcLmHFw94kuW31Bs',
-    features: [
-      'Premium templates',
-      'Advanced features',
-      'Priority support',
-      'Custom branding',
-    ],
-  },
-  enterprise: {
-    name: 'Enterprise Per Invoice',
-    price: 7.50,
-    currency: 'gbp',
-    interval: 'one-time',
-    priceId: process.env.STRIPE_ENTERPRISE_PER_INVOICE_PRICE_ID || 'price_1S5zEkL3DcLmHFw9ZcS6Fik2',
-    features: [
-      'All premium features',
-      'Dedicated support',
-      'API access',
-      'Custom integrations',
-    ],
-  },
   pro: {
-    name: 'Pro Subscription',
-    price: 29.99,
+    name: 'Pro Monthly',
+    price: 9.99,
     currency: 'gbp',
     interval: 'month',
     priceId: process.env.STRIPE_PRO_PRICE_ID || 'price_1S5zElL3DcLmHFw9ponmDFdT',
     features: [
       'Unlimited invoices',
       'All premium templates',
-      'Advanced analytics',
+      'Custom template builder',
       'Priority support',
-      'Custom branding',
-      'API access',
+      'Mobile optimized',
     ],
   },
-  enterpriseSub: {
-    name: 'Enterprise Subscription',
-    price: 99.99,
+  payAsYouGo: {
+    name: 'Pay Per Invoice',
+    price: 1.50,
     currency: 'gbp',
-    interval: 'month',
-    priceId: process.env.STRIPE_ENTERPRISE_PRICE_ID || 'price_1S5zEmL3DcLmHFw9YzB7CbKu',
+    interval: 'one-time',
+    priceId: process.env.STRIPE_BASIC_PER_INVOICE_PRICE_ID || 'price_1S5zEjL3DcLmHFw9IffjgNLA',
     features: [
-      'Everything in Pro',
-      'Dedicated support',
-      'Custom integrations',
-      'White-label options',
-      'Team management',
+      'Premium templates',
+      'Custom template builder',
+      'PDF generation',
+      'Email support',
+      'Perfect for occasional use',
     ],
   },
 };
