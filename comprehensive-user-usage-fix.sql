@@ -60,7 +60,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Step 9: Insert a test record to verify everything works
-INSERT INTO public.user_usage (user_id, email, downloads_this_month, total_downloads)
-VALUES (auth.uid(), auth.jwt() ->> 'email', 0, 0)
-ON CONFLICT (user_id) DO NOTHING;
+-- Step 9: Insert a test record to verify everything works (optional)
+-- Note: This will only work if you're authenticated in Supabase
+-- INSERT INTO public.user_usage (user_id, email, downloads_this_month, total_downloads)
+-- VALUES (auth.uid(), auth.jwt() ->> 'email', 0, 0);
