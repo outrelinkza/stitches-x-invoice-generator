@@ -40,12 +40,21 @@ export default function Home() {
     primaryColor: '#7C3AED',
     secondaryColor: '#8B5CF6',
     accentColor: '#A78BFA',
-    backgroundColor: '#1a1a2e',
-    textColor: '#ffffff',
+    backgroundColor: '#ffffff',
+    textColor: '#1a1a2e',
     fontFamily: 'Inter',
+    fontSize: '14px',
+    fontWeight: '400',
     layout: 'standard',
+    headerStyle: 'full-width',
+    logoPosition: 'left',
     showLogo: true,
-    showWatermark: false
+    showWatermark: false,
+    showSignature: true,
+    showTerms: true,
+    spacing: 'normal',
+    borderStyle: 'none',
+    sectionOrder: ['header', 'company', 'client', 'items', 'totals', 'notes', 'footer']
   });
   const logoInputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
@@ -1688,10 +1697,13 @@ export default function Home() {
       {/* Custom Template Builder Modal */}
       {showCustomBuilder && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 max-w-6xl w-full max-h-[95vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-white">🎨 Custom Template Builder</h2>
+                <div>
+                  <h2 className="text-2xl font-bold text-white">🎨 Custom Template Builder</h2>
+                  <p className="text-white/60 text-sm mt-1">Design your perfect invoice template</p>
+                </div>
                 <button
                   onClick={() => setShowCustomBuilder(false)}
                   className="text-white/60 hover:text-white transition-colors"
@@ -1700,174 +1712,257 @@ export default function Home() {
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Customization Panel */}
-                <div className="space-y-6">
-                  <div>
-                    <label className="block text-white/80 text-sm font-medium mb-2">Template Name</label>
-                    <input
-                      type="text"
-                      value={customTemplate.name}
-                      onChange={(e) => setCustomTemplate({...customTemplate, name: e.target.value})}
-                      className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:border-white/40 focus:outline-none"
-                      placeholder="My Awesome Template"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-white/80 text-sm font-medium mb-2">Primary Color</label>
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="color"
-                        value={customTemplate.primaryColor}
-                        onChange={(e) => setCustomTemplate({...customTemplate, primaryColor: e.target.value})}
-                        className="w-12 h-10 rounded-lg border border-white/20 cursor-pointer"
-                      />
-                      <input
-                        type="text"
-                        value={customTemplate.primaryColor}
-                        onChange={(e) => setCustomTemplate({...customTemplate, primaryColor: e.target.value})}
-                        className="flex-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:border-white/40 focus:outline-none"
-                        placeholder="#7C3AED"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-white/80 text-sm font-medium mb-2">Secondary Color</label>
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="color"
-                        value={customTemplate.secondaryColor}
-                        onChange={(e) => setCustomTemplate({...customTemplate, secondaryColor: e.target.value})}
-                        className="w-12 h-10 rounded-lg border border-white/20 cursor-pointer"
-                      />
-                      <input
-                        type="text"
-                        value={customTemplate.secondaryColor}
-                        onChange={(e) => setCustomTemplate({...customTemplate, secondaryColor: e.target.value})}
-                        className="flex-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:border-white/40 focus:outline-none"
-                        placeholder="#8B5CF6"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-white/80 text-sm font-medium mb-2">Accent Color</label>
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="color"
-                        value={customTemplate.accentColor}
-                        onChange={(e) => setCustomTemplate({...customTemplate, accentColor: e.target.value})}
-                        className="w-12 h-10 rounded-lg border border-white/20 cursor-pointer"
-                      />
-                      <input
-                        type="text"
-                        value={customTemplate.accentColor}
-                        onChange={(e) => setCustomTemplate({...customTemplate, accentColor: e.target.value})}
-                        className="flex-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:border-white/40 focus:outline-none"
-                        placeholder="#A78BFA"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-white/80 text-sm font-medium mb-2">Font Family</label>
-                    <select
-                      value={customTemplate.fontFamily}
-                      onChange={(e) => setCustomTemplate({...customTemplate, fontFamily: e.target.value})}
-                      className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:border-white/40 focus:outline-none"
-                    >
-                      <option value="Inter" className="bg-gray-800">Inter (Modern)</option>
-                      <option value="Roboto" className="bg-gray-800">Roboto (Clean)</option>
-                      <option value="Poppins" className="bg-gray-800">Poppins (Friendly)</option>
-                      <option value="Montserrat" className="bg-gray-800">Montserrat (Professional)</option>
-                      <option value="Open Sans" className="bg-gray-800">Open Sans (Readable)</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-white/80 text-sm font-medium mb-2">Layout Style</label>
-                    <div className="grid grid-cols-2 gap-3">
-                      <button
-                        onClick={() => setCustomTemplate({...customTemplate, layout: 'standard'})}
-                        className={`p-3 rounded-lg border transition-colors ${
-                          customTemplate.layout === 'standard' 
-                            ? 'border-white/40 bg-white/10' 
-                            : 'border-white/20 bg-white/5 hover:bg-white/10'
-                        }`}
-                      >
-                        <div className="text-white/80 text-sm font-medium">Standard</div>
-                        <div className="text-white/60 text-xs">Classic layout</div>
-                      </button>
-                      <button
-                        onClick={() => setCustomTemplate({...customTemplate, layout: 'minimal'})}
-                        className={`p-3 rounded-lg border transition-colors ${
-                          customTemplate.layout === 'minimal' 
-                            ? 'border-white/40 bg-white/10' 
-                            : 'border-white/20 bg-white/5 hover:bg-white/10'
-                        }`}
-                      >
-                        <div className="text-white/80 text-sm font-medium">Minimal</div>
-                        <div className="text-white/60 text-xs">Clean & simple</div>
-                      </button>
-                    </div>
-                  </div>
-
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Quick Presets */}
+                <div className="lg:col-span-1">
+                  <h3 className="text-white/80 text-sm font-medium mb-4">Quick Styles</h3>
                   <div className="space-y-3">
-                    <label className="flex items-center gap-3">
+                    <button
+                      onClick={() => setCustomTemplate({
+                        ...customTemplate,
+                        name: 'Minimal Clean',
+                        primaryColor: '#374151',
+                        secondaryColor: '#6B7280',
+                        accentColor: '#9CA3AF',
+                        backgroundColor: '#ffffff',
+                        textColor: '#1a1a2e',
+                        fontFamily: 'Inter',
+                        layout: 'minimal',
+                        headerStyle: 'simple'
+                      })}
+                      className="w-full p-3 rounded-lg border border-white/20 bg-white/5 hover:bg-white/10 transition-colors text-left"
+                    >
+                      <div className="text-white/80 text-sm font-medium">Minimal Clean</div>
+                      <div className="text-white/60 text-xs">Simple and professional</div>
+                    </button>
+                    
+                    <button
+                      onClick={() => setCustomTemplate({
+                        ...customTemplate,
+                        name: 'Corporate Blue',
+                        primaryColor: '#1E40AF',
+                        secondaryColor: '#3B82F6',
+                        accentColor: '#60A5FA',
+                        backgroundColor: '#ffffff',
+                        textColor: '#1a1a2e',
+                        fontFamily: 'Roboto',
+                        layout: 'standard',
+                        headerStyle: 'full-width'
+                      })}
+                      className="w-full p-3 rounded-lg border border-white/20 bg-white/5 hover:bg-white/10 transition-colors text-left"
+                    >
+                      <div className="text-white/80 text-sm font-medium">Corporate Blue</div>
+                      <div className="text-white/60 text-xs">Business and formal</div>
+                    </button>
+                    
+                    <button
+                      onClick={() => setCustomTemplate({
+                        ...customTemplate,
+                        name: 'Creative Purple',
+                        primaryColor: '#7C3AED',
+                        secondaryColor: '#8B5CF6',
+                        accentColor: '#A78BFA',
+                        backgroundColor: '#ffffff',
+                        textColor: '#1a1a2e',
+                        fontFamily: 'Poppins',
+                        layout: 'standard',
+                        headerStyle: 'centered'
+                      })}
+                      className="w-full p-3 rounded-lg border border-white/20 bg-white/5 hover:bg-white/10 transition-colors text-left"
+                    >
+                      <div className="text-white/80 text-sm font-medium">Creative Purple</div>
+                      <div className="text-white/60 text-xs">Modern and vibrant</div>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Customization Panel */}
+                <div className="lg:col-span-1">
+                  <h3 className="text-white/80 text-sm font-medium mb-4">Customize</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-white/80 text-sm font-medium mb-2">Template Name</label>
                       <input
-                        type="checkbox"
-                        checked={customTemplate.showLogo}
-                        onChange={(e) => setCustomTemplate({...customTemplate, showLogo: e.target.checked})}
-                        className="w-4 h-4 text-purple-600 bg-white/10 border-white/20 rounded focus:ring-purple-500"
+                        type="text"
+                        value={customTemplate.name}
+                        onChange={(e) => setCustomTemplate({...customTemplate, name: e.target.value})}
+                        className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:border-white/40 focus:outline-none text-sm"
+                        placeholder="My Awesome Template"
                       />
-                      <span className="text-white/80 text-sm">Show company logo</span>
-                    </label>
-                    <label className="flex items-center gap-3">
-                      <input
-                        type="checkbox"
-                        checked={customTemplate.showWatermark}
-                        onChange={(e) => setCustomTemplate({...customTemplate, showWatermark: e.target.checked})}
-                        className="w-4 h-4 text-purple-600 bg-white/10 border-white/20 rounded focus:ring-purple-500"
-                      />
-                      <span className="text-white/80 text-sm">Add watermark (free users)</span>
-                    </label>
+                    </div>
+
+                    <div>
+                      <label className="block text-white/80 text-sm font-medium mb-2">Brand Colors</label>
+                      <div className="grid grid-cols-3 gap-2">
+                        <div>
+                          <label className="block text-white/60 text-xs mb-1">Primary</label>
+                          <input
+                            type="color"
+                            value={customTemplate.primaryColor}
+                            onChange={(e) => setCustomTemplate({...customTemplate, primaryColor: e.target.value})}
+                            className="w-full h-8 rounded border border-white/20 cursor-pointer"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-white/60 text-xs mb-1">Secondary</label>
+                          <input
+                            type="color"
+                            value={customTemplate.secondaryColor}
+                            onChange={(e) => setCustomTemplate({...customTemplate, secondaryColor: e.target.value})}
+                            className="w-full h-8 rounded border border-white/20 cursor-pointer"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-white/60 text-xs mb-1">Accent</label>
+                          <input
+                            type="color"
+                            value={customTemplate.accentColor}
+                            onChange={(e) => setCustomTemplate({...customTemplate, accentColor: e.target.value})}
+                            className="w-full h-8 rounded border border-white/20 cursor-pointer"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-white/80 text-sm font-medium mb-2">Typography</label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <select
+                          value={customTemplate.fontFamily}
+                          onChange={(e) => setCustomTemplate({...customTemplate, fontFamily: e.target.value})}
+                          className="px-2 py-1 bg-white/10 border border-white/20 rounded text-white text-sm focus:border-white/40 focus:outline-none"
+                        >
+                          <option value="Inter" className="bg-gray-800">Inter</option>
+                          <option value="Roboto" className="bg-gray-800">Roboto</option>
+                          <option value="Poppins" className="bg-gray-800">Poppins</option>
+                          <option value="Montserrat" className="bg-gray-800">Montserrat</option>
+                        </select>
+                        <select
+                          value={customTemplate.fontSize}
+                          onChange={(e) => setCustomTemplate({...customTemplate, fontSize: e.target.value})}
+                          className="px-2 py-1 bg-white/10 border border-white/20 rounded text-white text-sm focus:border-white/40 focus:outline-none"
+                        >
+                          <option value="12px" className="bg-gray-800">Small</option>
+                          <option value="14px" className="bg-gray-800">Normal</option>
+                          <option value="16px" className="bg-gray-800">Large</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-white/80 text-sm font-medium mb-2">Layout</label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          onClick={() => setCustomTemplate({...customTemplate, headerStyle: 'full-width'})}
+                          className={`p-2 rounded border text-xs transition-colors ${
+                            customTemplate.headerStyle === 'full-width' 
+                              ? 'border-white/40 bg-white/10 text-white' 
+                              : 'border-white/20 bg-white/5 text-white/70 hover:bg-white/10'
+                          }`}
+                        >
+                          Full Width
+                        </button>
+                        <button
+                          onClick={() => setCustomTemplate({...customTemplate, headerStyle: 'centered'})}
+                          className={`p-2 rounded border text-xs transition-colors ${
+                            customTemplate.headerStyle === 'centered' 
+                              ? 'border-white/40 bg-white/10 text-white' 
+                              : 'border-white/20 bg-white/5 text-white/70 hover:bg-white/10'
+                          }`}
+                        >
+                          Centered
+                        </button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-white/80 text-sm font-medium mb-2">Elements</label>
+                      <div className="space-y-2">
+                        <label className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={customTemplate.showLogo}
+                            onChange={(e) => setCustomTemplate({...customTemplate, showLogo: e.target.checked})}
+                            className="w-3 h-3 text-purple-600 bg-white/10 border-white/20 rounded"
+                          />
+                          <span className="text-white/70 text-xs">Company logo</span>
+                        </label>
+                        <label className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={customTemplate.showSignature}
+                            onChange={(e) => setCustomTemplate({...customTemplate, showSignature: e.target.checked})}
+                            className="w-3 h-3 text-purple-600 bg-white/10 border-white/20 rounded"
+                          />
+                          <span className="text-white/70 text-xs">Signature area</span>
+                        </label>
+                        <label className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={customTemplate.showTerms}
+                            onChange={(e) => setCustomTemplate({...customTemplate, showTerms: e.target.checked})}
+                            className="w-3 h-3 text-purple-600 bg-white/10 border-white/20 rounded"
+                          />
+                          <span className="text-white/70 text-xs">Terms & conditions</span>
+                        </label>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
                 {/* Live Preview */}
-                <div>
-                  <h3 className="text-white/80 text-sm font-medium mb-4">Live Preview</h3>
+                <div className="lg:col-span-1">
+                  <h3 className="text-white/80 text-sm font-medium mb-4">Preview</h3>
                   <div 
-                    className="bg-white rounded-lg p-6 shadow-lg"
+                    className="bg-white rounded-lg p-4 shadow-lg text-xs"
                     style={{ 
                       backgroundColor: customTemplate.backgroundColor,
                       color: customTemplate.textColor,
-                      fontFamily: customTemplate.fontFamily
+                      fontFamily: customTemplate.fontFamily,
+                      fontSize: customTemplate.fontSize
                     }}
                   >
+                    {/* Header */}
                     <div 
-                      className="h-8 rounded mb-4"
+                      className="h-6 rounded mb-3 flex items-center px-2"
                       style={{ backgroundColor: customTemplate.primaryColor }}
+                    >
+                      <span className="text-white text-xs font-medium">INVOICE</span>
+                    </div>
+                    
+                    {/* Company Info */}
+                    <div className="mb-3">
+                      <div 
+                        className="h-3 rounded mb-1"
+                        style={{ backgroundColor: customTemplate.secondaryColor, width: '70%' }}
+                      ></div>
+                      <div 
+                        className="h-2 rounded mb-1"
+                        style={{ backgroundColor: customTemplate.accentColor, width: '50%' }}
+                      ></div>
+                    </div>
+                    
+                    {/* Line Items */}
+                    <div className="mb-3">
+                      <div 
+                        className="h-2 rounded mb-1"
+                        style={{ backgroundColor: customTemplate.primaryColor, width: '100%' }}
+                      ></div>
+                      <div 
+                        className="h-2 rounded mb-1"
+                        style={{ backgroundColor: customTemplate.secondaryColor, width: '80%' }}
+                      ></div>
+                      <div 
+                        className="h-2 rounded"
+                        style={{ backgroundColor: customTemplate.accentColor, width: '60%' }}
+                      ></div>
+                    </div>
+                    
+                    {/* Total */}
+                    <div 
+                      className="h-4 rounded"
+                      style={{ backgroundColor: customTemplate.primaryColor, width: '40%' }}
                     ></div>
-                    <div className="space-y-2">
-                      <div 
-                        className="h-4 rounded"
-                        style={{ backgroundColor: customTemplate.secondaryColor, width: '60%' }}
-                      ></div>
-                      <div 
-                        className="h-4 rounded"
-                        style={{ backgroundColor: customTemplate.accentColor, width: '40%' }}
-                      ></div>
-                      <div 
-                        className="h-4 rounded"
-                        style={{ backgroundColor: customTemplate.primaryColor, width: '80%' }}
-                      ></div>
-                    </div>
-                    <div className="mt-4 text-xs opacity-60">
-                      Your invoice will use these colors and styling
-                    </div>
                   </div>
                 </div>
               </div>
