@@ -26,7 +26,7 @@ import { showSuccess, showError, showInfo, showLoading, hideNotification } from 
 import NavHeader from '@/components/NavHeader';
 
 export default function Home() {
-  console.log('🎉 NEW CODE RUNNING - INDUSTRY-SPECIFIC FORMS - VERSION 4.0 - CACHE BUST: ' + Date.now());
+  console.log('🎉 NEW CODE RUNNING - NEUTRAL COLORS - VERSION 5.0 - CACHE BUST: ' + Date.now());
   const [invoiceType, setInvoiceType] = useState('product_sales');
   const [logo, setLogo] = useState<string | null>(null);
   const [isFormValid, setIsFormValid] = useState(false);
@@ -234,25 +234,10 @@ export default function Home() {
   // Get template-specific input classes
   const getTemplateInputClasses = () => {
     switch (selectedTemplate) {
-      case 'legal':
-        return 'text-gray-900 placeholder-gray-500 bg-white border-gray-300';
-      case 'restaurant':
-        return 'text-orange-900 placeholder-orange-500 bg-orange-50 border-orange-300';
-      case 'healthcare':
-        return 'text-emerald-900 placeholder-emerald-500 bg-emerald-50 border-emerald-300';
-      case 'elegant-luxury':
-        return 'text-amber-900 placeholder-amber-500 bg-amber-50 border-amber-300';
-      case 'modern-tech':
-        return 'text-cyan-900 placeholder-cyan-500 bg-cyan-50 border-cyan-300';
-      case 'creative-agency':
-        return 'text-pink-900 placeholder-pink-500 bg-pink-50 border-pink-300';
-      case 'consulting':
-        return 'text-gray-900 placeholder-gray-500 bg-gray-50 border-gray-300';
-      case 'recurring-clients':
-        return 'text-blue-900 placeholder-blue-500 bg-blue-50 border-blue-300';
       case 'minimalist-dark':
         return 'text-white placeholder-white/60 bg-black/20 border-white/20';
       default:
+        // All other templates use the same neutral colors as Standard
         return 'text-white placeholder-white/60';
     }
   };
@@ -260,25 +245,10 @@ export default function Home() {
   // Get template-specific text colors
   const getTemplateTextColor = () => {
     switch (selectedTemplate) {
-      case 'legal':
-        return 'text-gray-900';
-      case 'restaurant':
-        return 'text-orange-900';
-      case 'healthcare':
-        return 'text-emerald-900';
-      case 'elegant-luxury':
-        return 'text-amber-900';
-      case 'modern-tech':
-        return 'text-cyan-900';
-      case 'creative-agency':
-        return 'text-pink-900';
-      case 'consulting':
-        return 'text-gray-900';
-      case 'recurring-clients':
-        return 'text-blue-900';
       case 'minimalist-dark':
         return 'text-white';
       default:
+        // All other templates use the same neutral colors as Standard
         return 'text-white';
     }
   };
@@ -286,26 +256,11 @@ export default function Home() {
   // Get template-specific label colors
   const getTemplateLabelColor = () => {
     switch (selectedTemplate) {
-      case 'legal':
-        return 'text-gray-700';
-      case 'restaurant':
-        return 'text-orange-700';
-      case 'healthcare':
-        return 'text-emerald-700';
-      case 'elegant-luxury':
-        return 'text-amber-700';
-      case 'modern-tech':
-        return 'text-cyan-700';
-      case 'creative-agency':
-        return 'text-pink-700';
-      case 'consulting':
-        return 'text-gray-700';
-      case 'recurring-clients':
-        return 'text-blue-700';
       case 'minimalist-dark':
-        return '${getTemplateLabelColor()}';
+        return 'text-white/80';
       default:
-        return '${getTemplateLabelColor()}';
+        // All other templates use the same neutral colors as Standard
+        return 'text-white/80';
     }
   };
 
@@ -939,20 +894,20 @@ export default function Home() {
 
               {/* Legal Template Specific Section */}
               {selectedTemplate === 'legal' && (
-                <section className="space-y-6 p-6 bg-gray-50/95 rounded-lg border border-gray-300">
-                  <h3 className="text-lg font-semibold text-gray-900">Legal Case Details</h3>
+                <section className="space-y-6 p-6 bg-white/10 rounded-lg border border-white/20">
+                  <h3 className="text-lg font-semibold text-white">Legal Case Details</h3>
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <label className="block">
-                      <span className="text-sm font-medium text-gray-700">Case Number</span>
+                      <span className="text-sm font-medium text-white/80">Case Number</span>
                       <input 
                         type="text" 
-                        className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-gray-900 placeholder-gray-500 bg-white border-gray-300" 
+                        className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60" 
                         placeholder="Case #2024-001"
                       />
                     </label>
                     <label className="block">
-                      <span className="text-sm font-medium text-gray-700">Matter Type</span>
-                      <select className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-gray-900 bg-white border-gray-300">
+                      <span className="text-sm font-medium text-white/80">Matter Type</span>
+                      <select className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60">
                         <option value="litigation">Litigation</option>
                         <option value="corporate">Corporate Law</option>
                         <option value="real-estate">Real Estate</option>
@@ -964,18 +919,18 @@ export default function Home() {
                       </select>
                     </label>
                     <label className="block">
-                      <span className="text-sm font-medium text-gray-700">Court/Jurisdiction</span>
+                      <span className="text-sm font-medium text-white/80">Court/Jurisdiction</span>
                       <input 
                         type="text" 
-                        className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-gray-900 placeholder-gray-500 bg-white border-gray-300" 
+                        className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60" 
                         placeholder="Superior Court of California"
                       />
                     </label>
                     <label className="block">
-                      <span className="text-sm font-medium text-gray-700">Billing Period</span>
+                      <span className="text-sm font-medium text-white/80">Billing Period</span>
                       <input 
                         type="text" 
-                        className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-gray-900 placeholder-gray-500 bg-white border-gray-300" 
+                        className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60" 
                         placeholder="March 1-31, 2024"
                       />
                     </label>
@@ -983,25 +938,25 @@ export default function Home() {
                   <div className="space-y-4">
                     <h4 className="text-md font-semibold text-gray-800">Legal Services</h4>
                     <div className="grid grid-cols-12 gap-4">
-                      <div className="col-span-5"><span className="text-sm font-medium text-gray-700">Service Description</span></div>
-                      <div className="col-span-2"><span className="text-sm font-medium text-gray-700">Hours</span></div>
-                      <div className="col-span-2"><span className="text-sm font-medium text-gray-700">Rate ($)</span></div>
-                      <div className="col-span-2"><span className="text-sm font-medium text-gray-700">Total</span></div>
+                      <div className="col-span-5"><span className="text-sm font-medium text-white/80">Service Description</span></div>
+                      <div className="col-span-2"><span className="text-sm font-medium text-white/80">Hours</span></div>
+                      <div className="col-span-2"><span className="text-sm font-medium text-white/80">Rate ($)</span></div>
+                      <div className="col-span-2"><span className="text-sm font-medium text-white/80">Total</span></div>
                     </div>
                     <div className="grid grid-cols-12 gap-4 items-center">
                       <input 
                         type="text" 
-                        className="col-span-5 block w-full rounded-md shadow-sm focus:ring-0 text-gray-900 placeholder-gray-500 bg-white border-gray-300" 
+                        className="col-span-5 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60" 
                         placeholder="Legal research and case preparation"
                       />
                       <input 
                         type="number" 
-                        className="col-span-2 block w-full rounded-md shadow-sm focus:ring-0 text-gray-900 placeholder-gray-500 bg-white border-gray-300" 
+                        className="col-span-2 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60" 
                         placeholder="2.5"
                       />
                       <input 
                         type="number" 
-                        className="col-span-2 block w-full rounded-md shadow-sm focus:ring-0 text-gray-900 placeholder-gray-500 bg-white border-gray-300" 
+                        className="col-span-2 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60" 
                         placeholder="350"
                       />
                       <span className="col-span-2 text-sm text-gray-900">$875.00</span>
@@ -1013,11 +968,11 @@ export default function Home() {
 
               {/* Restaurant Template Specific Section */}
               {selectedTemplate === 'restaurant' && (
-                <section className="space-y-6 p-6 bg-orange-50/95 rounded-lg border border-orange-300">
-                  <h3 className="text-lg font-semibold text-orange-900">Restaurant Order Details</h3>
+                <section className="space-y-6 p-6 bg-white/10 rounded-lg border border-white/20">
+                  <h3 className="text-lg font-semibold text-white">Restaurant Order Details</h3>
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <label className="block">
-                      <span className="text-sm font-medium text-orange-700">Table Number</span>
+                      <span className="text-sm font-medium text-white/80">Table Number</span>
                       <input 
                         type="text" 
                         className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-orange-900 placeholder-orange-500 bg-orange-50 border-orange-300" 
@@ -1025,7 +980,7 @@ export default function Home() {
                       />
                     </label>
                     <label className="block">
-                      <span className="text-sm font-medium text-orange-700">Server Name</span>
+                      <span className="text-sm font-medium text-white/80">Server Name</span>
                       <input 
                         type="text" 
                         className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-orange-900 placeholder-orange-500 bg-orange-50 border-orange-300" 
@@ -1033,14 +988,14 @@ export default function Home() {
                       />
                     </label>
                     <label className="block">
-                      <span className="text-sm font-medium text-orange-700">Order Time</span>
+                      <span className="text-sm font-medium text-white/80">Order Time</span>
                       <input 
                         type="time" 
                         className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-orange-900 bg-orange-50 border-orange-300"
                       />
                     </label>
                     <label className="block">
-                      <span className="text-sm font-medium text-orange-700">Party Size</span>
+                      <span className="text-sm font-medium text-white/80">Party Size</span>
                       <input 
                         type="number" 
                         className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-orange-900 placeholder-orange-500 bg-orange-50 border-orange-300" 
@@ -1051,10 +1006,10 @@ export default function Home() {
                   <div className="space-y-4">
                     <h4 className="text-md font-semibold text-orange-800">Menu Items</h4>
                     <div className="grid grid-cols-12 gap-4">
-                      <div className="col-span-5"><span className="text-sm font-medium text-orange-700">Item Name</span></div>
-                      <div className="col-span-2"><span className="text-sm font-medium text-orange-700">Qty</span></div>
-                      <div className="col-span-2"><span className="text-sm font-medium text-orange-700">Price</span></div>
-                      <div className="col-span-2"><span className="text-sm font-medium text-orange-700">Total</span></div>
+                      <div className="col-span-5"><span className="text-sm font-medium text-white/80">Item Name</span></div>
+                      <div className="col-span-2"><span className="text-sm font-medium text-white/80">Qty</span></div>
+                      <div className="col-span-2"><span className="text-sm font-medium text-white/80">Price</span></div>
+                      <div className="col-span-2"><span className="text-sm font-medium text-white/80">Total</span></div>
                     </div>
                     <div className="grid grid-cols-12 gap-4 items-center">
                       <input 
@@ -1078,7 +1033,7 @@ export default function Home() {
                   </div>
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <label className="block">
-                      <span className="text-sm font-medium text-orange-700">Service Charge (%)</span>
+                      <span className="text-sm font-medium text-white/80">Service Charge (%)</span>
                       <input 
                         type="number" 
                         className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-orange-900 placeholder-orange-500 bg-orange-50 border-orange-300" 
@@ -1086,7 +1041,7 @@ export default function Home() {
                       />
                     </label>
                     <label className="block">
-                      <span className="text-sm font-medium text-orange-700">Tax Rate (%)</span>
+                      <span className="text-sm font-medium text-white/80">Tax Rate (%)</span>
                       <input 
                         type="number" 
                         className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-orange-900 placeholder-orange-500 bg-orange-50 border-orange-300" 
@@ -1099,11 +1054,11 @@ export default function Home() {
 
               {/* Healthcare Template Specific Section */}
               {selectedTemplate === 'healthcare' && (
-                <section className="space-y-6 p-6 bg-emerald-50/95 rounded-lg border border-emerald-300">
-                  <h3 className="text-lg font-semibold text-emerald-900">Medical Services</h3>
+                <section className="space-y-6 p-6 bg-white/10 rounded-lg border border-white/20">
+                  <h3 className="text-lg font-semibold text-white">Medical Services</h3>
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <label className="block">
-                      <span className="text-sm font-medium text-emerald-700">Patient ID</span>
+                      <span className="text-sm font-medium text-white/80">Patient ID</span>
                       <input 
                         type="text" 
                         className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-emerald-900 placeholder-emerald-500 bg-emerald-50 border-emerald-300" 
@@ -1111,7 +1066,7 @@ export default function Home() {
                       />
                     </label>
                     <label className="block">
-                      <span className="text-sm font-medium text-emerald-700">Insurance Provider</span>
+                      <span className="text-sm font-medium text-white/80">Insurance Provider</span>
                       <input 
                         type="text" 
                         className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-emerald-900 placeholder-emerald-500 bg-emerald-50 border-emerald-300" 
@@ -1119,7 +1074,7 @@ export default function Home() {
                       />
                     </label>
                     <label className="block">
-                      <span className="text-sm font-medium text-emerald-700">Policy Number</span>
+                      <span className="text-sm font-medium text-white/80">Policy Number</span>
                       <input 
                         type="text" 
                         className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-emerald-900 placeholder-emerald-500 bg-emerald-50 border-emerald-300" 
@@ -1127,7 +1082,7 @@ export default function Home() {
                       />
                     </label>
                     <label className="block">
-                      <span className="text-sm font-medium text-emerald-700">Date of Service</span>
+                      <span className="text-sm font-medium text-white/80">Date of Service</span>
                       <input 
                         type="date" 
                         className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-emerald-900 bg-emerald-50 border-emerald-300"
@@ -1137,10 +1092,10 @@ export default function Home() {
                   <div className="space-y-4">
                     <h4 className="text-md font-semibold text-emerald-800">Medical Procedures</h4>
                     <div className="grid grid-cols-12 gap-4">
-                      <div className="col-span-4"><span className="text-sm font-medium text-emerald-700">Procedure Code</span></div>
-                      <div className="col-span-4"><span className="text-sm font-medium text-emerald-700">Description</span></div>
-                      <div className="col-span-2"><span className="text-sm font-medium text-emerald-700">Amount</span></div>
-                      <div className="col-span-2"><span className="text-sm font-medium text-emerald-700">Total</span></div>
+                      <div className="col-span-4"><span className="text-sm font-medium text-white/80">Procedure Code</span></div>
+                      <div className="col-span-4"><span className="text-sm font-medium text-white/80">Description</span></div>
+                      <div className="col-span-2"><span className="text-sm font-medium text-white/80">Amount</span></div>
+                      <div className="col-span-2"><span className="text-sm font-medium text-white/80">Total</span></div>
                     </div>
                     <div className="grid grid-cols-12 gap-4 items-center">
                       <input 
