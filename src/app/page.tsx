@@ -39,7 +39,6 @@ export default function Home() {
   const [showTotals, setShowTotals] = useState(true);
   const [showResetModal, setShowResetModal] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [savedDrafts, setSavedDrafts] = useState<any[]>([]);
   const [invoiceNumber, setInvoiceNumber] = useState('');
   const [currentTotal, setCurrentTotal] = useState('0.00');
   const [pricingMode, setPricingMode] = useState<'per-invoice' | 'subscription'>('subscription');
@@ -1580,7 +1579,7 @@ export default function Home() {
                       </ul>
                       
                       <button 
-                        onClick={() => createOneTimePayment('basic')}
+                        onClick={() => createOneTimePayment(PRICING_PLANS.basic.priceId)}
                         className="w-full py-3 px-6 bg-white/10 text-white rounded-lg border border-white/20 hover:bg-white/20 transition-colors"
                       >
                         Pay £1.50 per Invoice
@@ -1632,7 +1631,7 @@ export default function Home() {
                         </ul>
                         
                         <button 
-                          onClick={() => createOneTimePayment('premium')}
+                          onClick={() => createOneTimePayment(PRICING_PLANS.premium.priceId)}
                           className="w-full py-3 px-6 bg-[var(--primary-color)] text-white rounded-lg hover:bg-[var(--primary-color)]/80 transition-colors font-medium"
                         >
                           Pay £3.50 per Invoice
