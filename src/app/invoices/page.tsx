@@ -95,7 +95,7 @@ export default function Invoices() {
       successMsg.className = 'fixed top-20 right-4 bg-green-500/90 backdrop-blur-md text-white px-6 py-4 rounded-xl shadow-lg z-50 transition-all border border-green-400/20';
       successMsg.innerHTML = `
         <div class="flex items-center gap-3">
-          <div class="text-2xl">✅</div>
+          <div class="text-2xl">✓</div>
           <div>
             <div class="font-semibold">Success!</div>
             <div class="text-sm opacity-90">Deleted ${draftInvoices.length} draft invoices</div>
@@ -114,7 +114,7 @@ export default function Invoices() {
       errorMsg.className = 'fixed top-20 right-4 bg-red-500/90 backdrop-blur-md text-white px-6 py-4 rounded-xl shadow-lg z-50 transition-all border border-red-400/20';
       errorMsg.innerHTML = `
         <div class="flex items-center gap-3">
-          <div class="text-2xl">❌</div>
+          <div class="text-2xl">✗</div>
           <div>
             <div class="font-semibold">Error!</div>
             <div class="text-sm opacity-90">Failed to delete some drafts. Please try again.</div>

@@ -99,7 +99,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
                 onClick={() => window.location.reload()}
                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-blue-500/25 transform hover:scale-[1.02]"
               >
-                ✅ I've Verified My Email
+                I've Verified My Email
               </button>
               
               <button
@@ -174,7 +174,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
                     onClick={() => setShowAuthModal(true)}
                     className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-blue-500/25 transform hover:scale-[1.02]"
                   >
-                    🔑 Sign In
+                    Sign In
                   </button>
                   
                   <button

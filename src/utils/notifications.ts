@@ -31,17 +31,17 @@ const getNotificationStyles = (type: NotificationType): string => {
 const getNotificationIcon = (type: NotificationType): string => {
   switch (type) {
     case 'success':
-      return '✅';
+      return '✓';
     case 'error':
-      return '❌';
+      return '✗';
     case 'warning':
-      return '⚠️';
+      return '!';
     case 'info':
-      return 'ℹ️';
+      return 'i';
     case 'loading':
-      return '⏳';
+      return '...';
     default:
-      return '📢';
+      return '•';
   }
 };
 

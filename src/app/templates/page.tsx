@@ -344,7 +344,7 @@ export default function Templates() {
               <div className="w-full h-32 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-lg flex items-center justify-center mb-4">
                 <span className="material-symbols-outlined text-purple-300 text-4xl">palette</span>
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">🎨 Custom Builder</h3>
+              <h3 className="text-lg font-semibold text-white mb-2">Custom Builder</h3>
               <p className="text-sm text-white/70 mb-4">Design your own template with colors, fonts, and layouts.</p>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-white/60">Interactive</span>

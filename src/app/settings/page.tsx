@@ -485,7 +485,7 @@ export default function Settings() {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
                 <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-                  <h3 className="text-white font-medium mb-2">💡 Suggestions</h3>
+                  <h3 className="text-white font-medium mb-2">Suggestions</h3>
                   <p className="text-white/70 text-sm">
                     Have ideas for new features or improvements? We'd love to hear them!
                   </p>

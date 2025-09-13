@@ -91,7 +91,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (!isSupabaseConfigured) {
         const errorMsg = document.createElement('div');
         errorMsg.className = 'fixed top-20 right-4 bg-white/10 backdrop-blur-xl border border-white/20 text-white px-6 py-4 rounded-xl shadow-2xl z-50 transition-all';
-        errorMsg.innerHTML = '⚠️ Supabase not configured. Please set up environment variables.';
+        errorMsg.innerHTML = 'Supabase not configured. Please set up environment variables.';
         document.body.appendChild(errorMsg);
         
         setTimeout(() => {
@@ -144,7 +144,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (!isSupabaseConfigured) {
         const errorMsg = document.createElement('div');
         errorMsg.className = 'fixed top-20 right-4 bg-white/10 backdrop-blur-xl border border-white/20 text-white px-6 py-4 rounded-xl shadow-2xl z-50 transition-all';
-        errorMsg.innerHTML = '⚠️ Supabase not configured. Please set up environment variables.';
+        errorMsg.innerHTML = 'Supabase not configured. Please set up environment variables.';
         document.body.appendChild(errorMsg);
         
         setTimeout(() => {
@@ -165,7 +165,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Show error message
         const errorMsg = document.createElement('div');
         errorMsg.className = 'fixed top-20 right-4 bg-red-500/90 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all';
-        errorMsg.innerHTML = `❌ ${error.message}`;
+        errorMsg.innerHTML = `Error: ${error.message}`;
         document.body.appendChild(errorMsg);
         
         setTimeout(() => {

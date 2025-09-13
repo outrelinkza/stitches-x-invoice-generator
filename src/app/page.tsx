@@ -669,7 +669,7 @@ export default function Home() {
                     onClick={() => setShowCustomBuilder(true)}
                     className="text-purple-400 hover:text-purple-300 text-sm font-medium transition-colors"
                   >
-                    🎨 Create Custom
+                    Create Custom
                   </button>
                   <span className="text-white/40">•</span>
                   <a href="/templates" className="text-[var(--primary-color)] hover:text-[var(--primary-color)]/80 text-sm font-medium">
@@ -1350,7 +1350,7 @@ export default function Home() {
                           
                           // Show sharing prompt for viral growth
                           setTimeout(() => {
-                            showInfo('💡 Love this template? Share StitchInvoice with other freelancers!');
+                            showInfo('Love this template? Share StitchInvoice with other freelancers!');
                           }, 2000);
                         } catch (error) {
                           console.error('Error generating invoice:', error);
@@ -1692,7 +1692,7 @@ export default function Home() {
                 });
               } else if (typeof window !== 'undefined') {
                 navigator.clipboard.writeText(window.location.origin);
-                showSuccess('Link copied! Share StitchInvoice with others 💙');
+                showSuccess('Link copied! Share StitchInvoice with others');
               }
             }}
             className="absolute bottom-4 right-4 w-12 h-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 hover:bg-white/20"
@@ -1749,7 +1749,7 @@ export default function Home() {
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className="text-2xl font-bold text-white">🎨 Advanced Template Builder</h2>
+                  <h2 className="text-2xl font-bold text-white">Advanced Template Builder</h2>
                   <p className="text-white/60 text-sm mt-1">Create professional invoices with complete customization</p>
                 </div>
                 <button
