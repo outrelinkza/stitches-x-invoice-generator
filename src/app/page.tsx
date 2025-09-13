@@ -750,16 +750,32 @@ export default function Home() {
                   {selectedTemplate === 'restaurant' && 'Restaurant Template'}
                 </span>
                 <div className="flex items-center gap-2">
+                  <select
+                    value={selectedTemplate}
+                    onChange={(e) => {
+                      setSelectedTemplate(e.target.value);
+                      localStorage.setItem('selectedTemplate', e.target.value);
+                    }}
+                    className="px-3 py-1 bg-white/10 border border-white/20 rounded text-white text-sm focus:border-white/40 focus:outline-none"
+                  >
+                    <option value="standard" className="bg-gray-800">Standard</option>
+                    <option value="minimalist-dark" className="bg-gray-800">Minimalist Dark</option>
+                    <option value="recurring-clients" className="bg-gray-800">Recurring Clients</option>
+                    <option value="creative-agency" className="bg-gray-800">Creative Agency</option>
+                    <option value="consulting" className="bg-gray-800">Consulting</option>
+                    <option value="modern-tech" className="bg-gray-800">Modern Tech</option>
+                    <option value="elegant-luxury" className="bg-gray-800">Elegant Luxury</option>
+                    <option value="healthcare" className="bg-gray-800">Healthcare</option>
+                    <option value="legal" className="bg-gray-800">Legal</option>
+                    <option value="restaurant" className="bg-gray-800">Restaurant</option>
+                    <option value="custom" className="bg-gray-800">Custom</option>
+                  </select>
                   <button
                     onClick={() => setShowCustomBuilder(true)}
                     className="text-purple-400 hover:text-purple-300 text-sm font-medium transition-colors"
                   >
                     Create Custom
                   </button>
-                  <span className="text-white/40">•</span>
-                  <a href="/templates" className="text-[var(--primary-color)] hover:text-[var(--primary-color)]/80 text-sm font-medium">
-                    Change
-                  </a>
                 </div>
               </div>
             </div>
