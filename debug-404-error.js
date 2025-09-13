@@ -47,13 +47,13 @@ if (!foundUsageCode) {
 console.log('6. Checking for Supabase calls...');
 const networkRequests = performance.getEntriesByType('resource');
 const supabaseRequests = networkRequests.filter(req => 
-  req.name.includes('supabase') && req.name.includes('user_usage')
+  req.name.includes('supabase')
 );
 
 if (supabaseRequests.length > 0) {
-  console.log('❌ Found Supabase user_usage requests:', supabaseRequests);
+  console.log('📊 Found Supabase requests:', supabaseRequests.length);
 } else {
-  console.log('✅ No Supabase user_usage requests found');
+  console.log('✅ No Supabase requests found');
 }
 
 // Force reload without cache
