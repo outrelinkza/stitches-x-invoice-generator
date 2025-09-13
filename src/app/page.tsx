@@ -1712,15 +1712,15 @@ export default function Home() {
         mode={authMode}
       />
 
-      {/* Custom Template Builder Modal */}
+      {/* Advanced Custom Template Builder Modal */}
       {showCustomBuilder && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 max-w-6xl w-full max-h-[95vh] overflow-y-auto">
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 max-w-7xl w-full max-h-[95vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className="text-2xl font-bold text-white">🎨 Custom Template Builder</h2>
-                  <p className="text-white/60 text-sm mt-1">Design your perfect invoice template</p>
+                  <h2 className="text-2xl font-bold text-white">🎨 Advanced Template Builder</h2>
+                  <p className="text-white/60 text-sm mt-1">Create professional invoices with complete customization</p>
                 </div>
                 <button
                   onClick={() => setShowCustomBuilder(false)}
@@ -1731,151 +1731,194 @@ export default function Home() {
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Quick Presets */}
-                <div className="lg:col-span-1">
-                  <h3 className="text-white/80 text-sm font-medium mb-4">Quick Styles</h3>
-                  <div className="space-y-3">
-                    <button
-                      onClick={() => setCustomTemplate({
-                        ...customTemplate,
-                        name: 'Minimal Clean',
-                        primaryColor: '#374151',
-                        secondaryColor: '#6B7280',
-                        accentColor: '#9CA3AF',
-                        backgroundColor: '#ffffff',
-                        textColor: '#1a1a2e',
-                        fontFamily: 'Inter',
-                        layout: 'minimal',
-                        headerStyle: 'simple'
-                      })}
-                      className="w-full p-3 rounded-lg border border-white/20 bg-white/5 hover:bg-white/10 transition-colors text-left"
-                    >
-                      <div className="text-white/80 text-sm font-medium">Minimal Clean</div>
-                      <div className="text-white/60 text-xs">Simple and professional</div>
-                    </button>
-                    
-                    <button
-                      onClick={() => setCustomTemplate({
-                        ...customTemplate,
-                        name: 'Corporate Blue',
-                        primaryColor: '#1E40AF',
-                        secondaryColor: '#3B82F6',
-                        accentColor: '#60A5FA',
-                        backgroundColor: '#ffffff',
-                        textColor: '#1a1a2e',
-                        fontFamily: 'Roboto',
-                        layout: 'standard',
-                        headerStyle: 'full-width'
-                      })}
-                      className="w-full p-3 rounded-lg border border-white/20 bg-white/5 hover:bg-white/10 transition-colors text-left"
-                    >
-                      <div className="text-white/80 text-sm font-medium">Corporate Blue</div>
-                      <div className="text-white/60 text-xs">Business and formal</div>
-                    </button>
-                    
-                    <button
-                      onClick={() => setCustomTemplate({
-                        ...customTemplate,
-                        name: 'Creative Purple',
-                        primaryColor: '#7C3AED',
-                        secondaryColor: '#8B5CF6',
-                        accentColor: '#A78BFA',
-                        backgroundColor: '#ffffff',
-                        textColor: '#1a1a2e',
-                        fontFamily: 'Poppins',
-                        layout: 'standard',
-                        headerStyle: 'centered'
-                      })}
-                      className="w-full p-3 rounded-lg border border-white/20 bg-white/5 hover:bg-white/10 transition-colors text-left"
-                    >
-                      <div className="text-white/80 text-sm font-medium">Creative Purple</div>
-                      <div className="text-white/60 text-xs">Modern and vibrant</div>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Customization Panel */}
-                <div className="lg:col-span-1">
-                  <h3 className="text-white/80 text-sm font-medium mb-4">Customize</h3>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-white/80 text-sm font-medium mb-2">Template Name</label>
-                      <input
-                        type="text"
-                        value={customTemplate.name}
-                        onChange={(e) => setCustomTemplate({...customTemplate, name: e.target.value})}
-                        className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:border-white/40 focus:outline-none text-sm"
-                        placeholder="My Awesome Template"
-                      />
+                {/* Customization Options */}
+                <div className="lg:col-span-2 space-y-6">
+                  {/* Template Presets */}
+                  <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+                    <h3 className="text-white/80 text-sm font-medium mb-3 flex items-center gap-2">
+                      <span className="material-symbols-outlined text-lg">palette</span>
+                      Quick Presets
+                    </h3>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                      {[
+                        { name: 'Professional', colors: ['#1E40AF', '#3B82F6', '#60A5FA'] },
+                        { name: 'Creative', colors: ['#BE185D', '#EC4899', '#F472B6'] },
+                        { name: 'Minimal', colors: ['#374151', '#6B7280', '#9CA3AF'] },
+                        { name: 'Vibrant', colors: ['#059669', '#10B981', '#34D399'] }
+                      ].map((preset) => (
+                        <button
+                          key={preset.name}
+                          onClick={() => setCustomTemplate({
+                            ...customTemplate,
+                            primaryColor: preset.colors[0],
+                            secondaryColor: preset.colors[1],
+                            accentColor: preset.colors[2]
+                          })}
+                          className="p-3 rounded-lg border border-white/20 hover:border-white/40 transition-colors"
+                        >
+                          <div className="flex gap-1 mb-2">
+                            {preset.colors.map((color, i) => (
+                              <div key={i} className="w-4 h-4 rounded" style={{ backgroundColor: color }}></div>
+                            ))}
+                          </div>
+                          <span className="text-white/70 text-xs">{preset.name}</span>
+                        </button>
+                      ))}
                     </div>
+                  </div>
 
-                    <div>
-                      <label className="block text-white/80 text-sm font-medium mb-2">Brand Colors</label>
-                      <div className="grid grid-cols-3 gap-2">
-                        <div>
-                          <label className="block text-white/60 text-xs mb-1">Primary</label>
-                          <input
-                            type="color"
-                            value={customTemplate.primaryColor}
-                            onChange={(e) => setCustomTemplate({...customTemplate, primaryColor: e.target.value})}
-                            className="w-full h-8 rounded border border-white/20 cursor-pointer"
-                          />
+                  {/* Branding & Appearance */}
+                  <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+                    <h3 className="text-white/80 text-sm font-medium mb-3 flex items-center gap-2">
+                      <span className="material-symbols-outlined text-lg">brush</span>
+                      Branding & Appearance
+                    </h3>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-white/80 text-sm font-medium mb-2">Template Name</label>
+                        <input
+                          type="text"
+                          value={customTemplate.name}
+                          onChange={(e) => setCustomTemplate({...customTemplate, name: e.target.value})}
+                          className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:border-white/40 focus:outline-none text-sm"
+                          placeholder="My Professional Template"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-white/80 text-sm font-medium mb-2">Brand Colors</label>
+                        <div className="grid grid-cols-3 gap-3">
+                          <div>
+                            <label className="block text-white/60 text-xs mb-1">Primary Color</label>
+                            <div className="flex gap-2">
+                              <input
+                                type="color"
+                                value={customTemplate.primaryColor}
+                                onChange={(e) => setCustomTemplate({...customTemplate, primaryColor: e.target.value})}
+                                className="w-12 h-8 rounded border border-white/20 cursor-pointer"
+                              />
+                              <input
+                                type="text"
+                                value={customTemplate.primaryColor}
+                                onChange={(e) => setCustomTemplate({...customTemplate, primaryColor: e.target.value})}
+                                className="flex-1 px-2 py-1 bg-white/10 border border-white/20 rounded text-white text-xs"
+                                placeholder="#7C3AED"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-white/60 text-xs mb-1">Secondary Color</label>
+                            <div className="flex gap-2">
+                              <input
+                                type="color"
+                                value={customTemplate.secondaryColor}
+                                onChange={(e) => setCustomTemplate({...customTemplate, secondaryColor: e.target.value})}
+                                className="w-12 h-8 rounded border border-white/20 cursor-pointer"
+                              />
+                              <input
+                                type="text"
+                                value={customTemplate.secondaryColor}
+                                onChange={(e) => setCustomTemplate({...customTemplate, secondaryColor: e.target.value})}
+                                className="flex-1 px-2 py-1 bg-white/10 border border-white/20 rounded text-white text-xs"
+                                placeholder="#8B5CF6"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-white/60 text-xs mb-1">Accent Color</label>
+                            <div className="flex gap-2">
+                              <input
+                                type="color"
+                                value={customTemplate.accentColor}
+                                onChange={(e) => setCustomTemplate({...customTemplate, accentColor: e.target.value})}
+                                className="w-12 h-8 rounded border border-white/20 cursor-pointer"
+                              />
+                              <input
+                                type="text"
+                                value={customTemplate.accentColor}
+                                onChange={(e) => setCustomTemplate({...customTemplate, accentColor: e.target.value})}
+                                className="flex-1 px-2 py-1 bg-white/10 border border-white/20 rounded text-white text-xs"
+                                placeholder="#A78BFA"
+                              />
+                            </div>
+                          </div>
                         </div>
-                        <div>
-                          <label className="block text-white/60 text-xs mb-1">Secondary</label>
-                          <input
-                            type="color"
-                            value={customTemplate.secondaryColor}
-                            onChange={(e) => setCustomTemplate({...customTemplate, secondaryColor: e.target.value})}
-                            className="w-full h-8 rounded border border-white/20 cursor-pointer"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-white/60 text-xs mb-1">Accent</label>
-                          <input
-                            type="color"
-                            value={customTemplate.accentColor}
-                            onChange={(e) => setCustomTemplate({...customTemplate, accentColor: e.target.value})}
-                            className="w-full h-8 rounded border border-white/20 cursor-pointer"
-                          />
+                      </div>
+
+                      <div>
+                        <label className="block text-white/80 text-sm font-medium mb-2">Background & Borders</label>
+                        <div className="grid grid-cols-2 gap-2">
+                          <select
+                            value={customTemplate.borderStyle}
+                            onChange={(e) => setCustomTemplate({...customTemplate, borderStyle: e.target.value})}
+                            className="px-3 py-2 bg-white/10 border border-white/20 rounded text-white text-sm focus:border-white/40 focus:outline-none"
+                          >
+                            <option value="none" className="bg-gray-800">No Borders</option>
+                            <option value="minimal" className="bg-gray-800">Minimal Lines</option>
+                            <option value="bordered" className="bg-gray-800">Boxed Layout</option>
+                            <option value="full-bleed" className="bg-gray-800">Full Bleed</option>
+                          </select>
+                          <select
+                            value={customTemplate.cornerRadius}
+                            onChange={(e) => setCustomTemplate({...customTemplate, cornerRadius: e.target.value})}
+                            className="px-3 py-2 bg-white/10 border border-white/20 rounded text-white text-sm focus:border-white/40 focus:outline-none"
+                          >
+                            <option value="none" className="bg-gray-800">Sharp Corners</option>
+                            <option value="small" className="bg-gray-800">Small Radius</option>
+                            <option value="medium" className="bg-gray-800">Medium Radius</option>
+                            <option value="large" className="bg-gray-800">Large Radius</option>
+                          </select>
                         </div>
                       </div>
                     </div>
+                  </div>
 
-                    <div>
-                      <label className="block text-white/80 text-sm font-medium mb-2">Typography</label>
-                      <div className="grid grid-cols-3 gap-2">
+                  {/* Typography */}
+                  <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+                    <h3 className="text-white/80 text-sm font-medium mb-3 flex items-center gap-2">
+                      <span className="material-symbols-outlined text-lg">format_size</span>
+                      Typography
+                    </h3>
+                    <div className="grid grid-cols-3 gap-3">
+                      <div>
+                        <label className="block text-white/60 text-xs mb-1">Font Family</label>
                         <select
                           value={customTemplate.fontFamily}
                           onChange={(e) => setCustomTemplate({...customTemplate, fontFamily: e.target.value})}
-                          className="px-2 py-1 bg-white/10 border border-white/20 rounded text-white text-sm focus:border-white/40 focus:outline-none"
+                          className="w-full px-2 py-2 bg-white/10 border border-white/20 rounded text-white text-sm focus:border-white/40 focus:outline-none"
                         >
-                          <option value="Helvetica" className="bg-gray-800">Helvetica</option>
-                          <option value="Times" className="bg-gray-800">Times</option>
-                          <option value="Courier" className="bg-gray-800">Courier</option>
-                          <option value="Inter" className="bg-gray-800">Inter</option>
-                          <option value="Roboto" className="bg-gray-800">Roboto</option>
-                          <option value="Poppins" className="bg-gray-800">Poppins</option>
-                          <option value="Montserrat" className="bg-gray-800">Montserrat</option>
+                          <option value="Helvetica" className="bg-gray-800">Helvetica (Clean)</option>
+                          <option value="Times" className="bg-gray-800">Times (Classic)</option>
+                          <option value="Courier" className="bg-gray-800">Courier (Monospace)</option>
+                          <option value="Inter" className="bg-gray-800">Inter (Modern)</option>
+                          <option value="Roboto" className="bg-gray-800">Roboto (Friendly)</option>
+                          <option value="Poppins" className="bg-gray-800">Poppins (Rounded)</option>
+                          <option value="Montserrat" className="bg-gray-800">Montserrat (Elegant)</option>
                         </select>
+                      </div>
+                      <div>
+                        <label className="block text-white/60 text-xs mb-1">Font Size</label>
                         <select
                           value={customTemplate.fontSize}
                           onChange={(e) => setCustomTemplate({...customTemplate, fontSize: e.target.value})}
-                          className="px-2 py-1 bg-white/10 border border-white/20 rounded text-white text-sm focus:border-white/40 focus:outline-none"
+                          className="w-full px-2 py-2 bg-white/10 border border-white/20 rounded text-white text-sm focus:border-white/40 focus:outline-none"
                         >
-                          <option value="10px" className="bg-gray-800">10px</option>
-                          <option value="11px" className="bg-gray-800">11px</option>
-                          <option value="12px" className="bg-gray-800">12px</option>
-                          <option value="13px" className="bg-gray-800">13px</option>
-                          <option value="14px" className="bg-gray-800">14px</option>
-                          <option value="15px" className="bg-gray-800">15px</option>
-                          <option value="16px" className="bg-gray-800">16px</option>
-                          <option value="18px" className="bg-gray-800">18px</option>
+                          <option value="10px" className="bg-gray-800">10px (Compact)</option>
+                          <option value="11px" className="bg-gray-800">11px (Small)</option>
+                          <option value="12px" className="bg-gray-800">12px (Standard)</option>
+                          <option value="13px" className="bg-gray-800">13px (Medium)</option>
+                          <option value="14px" className="bg-gray-800">14px (Large)</option>
+                          <option value="15px" className="bg-gray-800">15px (XL)</option>
+                          <option value="16px" className="bg-gray-800">16px (XXL)</option>
+                          <option value="18px" className="bg-gray-800">18px (Huge)</option>
                         </select>
+                      </div>
+                      <div>
+                        <label className="block text-white/60 text-xs mb-1">Font Weight</label>
                         <select
                           value={customTemplate.fontWeight}
                           onChange={(e) => setCustomTemplate({...customTemplate, fontWeight: e.target.value})}
-                          className="px-2 py-1 bg-white/10 border border-white/20 rounded text-white text-sm focus:border-white/40 focus:outline-none"
+                          className="w-full px-2 py-2 bg-white/10 border border-white/20 rounded text-white text-sm focus:border-white/40 focus:outline-none"
                         >
                           <option value="normal" className="bg-gray-800">Normal</option>
                           <option value="bold" className="bg-gray-800">Bold</option>
@@ -1883,63 +1926,112 @@ export default function Home() {
                         </select>
                       </div>
                     </div>
+                  </div>
 
-                    <div>
-                      <label className="block text-white/80 text-sm font-medium mb-2">Layout</label>
-                      <div className="grid grid-cols-2 gap-2">
-                        <button
-                          onClick={() => setCustomTemplate({...customTemplate, headerStyle: 'full-width'})}
-                          className={`p-2 rounded border text-xs transition-colors ${
-                            customTemplate.headerStyle === 'full-width' 
-                              ? 'border-white/40 bg-white/10 text-white' 
-                              : 'border-white/20 bg-white/5 text-white/70 hover:bg-white/10'
-                          }`}
-                        >
-                          Full Width
-                        </button>
-                        <button
-                          onClick={() => setCustomTemplate({...customTemplate, headerStyle: 'centered'})}
-                          className={`p-2 rounded border text-xs transition-colors ${
-                            customTemplate.headerStyle === 'centered' 
-                              ? 'border-white/40 bg-white/10 text-white' 
-                              : 'border-white/20 bg-white/5 text-white/70 hover:bg-white/10'
-                          }`}
-                        >
-                          Centered
-                        </button>
+                  {/* Layout & Structure */}
+                  <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+                    <h3 className="text-white/80 text-sm font-medium mb-3 flex items-center gap-2">
+                      <span className="material-symbols-outlined text-lg">view_quilt</span>
+                      Layout & Structure
+                    </h3>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-white/80 text-sm font-medium mb-2">Header Style</label>
+                        <div className="grid grid-cols-3 gap-2">
+                          {[
+                            { value: 'full-width', label: 'Full Width', icon: 'fullscreen' },
+                            { value: 'centered', label: 'Centered', icon: 'center_focus_strong' },
+                            { value: 'minimal', label: 'Minimal', icon: 'minimize' }
+                          ].map((style) => (
+                            <button
+                              key={style.value}
+                              onClick={() => setCustomTemplate({...customTemplate, headerStyle: style.value})}
+                              className={`p-3 rounded-lg border text-xs transition-colors flex flex-col items-center gap-1 ${
+                                customTemplate.headerStyle === style.value 
+                                  ? 'border-white/40 bg-white/10 text-white' 
+                                  : 'border-white/20 bg-white/5 text-white/70 hover:bg-white/10'
+                              }`}
+                            >
+                              <span className="material-symbols-outlined text-sm">{style.icon}</span>
+                              {style.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-white/80 text-sm font-medium mb-2">Spacing</label>
+                        <div className="grid grid-cols-3 gap-2">
+                          {[
+                            { value: 'compact', label: 'Compact' },
+                            { value: 'normal', label: 'Normal' },
+                            { value: 'spacious', label: 'Spacious' }
+                          ].map((spacing) => (
+                            <button
+                              key={spacing.value}
+                              onClick={() => setCustomTemplate({...customTemplate, spacing: spacing.value})}
+                              className={`p-2 rounded border text-xs transition-colors ${
+                                customTemplate.spacing === spacing.value 
+                                  ? 'border-white/40 bg-white/10 text-white' 
+                                  : 'border-white/20 bg-white/5 text-white/70 hover:bg-white/10'
+                              }`}
+                            >
+                              {spacing.label}
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     </div>
+                  </div>
 
-                    <div>
-                      <label className="block text-white/80 text-sm font-medium mb-2">Elements</label>
+                  {/* Content Elements */}
+                  <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+                    <h3 className="text-white/80 text-sm font-medium mb-3 flex items-center gap-2">
+                      <span className="material-symbols-outlined text-lg">tune</span>
+                      Content Elements
+                    </h3>
+                    <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <label className="flex items-center gap-2">
-                          <input
-                            type="checkbox"
-                            checked={customTemplate.showLogo}
-                            onChange={(e) => setCustomTemplate({...customTemplate, showLogo: e.target.checked})}
-                            className="w-3 h-3 text-purple-600 bg-white/10 border-white/20 rounded"
-                          />
-                          <span className="text-white/70 text-xs">Company logo</span>
-                        </label>
-                        <label className="flex items-center gap-2">
-                          <input
-                            type="checkbox"
-                            checked={customTemplate.showSignature}
-                            onChange={(e) => setCustomTemplate({...customTemplate, showSignature: e.target.checked})}
-                            className="w-3 h-3 text-purple-600 bg-white/10 border-white/20 rounded"
-                          />
-                          <span className="text-white/70 text-xs">Signature area</span>
-                        </label>
-                        <label className="flex items-center gap-2">
-                          <input
-                            type="checkbox"
-                            checked={customTemplate.showTerms}
-                            onChange={(e) => setCustomTemplate({...customTemplate, showTerms: e.target.checked})}
-                            className="w-3 h-3 text-purple-600 bg-white/10 border-white/20 rounded"
-                          />
-                          <span className="text-white/70 text-xs">Terms & conditions</span>
-                        </label>
+                        <h4 className="text-white/70 text-xs font-medium">Header Elements</h4>
+                        {[
+                          { key: 'showLogo', label: 'Company Logo', tooltip: 'Display your company logo in the header' },
+                          { key: 'showInvoiceNumber', label: 'Invoice Number', tooltip: 'Show invoice number prominently' },
+                          { key: 'showInvoiceDate', label: 'Invoice Date', tooltip: 'Display the invoice date' },
+                          { key: 'showDueDate', label: 'Due Date', tooltip: 'Show payment due date' }
+                        ].map((element) => (
+                          <label key={element.key} className="flex items-center gap-2 group">
+                            <input
+                              type="checkbox"
+                              checked={customTemplate[element.key as keyof typeof customTemplate] as boolean}
+                              onChange={(e) => setCustomTemplate({...customTemplate, [element.key]: e.target.checked})}
+                              className="w-4 h-4 text-purple-600 bg-white/10 border-white/20 rounded focus:ring-purple-500"
+                            />
+                            <span className="text-white/70 text-xs">{element.label}</span>
+                            <span className="material-symbols-outlined text-xs text-white/40 opacity-0 group-hover:opacity-100 transition-opacity" title={element.tooltip}>help</span>
+                          </label>
+                        ))}
+                      </div>
+                      <div className="space-y-2">
+                        <h4 className="text-white/70 text-xs font-medium">Content Elements</h4>
+                        {[
+                          { key: 'showCompanyAddress', label: 'Company Address', tooltip: 'Include your business address' },
+                          { key: 'showClientAddress', label: 'Client Address', tooltip: 'Show billing address' },
+                          { key: 'showTaxBreakdown', label: 'Tax Breakdown', tooltip: 'Detailed tax calculations' },
+                          { key: 'showNotes', label: 'Notes Section', tooltip: 'Additional notes or terms' },
+                          { key: 'showThankYouMessage', label: 'Thank You Message', tooltip: 'Professional closing message' },
+                          { key: 'showPageNumbers', label: 'Page Numbers', tooltip: 'Add page numbers for multi-page invoices' }
+                        ].map((element) => (
+                          <label key={element.key} className="flex items-center gap-2 group">
+                            <input
+                              type="checkbox"
+                              checked={customTemplate[element.key as keyof typeof customTemplate] as boolean}
+                              onChange={(e) => setCustomTemplate({...customTemplate, [element.key]: e.target.checked})}
+                              className="w-4 h-4 text-purple-600 bg-white/10 border-white/20 rounded focus:ring-purple-500"
+                            />
+                            <span className="text-white/70 text-xs">{element.label}</span>
+                            <span className="material-symbols-outlined text-xs text-white/40 opacity-0 group-hover:opacity-100 transition-opacity" title={element.tooltip}>help</span>
+                          </label>
+                        ))}
                       </div>
                     </div>
                   </div>
@@ -1947,104 +2039,248 @@ export default function Home() {
 
                 {/* Live Preview */}
                 <div className="lg:col-span-1">
-                  <h3 className="text-white/80 text-sm font-medium mb-4">Preview</h3>
-                  <div 
-                    className="bg-white rounded-lg p-4 shadow-lg text-xs"
-                    style={{ 
-                      backgroundColor: customTemplate.backgroundColor,
-                      color: customTemplate.textColor,
-                      fontFamily: customTemplate.fontFamily,
-                      fontSize: customTemplate.fontSize
-                    }}
-                  >
-                    {/* Header */}
-                    <div 
-                      className="h-6 rounded mb-3 flex items-center px-2"
-                      style={{ backgroundColor: customTemplate.primaryColor }}
-                    >
-                      <span className="text-white text-xs font-medium">INVOICE</span>
-                    </div>
-                    
-                    {/* Company Info */}
-                    <div className="mb-3">
+                  <div className="sticky top-4">
+                    <h3 className="text-white/80 text-sm font-medium mb-4 flex items-center gap-2">
+                      <span className="material-symbols-outlined text-lg">visibility</span>
+                      Live Preview
+                    </h3>
+                    <div className="bg-white rounded-lg shadow-xl overflow-hidden">
+                      {/* PDF Preview */}
+                      <div className="p-4 border-b border-gray-200">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-gray-600 text-xs font-medium">PDF Preview</span>
+                          <button
+                            onClick={() => {
+                              // Generate a preview PDF
+                              const previewData = {
+                                companyName: 'Your Company',
+                                companyAddress: '123 Business St\nCity, State 12345',
+                                companyContact: 'hello@stitchinvoice.com',
+                                clientName: 'Client Name',
+                                clientAddress: '456 Client Ave\nClient City, State 67890',
+                                clientContact: 'client@email.com',
+                                invoiceNumber: 'INV-001',
+                                date: new Date().toISOString().split('T')[0],
+                                dueDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                                paymentTerms: 'Net 15',
+                                items: [
+                                  { description: 'Sample Service', quantity: 1, rate: 100, amount: 100 },
+                                  { description: 'Additional Item', quantity: 2, rate: 50, amount: 100 }
+                                ],
+                                subtotal: 200,
+                                taxRate: 10,
+                                taxAmount: 20,
+                                total: 220,
+                                additionalNotes: 'Thank you for your business!',
+                                template: 'custom',
+                                customTemplate: customTemplate
+                              };
+                              generateInvoicePDF(previewData);
+                            }}
+                            className="px-3 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 transition-colors"
+                          >
+                            Test PDF
+                          </button>
+                        </div>
+                      </div>
+                      
+                      {/* Visual Preview */}
                       <div 
-                        className="h-3 rounded mb-1"
-                        style={{ backgroundColor: customTemplate.secondaryColor, width: '70%' }}
-                      ></div>
-                      <div 
-                        className="h-2 rounded mb-1"
-                        style={{ backgroundColor: customTemplate.accentColor, width: '50%' }}
-                      ></div>
-                    </div>
-                    
-                    {/* Line Items */}
-                    <div className="mb-3">
-                      <div 
-                        className="h-2 rounded mb-1"
-                        style={{ backgroundColor: customTemplate.primaryColor, width: '100%' }}
-                      ></div>
-                      <div 
-                        className="h-2 rounded mb-1"
-                        style={{ backgroundColor: customTemplate.secondaryColor, width: '80%' }}
-                      ></div>
-                      <div 
-                        className="h-2 rounded"
-                        style={{ backgroundColor: customTemplate.accentColor, width: '60%' }}
-                      ></div>
-                    </div>
-                    
-                    {/* Total */}
-                    <div 
-                      className="h-4 rounded"
-                      style={{ backgroundColor: customTemplate.primaryColor, width: '40%' }}
-                    ></div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Preview Section */}
-              <div className="mt-8 p-6 bg-white/5 rounded-xl border border-white/10">
-                <h3 className="text-lg font-semibold text-white mb-4">Preview</h3>
-                <div className="bg-white rounded-lg p-6 shadow-lg">
-                  <div 
-                    className="text-center"
-                    style={{
-                      fontFamily: customTemplate.fontFamily,
-                      fontSize: customTemplate.fontSize,
-                      fontWeight: customTemplate.fontWeight,
-                      color: customTemplate.textColor
-                    }}
-                  >
-                    <div 
-                      className="font-bold mb-2"
-                      style={{ 
-                        color: customTemplate.primaryColor,
-                        fontSize: '20px'
-                      }}
-                    >
-                      {customTemplate.name}
-                    </div>
-                    <div className="text-sm opacity-75">
-                      Sample Invoice Text
-                    </div>
-                    <div 
-                      className="mt-2 text-xs"
-                      style={{ color: customTemplate.secondaryColor }}
-                    >
-                      This is how your invoice will look
+                        className="p-6 text-xs"
+                        style={{ 
+                          backgroundColor: customTemplate.backgroundColor,
+                          color: customTemplate.textColor,
+                          fontFamily: customTemplate.fontFamily,
+                          fontSize: customTemplate.fontSize
+                        }}
+                      >
+                        {/* Header */}
+                        <div 
+                          className={`rounded mb-4 flex items-center px-3 py-2 ${
+                            customTemplate.headerHeight === 'small' ? 'h-8' :
+                            customTemplate.headerHeight === 'large' ? 'h-12' : 'h-10'
+                          }`}
+                          style={{ backgroundColor: customTemplate.primaryColor }}
+                        >
+                          <span className="text-white font-bold">INVOICE</span>
+                          {customTemplate.showInvoiceNumber && (
+                            <span className="text-white/80 ml-auto">#INV-001</span>
+                          )}
+                        </div>
+                        
+                        {/* Company Info */}
+                        {customTemplate.showCompanyAddress && (
+                          <div className="mb-4">
+                            <div 
+                              className="h-3 rounded mb-1"
+                              style={{ backgroundColor: customTemplate.secondaryColor, width: '70%' }}
+                            ></div>
+                            <div 
+                              className="h-2 rounded mb-1"
+                              style={{ backgroundColor: customTemplate.accentColor, width: '50%' }}
+                            ></div>
+                          </div>
+                        )}
+                        
+                        {/* Invoice Details */}
+                        <div className="mb-4 flex justify-between text-xs">
+                          {customTemplate.showInvoiceDate && (
+                            <div>
+                              <span style={{ color: customTemplate.primaryColor }}>Date: </span>
+                              <span>2025-01-15</span>
+                            </div>
+                          )}
+                          {customTemplate.showDueDate && (
+                            <div>
+                              <span style={{ color: customTemplate.primaryColor }}>Due: </span>
+                              <span>2025-01-30</span>
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Client Info */}
+                        {customTemplate.showClientAddress && (
+                          <div className="mb-4">
+                            <div 
+                              className="h-2 rounded mb-1"
+                              style={{ backgroundColor: customTemplate.secondaryColor, width: '60%' }}
+                            ></div>
+                            <div 
+                              className="h-2 rounded"
+                              style={{ backgroundColor: customTemplate.accentColor, width: '40%' }}
+                            ></div>
+                          </div>
+                        )}
+                        
+                        {/* Items Table */}
+                        <div className="mb-4">
+                          <div 
+                            className="h-2 rounded mb-1"
+                            style={{ backgroundColor: customTemplate.primaryColor, width: '100%' }}
+                          ></div>
+                          <div 
+                            className="h-2 rounded mb-1"
+                            style={{ backgroundColor: customTemplate.secondaryColor, width: '80%' }}
+                          ></div>
+                          <div 
+                            className="h-2 rounded"
+                            style={{ backgroundColor: customTemplate.accentColor, width: '60%' }}
+                          ></div>
+                        </div>
+                        
+                        {/* Total */}
+                        <div 
+                          className="h-4 rounded flex items-center justify-between px-2"
+                          style={{ backgroundColor: customTemplate.primaryColor }}
+                        >
+                          <span className="text-white font-bold">Total: $220.00</span>
+                        </div>
+                        
+                        {/* Notes */}
+                        {customTemplate.showNotes && (
+                          <div className="mt-4 p-2 rounded" style={{ backgroundColor: customTemplate.accentColor + '20' }}>
+                            <div 
+                              className="h-2 rounded mb-1"
+                              style={{ backgroundColor: customTemplate.accentColor, width: '80%' }}
+                            ></div>
+                            <div 
+                              className="h-2 rounded"
+                              style={{ backgroundColor: customTemplate.accentColor, width: '60%' }}
+                            ></div>
+                          </div>
+                        )}
+                        
+                        {/* Thank You */}
+                        {customTemplate.showThankYouMessage && (
+                          <div className="mt-4 text-center">
+                            <span 
+                              className="font-bold"
+                              style={{ color: customTemplate.primaryColor }}
+                            >
+                              Thank you for your business!
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
 
               <div className="flex items-center justify-between mt-8 pt-6 border-t border-white/20">
-                <button
-                  onClick={() => setShowCustomBuilder(false)}
-                  className="px-6 py-2 text-white/60 hover:text-white transition-colors"
-                >
-                  Cancel
-                </button>
                 <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => {
+                      // Reset to default template
+                      setCustomTemplate({
+                        name: 'My Custom Template',
+                        primaryColor: '#7C3AED',
+                        secondaryColor: '#8B5CF6',
+                        accentColor: '#A78BFA',
+                        backgroundColor: '#ffffff',
+                        textColor: '#1a1a2e',
+                        fontFamily: 'Inter',
+                        fontSize: '14px',
+                        fontWeight: '400',
+                        layout: 'standard',
+                        headerStyle: 'full-width',
+                        logoPosition: 'left',
+                        showLogo: true,
+                        showWatermark: false,
+                        showSignature: true,
+                        showTerms: true,
+                        spacing: 'normal',
+                        borderStyle: 'none',
+                        sectionOrder: ['header', 'company', 'client', 'items', 'totals', 'notes', 'footer'],
+                        headerHeight: 'medium',
+                        footerHeight: 'medium',
+                        showPageNumbers: true,
+                        showInvoiceDate: true,
+                        showDueDate: true,
+                        showInvoiceNumber: true,
+                        showClientAddress: true,
+                        showCompanyAddress: true,
+                        showTaxBreakdown: true,
+                        showDiscounts: true,
+                        showPaymentInfo: true,
+                        showNotes: true,
+                        showThankYouMessage: true,
+                        tableStyle: 'bordered',
+                        headerBackground: 'transparent',
+                        footerBackground: 'transparent',
+                        accentStyle: 'subtle',
+                        shadowStyle: 'none',
+                        cornerRadius: 'medium'
+                      });
+                    }}
+                    className="px-4 py-2 text-white/60 hover:text-white transition-colors text-sm"
+                  >
+                    Reset to Default
+                  </button>
+                  <button
+                    onClick={() => setShowCustomBuilder(false)}
+                    className="px-6 py-2 text-white/60 hover:text-white transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => {
+                      // Save template to localStorage
+                      const savedTemplates = JSON.parse(localStorage.getItem('savedTemplates') || '[]');
+                      savedTemplates.push({
+                        ...customTemplate,
+                        id: Date.now(),
+                        savedAt: new Date().toISOString()
+                      });
+                      localStorage.setItem('savedTemplates', JSON.stringify(savedTemplates));
+                      alert('Template saved successfully!');
+                    }}
+                    className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white font-medium rounded-lg transition-colors text-sm"
+                  >
+                    Save Template
+                  </button>
                   <button
                     onClick={async () => {
                       // Check if user can use custom templates
@@ -2058,7 +2294,7 @@ export default function Home() {
                     }}
                     className="px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-medium rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all"
                   >
-                    Save & Use Template
+                    Use This Template
                   </button>
                 </div>
               </div>
