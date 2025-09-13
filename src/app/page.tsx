@@ -56,6 +56,7 @@ export default function Home() {
     borderStyle: 'none',
     sectionOrder: ['header', 'company', 'client', 'items', 'totals', 'notes', 'footer']
   });
+  const [lineItems, setLineItems] = useState([{ id: 1, description: '', quantity: 1, rate: 0, amount: 0 }]);
   const logoInputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   
@@ -403,6 +404,33 @@ export default function Home() {
   const calculateLineTotal = useCallback((quantity: number, rate: number) => {
     return (quantity * rate).toFixed(2);
   }, []);
+
+  // Add new line item
+  const addLineItem = useCallback(() => {
+    const newId = Math.max(...lineItems.map(item => item.id), 0) + 1;
+    setLineItems([...lineItems, { id: newId, description: '', quantity: 1, rate: 0, amount: 0 }]);
+  }, [lineItems]);
+
+  // Remove line item
+  const removeLineItem = useCallback((id: number) => {
+    if (lineItems.length > 1) {
+      setLineItems(lineItems.filter(item => item.id !== id));
+    }
+  }, [lineItems]);
+
+  // Update line item
+  const updateLineItem = useCallback((id: number, field: string, value: string | number) => {
+    setLineItems(lineItems.map(item => {
+      if (item.id === id) {
+        const updated = { ...item, [field]: value };
+        if (field === 'quantity' || field === 'rate') {
+          updated.amount = updated.quantity * updated.rate;
+        }
+        return updated;
+      }
+      return item;
+    }));
+  }, [lineItems]);
 
   // Calculate subtotal from all line items
   const calculateSubtotal = useCallback(() => {
@@ -904,7 +932,7 @@ export default function Home() {
                         </svg>
                       </button>
                     </div>
-                    <button type="button" className="text-sm font-medium text-[var(--primary-color)] hover:text-blue-300 transition-transform duration-200 hover:scale-105">+ Add Line Item</button>
+                    <button type="button" onClick={addLineItem} className="text-sm font-medium text-[var(--primary-color)] hover:text-blue-300 transition-transform duration-200 hover:scale-105">+ Add Line Item</button>
                   </div>
                 </section>
               )}
@@ -1607,15 +1635,15 @@ export default function Home() {
         </section>
 
         {/* Footer */}
-        <footer className="mt-auto py-8 px-4 sm:px-10 relative">
+        <footer className="mt-auto py-6 sm:py-8 px-4 sm:px-6 lg:px-10 relative">
           <div className="container mx-auto text-center text-sm text-white/60">
-            <div className="flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-6">
-              <a className="hover:text-white transition-colors" href="/about">About Us</a>
-              <a className="hover:text-white transition-colors" href="/terms">Terms of Service</a>
-              <a className="hover:text-white transition-colors" href="/privacy">Privacy Policy</a>
-              <a className="hover:text-white transition-colors" href="/contacts">Contact Us</a>
+            <div className="flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-4 lg:space-x-6">
+              <a className="hover:text-white transition-colors text-xs sm:text-sm" href="/about">About Us</a>
+              <a className="hover:text-white transition-colors text-xs sm:text-sm" href="/terms">Terms of Service</a>
+              <a className="hover:text-white transition-colors text-xs sm:text-sm" href="/privacy">Privacy Policy</a>
+              <a className="hover:text-white transition-colors text-xs sm:text-sm" href="/contacts">Contact Us</a>
             </div>
-            <p className="mt-4">© 2025 InvoicePro. All rights reserved.</p>
+            <p className="mt-3 sm:mt-4 text-xs sm:text-sm">© 2025 InvoicePro. All rights reserved.</p>
           </div>
           
           {/* Share Button Bubble */}
@@ -1632,7 +1660,7 @@ export default function Home() {
                 showSuccess('Link copied! Share InvoicePro with others 💙');
               }
             }}
-            className="absolute bottom-4 right-4 w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
+            className="absolute bottom-4 right-4 w-12 h-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 hover:bg-white/20"
             title="Share InvoicePro"
           >
             <span className="material-symbols-outlined text-white text-lg">share</span>
