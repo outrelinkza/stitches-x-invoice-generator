@@ -86,7 +86,7 @@ export default function About() {
               <svg className="h-8 w-8 text-black" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                 <path clipRule="evenodd" d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z" fill="currentColor" fillRule="evenodd"></path>
               </svg>
-              <h1 className="text-2xl font-bold tracking-tighter text-white">Stitches X</h1>
+              <h1 className="text-2xl font-bold tracking-tighter text-white">StitchInvoice</h1>
             </a>
             <nav className="flex items-center gap-8 text-sm font-medium text-white/70">
               <a className="hover:text-[var(--primary-color)] transition-colors relative group" href="/dashboard">
@@ -149,7 +149,7 @@ export default function About() {
 
               <div className={`transform transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`} style={{animationDelay: '400ms'}}>
                 <h1 className="text-6xl md:text-7xl font-black text-white mb-6 bg-gradient-to-r from-white via-blue-100 to-purple-200 bg-clip-text text-transparent">
-                  Stitches X
+                  StitchInvoice
                 </h1>
                 <p className="text-2xl md:text-3xl text-white/80 mb-8 max-w-4xl mx-auto leading-relaxed">
                   The Future of Professional Invoice Generation
@@ -228,7 +228,7 @@ export default function About() {
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 bg-gradient-to-r from-violet-400 via-fuchsia-400 to-indigo-400 bg-clip-text text-transparent">
-                Why Stitches X?
+                Why StitchInvoice?
               </h2>
               <p className="text-xl text-white/70 max-w-3xl mx-auto">
                 We've reimagined invoice generation with intelligent automation and seamless user experience.
@@ -305,7 +305,7 @@ export default function About() {
                 Try It Yourself
               </h2>
               <p className="text-xl text-white/70 max-w-3xl mx-auto">
-                Experience the power of Stitches X with our interactive demo.
+                Experience the power of StitchInvoice with our interactive demo.
               </p>
             </div>
 
@@ -374,7 +374,7 @@ export default function About() {
                 Ready to Transform Your Invoicing?
               </h2>
               <p className="text-xl text-white/80 mb-8">
-                Join our beta users who are already using Stitches X to streamline their invoicing process and save time.
+                Join our beta users who are already using StitchInvoice to streamline their invoicing process and save time.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <a 
@@ -399,7 +399,7 @@ export default function About() {
         <footer className="mt-auto py-8 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto text-center">
             <div className="text-white/60 text-sm">
-              <p className="mb-4">© 2025 Stitches X Inc. All rights reserved.</p>
+              <p className="mb-4">© 2025 StitchInvoice Inc. All rights reserved.</p>
               <div className="flex justify-center gap-6">
                 <a className="hover:text-white transition-colors" href="/terms">Terms of Service</a>
                 <a className="hover:text-white transition-colors" href="/privacy">Privacy Policy</a>

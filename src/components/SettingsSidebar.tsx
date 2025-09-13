@@ -44,7 +44,7 @@ export default function SettingsSidebar({ currentSection, onSectionChange }: Set
           <svg className="text-white h-5 w-5 lg:h-8 lg:w-8" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
             <path clipRule="evenodd" d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z" fill="currentColor" fillRule="evenodd"></path>
           </svg>
-          <span className="text-sm lg:text-xl font-bold text-white hidden xs:block">InvoicePro</span>
+          <span className="text-sm lg:text-xl font-bold text-white hidden xs:block">StitchInvoice</span>
         </Link>
       </div>
 

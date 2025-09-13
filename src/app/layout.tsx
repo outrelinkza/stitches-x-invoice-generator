@@ -20,7 +20,7 @@ const notoSans = Noto_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Stitches X - Professional Invoice Generator",
+  title: "StitchInvoice - Professional Invoice Generator",
   description: "Create beautiful, professional invoices in seconds. Multiple templates, auto-calculation, and instant PDF generation.",
 };
 

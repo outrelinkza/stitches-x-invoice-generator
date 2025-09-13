@@ -1266,9 +1266,9 @@ export default function Home() {
                           }
                           
                           const pdfData: InvoiceData = {
-                            companyName: invoiceData.companyName || 'InvoicePro',
+                            companyName: invoiceData.companyName || 'StitchInvoice',
                             companyAddress: invoiceData.companyAddress || 'Your Business Address',
-                            companyContact: invoiceData.companyContact || 'stitchesx.service@gmail.com',
+                            companyContact: invoiceData.companyContact || 'hello@stitchinvoice.com',
                             logo: logo || undefined,
                             clientName: invoiceData.clientName || 'Client Name',
                             clientAddress: invoiceData.clientAddress || 'Client Address',
@@ -1304,7 +1304,7 @@ export default function Home() {
                           
                           // Show sharing prompt for viral growth
                           setTimeout(() => {
-                            showInfo('💡 Love this template? Share InvoicePro with other freelancers!');
+                            showInfo('💡 Love this template? Share StitchInvoice with other freelancers!');
                           }, 2000);
                         } catch (error) {
                           console.error('Error generating invoice:', error);
@@ -1509,45 +1509,6 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {/* Enterprise Per Invoice */}
-                  <div className="glass-effect rounded-2xl p-8 relative">
-                    <div className="text-center">
-                      <h3 className="text-2xl font-bold text-white mb-2">Enterprise</h3>
-                      <div className="mb-4">
-                        <span className="text-4xl font-bold text-white">£7.50</span>
-                        <span className="text-white/60">/invoice</span>
-                      </div>
-                      <p className="text-white/70 mb-6">For large projects</p>
-                      
-                      <ul className="space-y-3 mb-8 text-left">
-                        <li className="flex items-center text-white/80">
-                          <svg className="w-5 h-5 text-green-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
-                          Everything in Premium
-                        </li>
-                        <li className="flex items-center text-white/80">
-                          <svg className="w-5 h-5 text-green-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
-                          White-label options
-                        </li>
-                        <li className="flex items-center text-white/80">
-                          <svg className="w-5 h-5 text-green-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
-                          API integration
-                        </li>
-                        <li className="flex items-center text-white/80">
-                          <svg className="w-5 h-5 text-green-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
-                          Dedicated support
-                        </li>
-                      </ul>
-                      
-                    </div>
-                  </div>
                 </>
               ) : (
                 <>
@@ -1641,45 +1602,6 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {/* Enterprise Plan */}
-                  <div className="glass-effect rounded-2xl p-8 relative">
-                    <div className="text-center">
-                      <h3 className="text-2xl font-bold text-white mb-2">Enterprise</h3>
-                      <div className="mb-4">
-                        <span className="text-4xl font-bold text-white">£29</span>
-                        <span className="text-white/60">/month</span>
-                      </div>
-                      <p className="text-white/70 mb-6">For large teams</p>
-                      
-                      <ul className="space-y-3 mb-8 text-left">
-                        <li className="flex items-center text-white/80">
-                          <svg className="w-5 h-5 text-green-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
-                          Everything in Pro
-                        </li>
-                        <li className="flex items-center text-white/80">
-                          <svg className="w-5 h-5 text-green-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
-                          Team collaboration
-                        </li>
-                        <li className="flex items-center text-white/80">
-                          <svg className="w-5 h-5 text-green-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
-                          Custom branding
-                        </li>
-                        <li className="flex items-center text-white/80">
-                          <svg className="w-5 h-5 text-green-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
-                          API access
-                        </li>
-                      </ul>
-                      
-                    </div>
-                  </div>
                 </>
               )}
             </div>
@@ -1694,7 +1616,7 @@ export default function Home() {
             <div className="relative overflow-hidden text-white rounded-2xl">
               <div className="absolute inset-0 bg-gradient-to-r from-gray-800/40 via-gray-700/30 to-gray-800/40"></div>
               <div className="relative text-center pt-12 pr-8 pb-12 pl-8">
-                <h2 className="text-3xl font-serif font-medium mb-4">Join the InvoicePro Experience</h2>
+                <h2 className="text-3xl font-serif font-medium mb-4">Join the StitchInvoice Experience</h2>
                 <p className="text-lg opacity-90 mb-6 max-w-xl mx-auto">Be the first to discover new features, exclusive templates, and member-only benefits.</p>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-4">
                   <input 
@@ -1726,7 +1648,7 @@ export default function Home() {
               <a className="hover:text-white transition-colors text-xs sm:text-sm" href="/privacy">Privacy Policy</a>
               <a className="hover:text-white transition-colors text-xs sm:text-sm" href="/contacts">Contact Us</a>
             </div>
-            <p className="mt-3 sm:mt-4 text-xs sm:text-sm">© 2025 InvoicePro. All rights reserved.</p>
+            <p className="mt-3 sm:mt-4 text-xs sm:text-sm">© 2025 StitchInvoice. All rights reserved.</p>
           </div>
           
           {/* Share Button Bubble */}
@@ -1734,17 +1656,17 @@ export default function Home() {
             onClick={() => {
               if (typeof window !== 'undefined' && navigator.share) {
                 navigator.share({
-                  title: 'InvoicePro - Professional Invoice Generator',
+                  title: 'StitchInvoice - Professional Invoice Generator',
                   text: 'Create beautiful, professional invoices in seconds!',
                   url: window.location.origin
                 });
               } else if (typeof window !== 'undefined') {
                 navigator.clipboard.writeText(window.location.origin);
-                showSuccess('Link copied! Share InvoicePro with others 💙');
+                showSuccess('Link copied! Share StitchInvoice with others 💙');
               }
             }}
             className="absolute bottom-4 right-4 w-12 h-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 hover:bg-white/20"
-            title="Share InvoicePro"
+            title="Share StitchInvoice"
           >
             <span className="material-symbols-outlined text-white text-lg">share</span>
           </button>

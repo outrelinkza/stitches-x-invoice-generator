@@ -16,9 +16,9 @@ export default function Settings() {
   // Invoice & Company Settings (Functional)
   const [taxRate, setTaxRate] = useState(10);
   const [paymentTerms, setPaymentTerms] = useState('Net 15');
-  const [companyName, setCompanyName] = useState('Stitches X');
+  const [companyName, setCompanyName] = useState('StitchInvoice');
   const [companyAddress, setCompanyAddress] = useState('Your Business Address');
-  const [companyEmail, setCompanyEmail] = useState('stitchesx.service@gmail.com');
+  const [companyEmail, setCompanyEmail] = useState('hello@stitchinvoice.com');
 
   // User Profile Settings
   const [userName, setUserName] = useState('');
@@ -393,7 +393,7 @@ export default function Settings() {
             <div className="space-y-6">
               <div className="text-center">
                 <p className="text-white/70 mb-6">
-                  We'd love to hear your thoughts and suggestions to help us improve Stitches X.
+                  We'd love to hear your thoughts and suggestions to help us improve StitchInvoice.
                 </p>
               </div>
 
@@ -505,7 +505,7 @@ export default function Settings() {
                 <div className="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
                   <h3 className="text-white font-medium mb-2">📧 Contact</h3>
                   <p className="text-white/70 text-sm">
-                    Need direct support? Contact us at stitchesx.service@gmail.com
+                    Need direct support? Contact us at hello@stitchinvoice.com
                   </p>
                 </div>
               </div>
@@ -529,7 +529,7 @@ export default function Settings() {
         <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
           <header className="mb-6 animate-enter" style={{animationDelay: '200ms'}}>
             <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">Settings</h1>
-            <p className="mt-1 text-base sm:text-lg text-white/70">Manage your InvoicePro preferences.</p>
+            <p className="mt-1 text-base sm:text-lg text-white/70">Manage your StitchInvoice preferences.</p>
           </header>
 
           {/* Settings Content */}

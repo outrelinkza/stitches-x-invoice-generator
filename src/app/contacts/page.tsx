@@ -84,7 +84,7 @@ export default function Contacts() {
               <svg className="h-8 w-8 text-black" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                 <path clipRule="evenodd" d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z" fill="currentColor" fillRule="evenodd"></path>
               </svg>
-              <h2 className="text-white text-xl font-semibold leading-tight">InvoicePro</h2>
+              <h2 className="text-white text-xl font-semibold leading-tight">StitchInvoice</h2>
             </a>
             <nav className="hidden md:flex items-center gap-8">
               <a className="relative group text-white/70 hover:text-white text-sm font-medium" href="/dashboard">
@@ -149,7 +149,7 @@ export default function Contacts() {
                       <div>
                         <h3 className="text-white font-semibold mb-1">Email Support</h3>
                         <p className="text-white/70 text-sm mb-2">Get help with your account and invoices</p>
-                        <a href="mailto:stitchesx.service@gmail.com" className="text-[var(--primary-color)] hover:underline">stitchesx.service@gmail.com</a>
+                        <a href="mailto:hello@stitchinvoice.com" className="text-[var(--primary-color)] hover:underline">hello@stitchinvoice.com</a>
                       </div>
                     </div>
 
@@ -160,7 +160,7 @@ export default function Contacts() {
                       <div>
                         <h3 className="text-white font-semibold mb-1">Business Inquiries</h3>
                         <p className="text-white/70 text-sm mb-2">Partnerships and enterprise solutions</p>
-                        <a href="mailto:stitchesx.service@gmail.com" className="text-[var(--primary-color)] hover:underline">stitchesx.service@gmail.com</a>
+                        <a href="mailto:hello@stitchinvoice.com" className="text-[var(--primary-color)] hover:underline">hello@stitchinvoice.com</a>
                       </div>
                     </div>
 

@@ -28,7 +28,7 @@ export default function NavHeader({ currentPage }: NavHeaderProps) {
             <svg className="h-6 w-6 sm:h-8 sm:w-8 text-white" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
               <path clipRule="evenodd" d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z" fill="currentColor" fillRule="evenodd"></path>
             </svg>
-            <h2 className="text-lg sm:text-xl font-bold tracking-tight text-white">InvoicePro</h2>
+            <h2 className="text-lg sm:text-xl font-bold tracking-tight text-white">StitchInvoice</h2>
           </a>
           
           {/* Desktop Navigation */}
