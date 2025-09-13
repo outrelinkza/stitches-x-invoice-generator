@@ -54,10 +54,9 @@ export default function NavHeader({ currentPage }: NavHeaderProps) {
           </nav>
 
           {/* Desktop Auth */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden lg:flex items-center gap-4">
             {user ? (
               <div className="flex items-center gap-4">
-                <span className="text-white/80 text-sm hidden lg:block">Welcome, {user.user_metadata?.full_name || user.email}</span>
                 <button 
                   onClick={() => signOut()}
                   className="text-white/80 hover:text-white transition-colors text-sm font-medium"
@@ -92,7 +91,7 @@ export default function NavHeader({ currentPage }: NavHeaderProps) {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden text-white/80 hover:text-white transition-colors"
+            className="lg:hidden text-white/80 hover:text-white transition-colors"
           >
             <span className="material-symbols-outlined text-2xl">
               {mobileMenuOpen ? 'close' : 'menu'}
@@ -102,7 +101,7 @@ export default function NavHeader({ currentPage }: NavHeaderProps) {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-white/10 py-4">
+          <div className="lg:hidden border-t border-white/10 py-4">
             <nav className="flex flex-col space-y-4">
               {navItems.map((item) => (
                 <a 
@@ -124,7 +123,6 @@ export default function NavHeader({ currentPage }: NavHeaderProps) {
               <div className="border-t border-white/10 pt-4 mt-4">
                 {user ? (
                   <div className="px-4 py-2">
-                    <div className="text-white/80 text-sm mb-3">Welcome, {user.user_metadata?.full_name || user.email}</div>
                     <button 
                       onClick={() => {
                         signOut();
