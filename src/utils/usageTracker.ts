@@ -177,6 +177,14 @@ export class UsageTracker {
 
       console.log('UsageTracker: Querying user_usage table with userId:', userId, 'email:', email);
 
+      // Test table existence first
+      const { data: testData, error: testError } = await supabase
+        .from('user_usage')
+        .select('count')
+        .limit(1);
+      
+      console.log('UsageTracker: Table test - data:', testData, 'error:', testError);
+
       let query = supabase.from('user_usage').select('*');
       
       if (userId) {
@@ -188,6 +196,16 @@ export class UsageTracker {
       const { data, error } = await query.single();
       
       console.log('UsageTracker: Query result - data:', data, 'error:', error);
+      
+      // Log the full error details
+      if (error) {
+        console.error('UsageTracker: Full error details:', {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint
+        });
+      }
 
       // Handle 406 error specifically (RLS policy issues)
       if (error && error.code === '406') {
