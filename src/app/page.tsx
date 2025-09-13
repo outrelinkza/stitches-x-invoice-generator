@@ -26,7 +26,7 @@ import { showSuccess, showError, showInfo, showLoading, hideNotification } from 
 import NavHeader from '@/components/NavHeader';
 
 export default function Home() {
-  console.log('🎉 NEW CODE RUNNING - FIXED STANDARD TEMPLATE - VERSION 8.0 - CACHE BUST: ' + Date.now());
+  console.log('🎉 NEW CODE RUNNING - FORCE DEPLOY - VERSION 9.0 - CACHE BUST: ' + Date.now() + ' - STANDARD TEMPLATE FIXED');
   const [invoiceType, setInvoiceType] = useState('product_sales');
   const [logo, setLogo] = useState<string | null>(null);
   const [isFormValid, setIsFormValid] = useState(false);
