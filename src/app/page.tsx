@@ -208,12 +208,20 @@ export default function Home() {
     }
   };
 
+  // Helper function to convert hex to rgba
+  const hexToRgba = (hex: string, alpha: number) => {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  };
+
   // Get custom input styles for custom template
   const getCustomInputStyles = () => {
     if (selectedTemplate === 'custom') {
       return {
-        borderColor: `${customTemplate.primaryColor}30`,
-        backgroundColor: `${customTemplate.primaryColor}10`,
+        borderColor: hexToRgba(customTemplate.primaryColor, 0.3),
+        backgroundColor: hexToRgba(customTemplate.primaryColor, 0.1),
         color: customTemplate.textColor,
       };
     }
@@ -882,11 +890,23 @@ export default function Home() {
                     </label>
                     <label className="block">
                       <span className="text-sm font-medium text-white/90">Address</span>
-                      <textarea name="clientAddress" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="Client Address" rows={2}></textarea>
+                      <textarea 
+                        name="clientAddress" 
+                        className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} 
+                        style={getCustomInputStyles()}
+                        placeholder="Client Address" 
+                        rows={2}
+                      ></textarea>
                     </label>
                     <label className="block">
                       <span className="text-sm font-medium text-white/90">Email/Phone</span>
-                      <input name="clientContact" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="Client email" type="text"/>
+                      <input 
+                        name="clientContact" 
+                        className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} 
+                        style={getCustomInputStyles()}
+                        placeholder="Client email" 
+                        type="text"
+                      />
                     </label>
                   </div>
                 </section>
@@ -2023,7 +2043,12 @@ export default function Home() {
                               className="w-4 h-4 text-purple-600 bg-white/10 border-white/20 rounded focus:ring-purple-500"
                             />
                             <span className="text-white/70 text-xs">{element.label}</span>
-                            <span className="material-symbols-outlined text-xs text-white/40 opacity-0 group-hover:opacity-100 transition-opacity" title={element.tooltip}>help</span>
+                            <span 
+                              className="material-symbols-outlined text-xs text-white/60 hover:text-white transition-colors cursor-help" 
+                              title={element.tooltip}
+                            >
+                              help
+                            </span>
                           </label>
                         ))}
                       </div>
@@ -2045,7 +2070,12 @@ export default function Home() {
                               className="w-4 h-4 text-purple-600 bg-white/10 border-white/20 rounded focus:ring-purple-500"
                             />
                             <span className="text-white/70 text-xs">{element.label}</span>
-                            <span className="material-symbols-outlined text-xs text-white/40 opacity-0 group-hover:opacity-100 transition-opacity" title={element.tooltip}>help</span>
+                            <span 
+                              className="material-symbols-outlined text-xs text-white/60 hover:text-white transition-colors cursor-help" 
+                              title={element.tooltip}
+                            >
+                              help
+                            </span>
                           </label>
                         ))}
                       </div>
