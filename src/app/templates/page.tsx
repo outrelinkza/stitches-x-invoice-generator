@@ -341,32 +341,24 @@ export default function Templates() {
             </div>
 
             <div className="glass-effect rounded-2xl shadow-sm border border-white/20 p-6 border-dashed border-2 border-white/30 animate-enter hover-tilt" style={{animationDelay: '1300ms'}}>
-              <div className="w-full h-32 bg-white/5 rounded-lg flex items-center justify-center mb-4">
-                <span className="material-symbols-outlined text-white/60 text-4xl">add</span>
+              <div className="w-full h-32 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-lg flex items-center justify-center mb-4">
+                <span className="material-symbols-outlined text-purple-300 text-4xl">palette</span>
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">Create Custom</h3>
-              <p className="text-sm text-white/70 mb-4">Design your own template from scratch.</p>
+              <h3 className="text-lg font-semibold text-white mb-2">🎨 Custom Builder</h3>
+              <p className="text-sm text-white/70 mb-4">Design your own template with colors, fonts, and layouts.</p>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-white/60">Available</span>
-                <button 
-                  className="px-4 py-2 bg-[var(--primary-color)] text-white text-sm font-medium rounded-lg hover:bg-blue-600 transition-colors"
+                <span className="text-sm text-white/60">Interactive</span>
+                <a 
+                  href="/"
+                  className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-sm font-medium rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all"
                   onClick={() => {
                     if (typeof window !== 'undefined') {
                       localStorage.setItem('selectedTemplate', 'custom');
-                      localStorage.setItem('templatePreferences', JSON.stringify({
-                        'product_sales': { 'Custom Template': 1 },
-                        'freelance_consulting': { 'Custom Template': 1 },
-                        'time_tracking': { 'Custom Template': 1 },
-                        'simple_receipt': { 'Custom Template': 1 }
-                      }));
-                      setSelectedTemplate('custom');
-                      // Redirect to main page to use the template
-                      window.location.href = '/';
                     }
                   }}
                 >
-                  Create & Use
-                </button>
+                  Open Builder
+                </a>
               </div>
             </div>
           </div>

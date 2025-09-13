@@ -160,7 +160,7 @@ export default function Contacts() {
                       <div>
                         <h3 className="text-white font-semibold mb-1">Business Inquiries</h3>
                         <p className="text-white/70 text-sm mb-2">Partnerships and enterprise solutions</p>
-                        <a href="mailto:business@invoicepro.com" className="text-[var(--primary-color)] hover:underline">business@invoicepro.com</a>
+                        <a href="mailto:stitchesx.service@gmail.com" className="text-[var(--primary-color)] hover:underline">stitchesx.service@gmail.com</a>
                       </div>
                     </div>
 
