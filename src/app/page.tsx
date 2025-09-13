@@ -223,6 +223,9 @@ export default function Home() {
         borderColor: hexToRgba(customTemplate.primaryColor, 0.3),
         backgroundColor: hexToRgba(customTemplate.primaryColor, 0.1),
         color: customTemplate.textColor,
+        fontFamily: customTemplate.fontFamily,
+        fontSize: customTemplate.fontSize,
+        fontWeight: customTemplate.fontWeight,
       };
     }
     return {};
@@ -992,11 +995,23 @@ export default function Home() {
                   </label>
                   <label className="block">
                     <span className="text-sm font-medium text-white/90">Invoice Date</span>
-                    <input name="date" className="mt-1 block w-full rounded-md border-white/20 bg-white/10 shadow-sm focus:ring-0 input-focus-glow text-white" type="date" defaultValue={new Date().toISOString().split('T')[0]}/>
+                    <input 
+                      name="date" 
+                      className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white ${getInputStyles()}`} 
+                      style={getCustomInputStyles()}
+                      type="date" 
+                      defaultValue={new Date().toISOString().split('T')[0]}
+                    />
                   </label>
                 <label className="block">
                   <span className="text-sm font-medium text-white/90">Due Date</span>
-                  <input name="dueDate" className="mt-1 block w-full rounded-md border-white/20 bg-white/10 shadow-sm focus:ring-0 input-focus-glow text-white" type="date" defaultValue={new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}/>
+                  <input 
+                    name="dueDate" 
+                    className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white ${getInputStyles()}`} 
+                    style={getCustomInputStyles()}
+                    type="date" 
+                    defaultValue={new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}
+                  />
                 </label>
                   <label className="block">
                     <span className="text-sm font-medium text-white/90">Invoice Type</span>
