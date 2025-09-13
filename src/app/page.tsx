@@ -349,20 +349,17 @@ export default function Home() {
         };
       case 'healthcare':
         return {
-          showHourlyRates: true,
-          showConsultationTypes: true,
+          showHealthcareFields: true,
           defaultPaymentTerms: 'Net 30'
         };
       case 'legal':
         return {
-          showHourlyRates: true,
-          showConsultationTypes: true,
+          showLegalFields: true,
           defaultPaymentTerms: 'Net 30'
         };
       case 'restaurant':
         return {
-          showProjectFields: true,
-          showMoodBoard: true,
+          showRestaurantFields: true,
           defaultPaymentTerms: 'Net 15'
         };
       default:
