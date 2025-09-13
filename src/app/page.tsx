@@ -26,7 +26,7 @@ import { showSuccess, showError, showInfo, showLoading, hideNotification } from 
 import NavHeader from '@/components/NavHeader';
 
 export default function Home() {
-  console.log('🎉 NEW CODE RUNNING - LAYOUT FIXES - VERSION 13.0 - CACHE BUST: ' + Date.now() + ' - LOGO MOVED LEFT, PRICING ADJUSTED');
+  console.log('🎉 NEW CODE RUNNING - FINAL LAYOUT FIXES - VERSION 14.0 - CACHE BUST: ' + Date.now() + ' - LOGO TO CORNER, PRICING SPACED OUT');
   const [invoiceType, setInvoiceType] = useState('product_sales');
   const [logo, setLogo] = useState<string | null>(null);
   const [isFormValid, setIsFormValid] = useState(false);
@@ -732,7 +732,7 @@ export default function Home() {
               </div>
             </div>
 
-            <form ref={formRef} onChange={handleFormChange} className={`rounded-2xl shadow-lg p-8 space-y-8 animate-enter ${
+            <form ref={formRef} onChange={handleFormChange} className={`rounded-2xl shadow-lg p-6 space-y-8 animate-enter ${
               selectedTemplate === 'minimalist-dark' ? 'bg-black/40 border border-white/10' :
               'glass-effect'
             }`} style={{animationDelay: '300ms'}}>
@@ -760,7 +760,7 @@ export default function Home() {
                 </div>
               )}
               
-              <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 {/* Company Info Section */}
                 <section className="space-y-6">
                   <div className="flex items-center justify-between">
@@ -1684,7 +1684,7 @@ export default function Home() {
 
         {/* Pricing Section */}
         <section className="mb-16">
-          <div className="max-w-7xl mx-auto px-1 sm:px-2 lg:px-4">
+          <div className="max-w-7xl mx-auto px-0 sm:px-1 lg:px-2">
             <div className="text-center mb-12">
               <h2 className="text-4xl font-bold text-white mb-4">Choose Your Plan</h2>
               <p className="text-xl text-white/80 max-w-2xl mx-auto">
@@ -1718,12 +1718,12 @@ export default function Home() {
               </div>
             </div>
             
-            <div className="grid md:grid-cols-3 gap-4 max-w-full mx-auto">
+            <div className="grid md:grid-cols-3 gap-6 max-w-full mx-auto">
               {/* Pay Per Invoice Plans */}
               {pricingMode === 'per-invoice' ? (
                 <>
                   {/* Basic Per Invoice */}
-                  <div className="glass-effect rounded-2xl p-8 relative">
+                  <div className="glass-effect rounded-2xl p-6 relative">
                     <div className="text-center">
                       <h3 className="text-2xl font-bold text-white mb-2">Basic</h3>
                       <div className="mb-4">
@@ -1779,7 +1779,7 @@ export default function Home() {
                         Most Popular
                       </span>
                     </div>
-                    <div className="glass-effect rounded-2xl p-8 border-2 border-[var(--primary-color)]">
+                    <div className="glass-effect rounded-2xl p-6 border-2 border-[var(--primary-color)]">
                       <div className="text-center">
                         <h3 className="text-2xl font-bold text-white mb-2">Premium</h3>
                         <div className="mb-4">
@@ -1839,7 +1839,7 @@ export default function Home() {
               ) : (
                 <>
                   {/* Free Plan */}
-                  <div className="glass-effect rounded-2xl p-8 relative">
+                  <div className="glass-effect rounded-2xl p-6 relative">
                     <div className="text-center">
                       <h3 className="text-2xl font-bold text-white mb-2">Free</h3>
                       <div className="mb-4">
@@ -1882,7 +1882,7 @@ export default function Home() {
                         Most Popular
                       </span>
                     </div>
-                    <div className="glass-effect rounded-2xl p-8 border-2 border-[var(--primary-color)]">
+                    <div className="glass-effect rounded-2xl p-6 border-2 border-[var(--primary-color)]">
                       <div className="text-center">
                       <h3 className="text-2xl font-bold text-white mb-2">Pro</h3>
                       <div className="mb-4">
@@ -2002,7 +2002,7 @@ export default function Home() {
       {/* Reset Modal */}
       {showResetModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
-          <div className="glass-effect rounded-2xl shadow-lg p-8 w-full max-w-md text-center mx-4">
+          <div className="glass-effect rounded-2xl shadow-lg p-6 w-full max-w-md text-center mx-4">
             <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-500/20">
               <svg className="h-6 w-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
