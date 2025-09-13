@@ -10,7 +10,7 @@ export default function Notifications() {
             <svg className="h-8 w-8 text-black" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
               <path clipRule="evenodd" d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z" fill="currentColor" fillRule="evenodd"></path>
             </svg>
-            <h2 className="text-xl font-bold tracking-tight text-white">Stitches X</h2>
+            <h2 className="text-xl font-bold tracking-tight text-white">StitchInvoice</h2>
           </a>
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-[var(--text-secondary)]">
             <a className="hover:text-[var(--text-primary)] transition-colors" href="/dashboard">Dashboard</a>

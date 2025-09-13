@@ -11,7 +11,7 @@ export default function Support() {
               <path clipRule="evenodd" d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z" fill="currentColor" fillRule="evenodd"></path>
             </svg>
           </div>
-          <h2 className="text-gray-900 text-xl font-bold leading-tight tracking-[-0.015em]">Stitches X</h2>
+          <h2 className="text-gray-900 text-xl font-bold leading-tight tracking-[-0.015em]">StitchInvoice</h2>
         </div>
         <nav className="hidden md:flex items-center gap-8">
           <a className="text-gray-600 hover:text-gray-900 text-sm font-medium leading-normal transition-colors" href="/dashboard">Dashboard</a>
@@ -42,14 +42,14 @@ export default function Support() {
               </div>
               
               <div className="space-y-6">
-                <a className="flex items-start gap-4 p-4 rounded-xl hover:bg-gray-100 transition-colors" href="mailto:stitchesx.service@gmail.com">
+                <a className="flex items-start gap-4 p-4 rounded-xl hover:bg-gray-100 transition-colors" href="mailto:hello@stitchinvoice.com">
                   <div className="flex-shrink-0 size-12 rounded-lg bg-gray-100 flex items-center justify-center">
                     <span className="material-symbols-outlined text-gray-600 text-2xl"> mail </span>
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900">Email Us</h3>
                     <p className="text-gray-600 text-sm">Our support team is available 24/7.</p>
-                    <p className="text-blue-600 font-medium text-sm mt-1">stitchesx.service@gmail.com</p>
+                    <p className="text-blue-600 font-medium text-sm mt-1">hello@stitchinvoice.com</p>
                   </div>
                 </a>
                 

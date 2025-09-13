@@ -14,7 +14,7 @@ export default function Privacy() {
               <svg className="h-8 w-8 text-black" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                 <path clipRule="evenodd" d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z" fill="currentColor" fillRule="evenodd"></path>
               </svg>
-              <h2 className="text-white text-xl font-semibold leading-tight">Stitches X</h2>
+              <h2 className="text-white text-xl font-semibold leading-tight">StitchInvoice</h2>
             </a>
             <nav className="hidden md:flex items-center gap-8">
               <a className="text-white/70 hover:text-white text-sm font-medium" href="/dashboard">Dashboard</a>
@@ -47,12 +47,12 @@ export default function Privacy() {
                     
                     <h3 className="text-xl font-semibold text-white mt-8">1. Introduction</h3>
                     <p>
-                      Stitches X ("we," "our," or "us") is committed to protecting your privacy and personal data. This Privacy Policy explains how we collect, use, store, and protect your information when you use our AI invoice generation service.
+                      StitchInvoice ("we," "our," or "us") is committed to protecting your privacy and personal data. This Privacy Policy explains how we collect, use, store, and protect your information when you use our AI invoice generation service.
                     </p>
 
                     <h3 className="text-xl font-semibold text-white mt-8">2. Data Controller</h3>
                     <p>
-                      Stitches X is the data controller for the personal data we collect and process. For any privacy-related questions, contact us at: <a href="mailto:stitchesx.service@gmail.com" className="text-blue-400 hover:text-blue-300">stitchesx.service@gmail.com</a>
+                      StitchInvoice is the data controller for the personal data we collect and process. For any privacy-related questions, contact us at: <a href="mailto:hello@stitchinvoice.com" className="text-blue-400 hover:text-blue-300">hello@stitchinvoice.com</a>
                     </p>
 
                     <h3 className="text-xl font-semibold text-white mt-8">3. Information We Collect</h3>
@@ -144,7 +144,7 @@ export default function Privacy() {
 
                     <h3 className="text-xl font-semibold text-white mt-8">14. Contact Us</h3>
                     <p>
-                      For any questions about this Privacy Policy or to exercise your rights, please contact us at: <a href="mailto:stitchesx.service@gmail.com" className="text-blue-400 hover:text-blue-300">stitchesx.service@gmail.com</a>
+                      For any questions about this Privacy Policy or to exercise your rights, please contact us at: <a href="mailto:hello@stitchinvoice.com" className="text-blue-400 hover:text-blue-300">hello@stitchinvoice.com</a>
                     </p>
                     <p className="mt-4">
                       You also have the right to lodge a complaint with your local data protection authority if you believe we have not handled your personal data in accordance with applicable law.

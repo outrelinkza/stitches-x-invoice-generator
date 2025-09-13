@@ -40,7 +40,7 @@ const createTransporter = () => {
   return nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: process.env.EMAIL_USER || 'stitchesx.service@gmail.com',
+      user: process.env.EMAIL_USER || 'hello@stitchinvoice.com',
       pass: process.env.EMAIL_PASS || process.env.APP_PASSWORD, // Use App Password for Gmail
     },
   });
@@ -51,7 +51,7 @@ export const sendEmail = async (emailData: EmailData): Promise<boolean> => {
     const transporter = createTransporter();
     
     const mailOptions = {
-      from: `"Stitches X" <${process.env.EMAIL_USER || 'stitchesx.service@gmail.com'}>`,
+      from: `"StitchInvoice" <${process.env.EMAIL_USER || 'hello@stitchinvoice.com'}>`,
       to: emailData.to,
       subject: emailData.subject,
       html: emailData.html,
@@ -73,7 +73,7 @@ export const sendContactFormEmail = async (formData: ContactFormData): Promise<b
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
       <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px 8px 0 0;">
         <h2 style="margin: 0; font-size: 24px;">New Contact Form Submission</h2>
-        <p style="margin: 5px 0 0 0; opacity: 0.9;">From Stitches X Website</p>
+        <p style="margin: 5px 0 0 0; opacity: 0.9;">From StitchInvoice Website</p>
       </div>
       
       <div style="background: #f8f9fa; padding: 20px; border-radius: 0 0 8px 8px; border: 1px solid #e9ecef;">
@@ -101,7 +101,7 @@ export const sendContactFormEmail = async (formData: ContactFormData): Promise<b
         
         <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #dee2e6; text-align: center;">
           <p style="color: #6c757d; font-size: 14px; margin: 0;">
-            This message was sent from the Stitches X contact form.
+            This message was sent from the StitchInvoice contact form.
           </p>
         </div>
       </div>
@@ -109,7 +109,7 @@ export const sendContactFormEmail = async (formData: ContactFormData): Promise<b
   `;
 
   const text = `
-New Contact Form Submission from Stitches X Website
+New Contact Form Submission from StitchInvoice Website
 
 Name: ${formData.name}
 Email: ${formData.email}
@@ -119,11 +119,11 @@ Message:
 ${formData.message}
 
 ---
-This message was sent from the Stitches X contact form.
+This message was sent from the StitchInvoice contact form.
   `;
 
   return await sendEmail({
-    to: 'stitchesx.service@gmail.com',
+    to: 'hello@stitchinvoice.com',
     subject: `Contact Form: ${formData.subject}`,
     html,
     text,
@@ -206,7 +206,7 @@ export const sendFeedbackEmail = async (feedbackData: FeedbackData): Promise<boo
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
       <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px 8px 0 0;">
         <h2 style="margin: 0; font-size: 24px;">New Feedback Submission</h2>
-        <p style="margin: 5px 0 0 0; opacity: 0.9;">From Stitches X User</p>
+        <p style="margin: 5px 0 0 0; opacity: 0.9;">From StitchInvoice User</p>
       </div>
       
       <div style="background: #f8f9fa; padding: 20px; border-radius: 0 0 8px 8px; border: 1px solid #e9ecef;">
@@ -236,7 +236,7 @@ export const sendFeedbackEmail = async (feedbackData: FeedbackData): Promise<boo
         
         <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #dee2e6; text-align: center;">
           <p style="color: #6c757d; font-size: 14px; margin: 0;">
-            This feedback was submitted through the Stitches X feedback form.
+            This feedback was submitted through the StitchInvoice feedback form.
           </p>
         </div>
       </div>
@@ -244,7 +244,7 @@ export const sendFeedbackEmail = async (feedbackData: FeedbackData): Promise<boo
   `;
 
   const text = `
-New Feedback Submission from Stitches X User
+New Feedback Submission from StitchInvoice User
 
 Name: ${feedbackData.name}
 Email: ${feedbackData.email}
@@ -254,11 +254,11 @@ Feedback:
 ${feedbackData.feedback}
 
 ---
-This feedback was submitted through the Stitches X feedback form.
+This feedback was submitted through the StitchInvoice feedback form.
   `;
 
   return await sendEmail({
-    to: 'stitchesx.service@gmail.com',
+    to: 'hello@stitchinvoice.com',
     subject: `Feedback from ${feedbackData.name}`,
     html,
     text,
@@ -269,7 +269,7 @@ export const sendWelcomeEmail = async (email: string, name: string): Promise<boo
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
       <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px 8px 0 0;">
-        <h2 style="margin: 0; font-size: 24px;">Welcome to Stitches X!</h2>
+        <h2 style="margin: 0; font-size: 24px;">Welcome to StitchInvoice!</h2>
         <p style="margin: 5px 0 0 0; opacity: 0.9;">Your AI Invoice Generator</p>
       </div>
       
@@ -277,7 +277,7 @@ export const sendWelcomeEmail = async (email: string, name: string): Promise<boo
         <div style="margin-bottom: 20px;">
           <p style="color: #495057; font-size: 16px; margin: 0 0 10px 0;">Hi ${name},</p>
           <p style="color: #6c757d; line-height: 1.6; margin: 0;">
-            Welcome to Stitches X! We're excited to help you create professional invoices with our AI-powered generator.
+            Welcome to StitchInvoice! We're excited to help you create professional invoices with our AI-powered generator.
           </p>
         </div>
         
@@ -292,14 +292,14 @@ export const sendWelcomeEmail = async (email: string, name: string): Promise<boo
         </div>
         
         <div style="margin: 20px 0; text-align: center;">
-          <a href="https://stitchesx.com" style="background: #667eea; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block; font-weight: 600;">
+          <a href="https://stitchinvoice.com" style="background: #667eea; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block; font-weight: 600;">
             Get Started
           </a>
         </div>
         
         <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #dee2e6; text-align: center;">
           <p style="color: #6c757d; font-size: 14px; margin: 0;">
-            If you have any questions, feel free to reach out to us at stitchesx.service@gmail.com
+            If you have any questions, feel free to reach out to us at hello@stitchinvoice.com
           </p>
         </div>
       </div>
@@ -307,11 +307,11 @@ export const sendWelcomeEmail = async (email: string, name: string): Promise<boo
   `;
 
   const text = `
-Welcome to Stitches X!
+Welcome to StitchInvoice!
 
 Hi ${name},
 
-Welcome to Stitches X! We're excited to help you create professional invoices with our AI-powered generator.
+Welcome to StitchInvoice! We're excited to help you create professional invoices with our AI-powered generator.
 
 What you can do:
 - Generate professional PDF invoices
@@ -319,14 +319,14 @@ What you can do:
 - Use multiple invoice templates
 - Track your invoice analytics
 
-Get started at: https://stitchesx.com
+Get started at: https://stitchinvoice.com
 
-If you have any questions, feel free to reach out to us at stitchesx.service@gmail.com
+If you have any questions, feel free to reach out to us at hello@stitchinvoice.com
   `;
 
   return await sendEmail({
     to: email,
-    subject: 'Welcome to Stitches X - Your AI Invoice Generator',
+    subject: 'Welcome to StitchInvoice - Your AI Invoice Generator',
     html,
     text,
   });

@@ -79,7 +79,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode }) =
             {isSignUp ? 'Create Account' : 'Sign In'}
           </h2>
           <p className="text-white/70">
-            {isSignUp ? 'Join Stitches X to get started' : 'Welcome back to Stitches X'}
+            {isSignUp ? 'Join StitchInvoice to get started' : 'Welcome back to StitchInvoice'}
           </p>
         </div>
 

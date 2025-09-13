@@ -65,7 +65,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
                   <span className="text-2xl font-bold text-white">S</span>
                 </div>
                 <div className="ml-3">
-                  <h1 className="text-2xl font-bold text-white">Stitches X</h1>
+                  <h1 className="text-2xl font-bold text-white">StitchInvoice</h1>
                   <p className="text-white/60 text-sm">Invoice Generator</p>
                 </div>
               </div>
@@ -89,7 +89,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
               </div>
               <p className="text-white/70 text-sm leading-relaxed">
                 Please check your email and click the verification link to activate your account. 
-                After verification, you'll have full access to all Stitches X features.
+                After verification, you'll have full access to all StitchInvoice features.
               </p>
             </div>
             
@@ -147,7 +147,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
                       <span className="text-2xl font-bold text-white">S</span>
                     </div>
                     <div className="ml-3">
-                      <h1 className="text-2xl font-bold text-white">Stitches X</h1>
+                      <h1 className="text-2xl font-bold text-white">StitchInvoice</h1>
                       <p className="text-white/60 text-sm">Invoice Generator</p>
                     </div>
                   </div>
@@ -164,7 +164,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
                 <div className="text-center mb-8">
                   <h2 className="text-2xl font-bold text-white mb-3">Authentication Required</h2>
                   <p className="text-white/80 leading-relaxed">
-                    Please sign in to access this page and manage your invoices with Stitches X.
+                    Please sign in to access this page and manage your invoices with StitchInvoice.
                   </p>
                 </div>
                 
@@ -188,7 +188,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
                 {/* Help Text */}
                 <div className="text-center mt-6">
                   <p className="text-white/50 text-xs">
-                    New to Stitches X? Sign up to create professional invoices in minutes.
+                    New to StitchInvoice? Sign up to create professional invoices in minutes.
                   </p>
                 </div>
               </div>

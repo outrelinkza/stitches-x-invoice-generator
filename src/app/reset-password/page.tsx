@@ -64,7 +64,7 @@ export default function ResetPassword() {
           </div>
 
           <div className="mt-8 text-center text-xs text-slate-400">
-            <p>© 2025 Stitches X. All rights reserved.</p>
+            <p>© 2025 StitchInvoice. All rights reserved.</p>
           </div>
         </div>
       </div>

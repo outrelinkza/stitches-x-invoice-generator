@@ -15,7 +15,7 @@ export default function Subscription() {
                 <path clipRule="evenodd" d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z" fill="currentColor" fillRule="evenodd"></path>
               </svg>
             </div>
-            <h2 className="text-gray-900 text-lg font-bold leading-tight tracking-[-0.015em]">Stitches X</h2>
+            <h2 className="text-gray-900 text-lg font-bold leading-tight tracking-[-0.015em]">StitchInvoice</h2>
           </div>
           <div className="flex items-center gap-4">
             <a className="text-gray-600 hover:text-gray-900 text-sm font-medium leading-normal" href="/dashboard">Dashboard</a>

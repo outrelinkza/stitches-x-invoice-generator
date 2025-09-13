@@ -71,7 +71,7 @@ export default function ResetPasswordPage() {
                   <span className="text-2xl font-bold text-white">S</span>
                 </div>
                 <div className="ml-3">
-                  <h1 className="text-2xl font-bold text-white">Stitches X</h1>
+                  <h1 className="text-2xl font-bold text-white">StitchInvoice</h1>
                   <p className="text-white/60 text-sm">Invoice Generator</p>
                 </div>
               </div>
@@ -118,7 +118,7 @@ export default function ResetPasswordPage() {
                 <span className="text-2xl font-bold text-white">S</span>
               </div>
               <div className="ml-3">
-                <h1 className="text-2xl font-bold text-white">Stitches X</h1>
+                <h1 className="text-2xl font-bold text-white">StitchInvoice</h1>
                 <p className="text-white/60 text-sm">Invoice Generator</p>
               </div>
             </div>

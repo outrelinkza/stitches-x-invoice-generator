@@ -13,7 +13,7 @@ export default function Profile() {
               </svg>
             </div>
             <h2 className="text-gray-900 text-xl font-bold leading-tight tracking-[-0.015em]">
-              Stitches X
+              StitchInvoice
             </h2>
           </div>
           <nav className="flex items-center gap-6 text-sm font-medium text-gray-600">

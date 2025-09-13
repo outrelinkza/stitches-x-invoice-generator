@@ -13,7 +13,7 @@ export default function ForgotPassword() {
             <svg className="h-8 w-8 text-[var(--primary-color)]" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
               <path clipRule="evenodd" d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z" fill="currentColor" fillRule="evenodd"></path>
             </svg>
-            <h1 className="text-3xl font-bold tracking-tight">Stitches X</h1>
+            <h1 className="text-3xl font-bold tracking-tight">StitchInvoice</h1>
           </div>
         </div>
 
@@ -54,7 +54,7 @@ export default function ForgotPassword() {
         </div>
 
         <p className="mt-8 text-center text-xs text-gray-500">
-          © 2025 Stitches X. All rights reserved.
+          © 2025 StitchInvoice. All rights reserved.
         </p>
       </div>
     </div>

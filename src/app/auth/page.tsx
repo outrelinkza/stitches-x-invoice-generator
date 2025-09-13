@@ -18,7 +18,7 @@ export default function Auth() {
               <path d="M3 7L12 12L21 7" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
               <path d="M12 12V22" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
             </svg>
-            <h1 className="text-xl font-bold tracking-tight">Stitches X</h1>
+            <h1 className="text-xl font-bold tracking-tight">StitchInvoice</h1>
           </a>
           <nav className="hidden items-center gap-6 text-sm font-medium md:flex">
             <a className="text-[var(--secondary-foreground-color)] transition-colors hover:text-[var(--foreground-color)]" href="#">Product</a>
