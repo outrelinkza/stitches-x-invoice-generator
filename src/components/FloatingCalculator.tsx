@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 
 const FloatingCalculator = React.memo(function FloatingCalculator() {
   const [isOpen, setIsOpen] = useState(false);
-  const [position, setPosition] = useState({ x: 20, y: 20 });
+  const [position, setPosition] = useState({ x: 20, y: 100 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [results, setResults] = useState<{[key: string]: any}>({});
@@ -18,6 +18,16 @@ const FloatingCalculator = React.memo(function FloatingCalculator() {
     });
   };
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+    const touch = e.touches[0];
+    setDragStart({
+      x: touch.clientX - position.x,
+      y: touch.clientY - position.y
+    });
+  };
+
   const handleMouseMove = (e: MouseEvent) => {
     if (isDragging) {
       e.preventDefault();
@@ -28,20 +38,39 @@ const FloatingCalculator = React.memo(function FloatingCalculator() {
     }
   };
 
+  const handleTouchMove = (e: TouchEvent) => {
+    if (isDragging) {
+      e.preventDefault();
+      const touch = e.touches[0];
+      setPosition({
+        x: touch.clientX - dragStart.x,
+        y: touch.clientY - dragStart.y
+      });
+    }
+  };
+
   const handleMouseUp = () => {
     setIsDragging(false);
   };
 
-  // Add global mouse event listeners for better dragging
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+  };
+
+  // Add global mouse and touch event listeners for better dragging
   React.useEffect(() => {
     if (isDragging) {
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
+      document.addEventListener('touchmove', handleTouchMove, { passive: false });
+      document.addEventListener('touchend', handleTouchEnd);
       document.body.style.userSelect = 'none';
       
       return () => {
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
+        document.removeEventListener('touchmove', handleTouchMove);
+        document.removeEventListener('touchend', handleTouchEnd);
         document.body.style.userSelect = '';
       };
     }
@@ -106,6 +135,7 @@ const FloatingCalculator = React.memo(function FloatingCalculator() {
         className="fixed z-50 cursor-move"
         style={{ left: position.x, top: position.y }}
         onMouseDown={handleMouseDown}
+        onTouchStart={handleTouchStart}
       >
         <button
           onClick={() => setIsOpen(!isOpen)}
