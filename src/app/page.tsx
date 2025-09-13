@@ -133,18 +133,21 @@ export default function Home() {
   // Load selected template on component mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const savedTemplate = localStorage.getItem('selectedTemplate');
-      if (savedTemplate) {
-        setSelectedTemplate(savedTemplate);
-      }
-      
       // Load custom template if it exists
       const savedCustomTemplate = localStorage.getItem('customTemplate');
       if (savedCustomTemplate) {
         try {
           setCustomTemplate(JSON.parse(savedCustomTemplate));
+          // If custom template exists, set selected template to custom
+          setSelectedTemplate('custom');
         } catch (error) {
           console.error('Failed to parse custom template:', error);
+        }
+      } else {
+        // Only load saved template if no custom template exists
+        const savedTemplate = localStorage.getItem('selectedTemplate');
+        if (savedTemplate) {
+          setSelectedTemplate(savedTemplate);
         }
       }
       
