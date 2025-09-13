@@ -12,6 +12,8 @@ export default function Invoices() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
@@ -77,6 +79,58 @@ export default function Invoices() {
     
     return matchesSearch && matchesStatus;
   });
+
+  const handleDeleteAllDrafts = async () => {
+    setIsDeleting(true);
+    try {
+      const draftInvoices = invoices.filter(inv => inv.status === 'draft');
+      for (const invoice of draftInvoices) {
+        await InvoiceService.deleteInvoice(invoice.id);
+      }
+      setInvoices(invoices.filter(inv => inv.status !== 'draft'));
+      setShowDeleteModal(false);
+      
+      // Show success notification
+      const successMsg = document.createElement('div');
+      successMsg.className = 'fixed top-20 right-4 bg-green-500/90 backdrop-blur-md text-white px-6 py-4 rounded-xl shadow-lg z-50 transition-all border border-green-400/20';
+      successMsg.innerHTML = `
+        <div class="flex items-center gap-3">
+          <div class="text-2xl">✅</div>
+          <div>
+            <div class="font-semibold">Success!</div>
+            <div class="text-sm opacity-90">Deleted ${draftInvoices.length} draft invoices</div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(successMsg);
+      setTimeout(() => {
+        if (document.body.contains(successMsg)) {
+          document.body.removeChild(successMsg);
+        }
+      }, 4000);
+    } catch (error) {
+      console.error('Failed to delete drafts:', error);
+      const errorMsg = document.createElement('div');
+      errorMsg.className = 'fixed top-20 right-4 bg-red-500/90 backdrop-blur-md text-white px-6 py-4 rounded-xl shadow-lg z-50 transition-all border border-red-400/20';
+      errorMsg.innerHTML = `
+        <div class="flex items-center gap-3">
+          <div class="text-2xl">❌</div>
+          <div>
+            <div class="font-semibold">Error!</div>
+            <div class="text-sm opacity-90">Failed to delete some drafts. Please try again.</div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(errorMsg);
+      setTimeout(() => {
+        if (document.body.contains(errorMsg)) {
+          document.body.removeChild(errorMsg);
+        }
+      }, 4000);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -225,34 +279,7 @@ export default function Invoices() {
               {invoices.filter(inv => inv.status === 'draft').length > 0 && (
                 <div className="mb-4 flex justify-end">
                   <button
-                    onClick={async () => {
-                      if (confirm(`Are you sure you want to delete all ${invoices.filter(inv => inv.status === 'draft').length} draft invoices? This action cannot be undone.`)) {
-                        try {
-                          const draftInvoices = invoices.filter(inv => inv.status === 'draft');
-                          for (const invoice of draftInvoices) {
-                            await InvoiceService.deleteInvoice(invoice.id);
-                          }
-                          setInvoices(invoices.filter(inv => inv.status !== 'draft'));
-                          
-                          // Show success notification
-                          const successMsg = document.createElement('div');
-                          successMsg.className = 'fixed top-20 right-4 bg-green-500/90 text-white px-4 py-3 rounded-lg shadow-lg z-50 transition-all';
-                          successMsg.innerHTML = `
-                            <div class="font-semibold">✅ Success!</div>
-                            <div class="text-sm">Deleted ${draftInvoices.length} draft invoices</div>
-                          `;
-                          document.body.appendChild(successMsg);
-                          setTimeout(() => {
-                            if (document.body.contains(successMsg)) {
-                              document.body.removeChild(successMsg);
-                            }
-                          }, 3000);
-                        } catch (error) {
-                          console.error('Failed to delete drafts:', error);
-                          alert('Failed to delete some drafts. Please try again.');
-                        }
-                      }
-                    }}
+                    onClick={() => setShowDeleteModal(true)}
                     className="px-4 py-2 bg-red-500/20 text-red-400 border border-red-400/30 rounded-lg hover:bg-red-500/30 transition-colors text-sm font-medium"
                   >
                     🗑️ Clear All Drafts ({invoices.filter(inv => inv.status === 'draft').length})
@@ -358,6 +385,55 @@ export default function Invoices() {
       
         {/* Floating Calculator */}
         <FloatingCalculator />
+
+        {/* Delete All Drafts Modal */}
+        {showDeleteModal && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="glass-effect rounded-2xl p-8 max-w-md w-full text-center border border-white/20">
+              <div className="text-6xl mb-4">🗑️</div>
+              
+              <h3 className="text-2xl font-bold text-white mb-2">
+                Delete All Drafts?
+              </h3>
+              
+              <p className="text-white/70 mb-6">
+                Are you sure you want to delete all <span className="font-semibold text-white">{invoices.filter(inv => inv.status === 'draft').length}</span> draft invoices? This action cannot be undone.
+              </p>
+
+              <div className="bg-red-500/10 border border-red-400/20 rounded-lg p-4 mb-6">
+                <div className="flex items-center gap-2 text-red-400">
+                  <span className="material-symbols-outlined text-lg">warning</span>
+                  <span className="text-sm font-medium">This will permanently delete all your draft invoices</span>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowDeleteModal(false)}
+                  disabled={isDeleting}
+                  className="flex-1 bg-white/10 hover:bg-white/20 text-white font-medium py-3 px-6 rounded-lg transition-colors disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                
+                <button
+                  onClick={handleDeleteAllDrafts}
+                  disabled={isDeleting}
+                  className="flex-1 bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {isDeleting ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      Deleting...
+                    </>
+                  ) : (
+                    'Delete All'
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </AuthGuard>
   );
