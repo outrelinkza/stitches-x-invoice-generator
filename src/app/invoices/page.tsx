@@ -98,66 +98,66 @@ export default function Invoices() {
         <NavHeader currentPage="/invoices" />
         {/* Main Content */}
       <main className="w-full pt-24">
-        <div className="max-w-7xl mx-auto p-8">
-          <header className="mb-10 animate-enter" style={{animationDelay: '100ms'}}>
-            <div className="flex justify-between items-center">
+        <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+          <header className="mb-6 sm:mb-10 animate-enter" style={{animationDelay: '100ms'}}>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
-                <h1 className="text-4xl font-bold tracking-tight text-white">Invoices</h1>
-                <p className="mt-1 text-lg text-white/70">Manage and track your invoices.</p>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white">Invoices</h1>
+                <p className="mt-1 text-sm sm:text-base lg:text-lg text-white/70">Manage and track your invoices.</p>
               </div>
-              <a href="/" className="flex items-center gap-2 px-4 py-2 bg-[var(--primary-color)] text-white text-sm font-medium rounded-lg hover:bg-[var(--primary-color)]/80 transition-colors">
-                <span className="material-symbols-outlined text-base">add</span>
+              <a href="/" className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-[var(--primary-color)] text-white text-xs sm:text-sm font-medium rounded-lg hover:bg-[var(--primary-color)]/80 transition-colors w-full sm:w-auto justify-center">
+                <span className="material-symbols-outlined text-sm sm:text-base">add</span>
                 <span>Create Invoice</span>
               </a>
             </div>
           </header>
           
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div className="glass-effect bg-white/10 rounded-2xl p-6 animate-enter" style={{animationDelay: '150ms'}}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+            <div className="glass-effect bg-white/10 rounded-2xl p-4 sm:p-6 animate-enter" style={{animationDelay: '150ms'}}>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-white/70">Total Invoices</p>
-                  <p className="text-2xl font-bold text-white">{invoices.length}</p>
+                  <p className="text-xs sm:text-sm font-medium text-white/70">Total Invoices</p>
+                  <p className="text-xl sm:text-2xl font-bold text-white">{invoices.length}</p>
                 </div>
-                <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
-                  <span className="material-symbols-outlined text-white">receipt_long</span>
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-lg flex items-center justify-center">
+                  <span className="material-symbols-outlined text-white text-lg sm:text-xl">receipt_long</span>
                 </div>
               </div>
             </div>
 
-            <div className="glass-effect bg-white/10 rounded-2xl p-6 animate-enter" style={{animationDelay: '200ms'}}>
+            <div className="glass-effect bg-white/10 rounded-2xl p-4 sm:p-6 animate-enter" style={{animationDelay: '200ms'}}>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-white/70">Paid</p>
-                  <p className="text-2xl font-bold text-green-400">{invoices.filter(inv => inv.status === 'paid').length}</p>
+                  <p className="text-xs sm:text-sm font-medium text-white/70">Paid</p>
+                  <p className="text-xl sm:text-2xl font-bold text-green-400">{invoices.filter(inv => inv.status === 'paid').length}</p>
                 </div>
-                <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
-                  <span className="material-symbols-outlined text-green-400">check_circle</span>
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-lg flex items-center justify-center">
+                  <span className="material-symbols-outlined text-green-400 text-lg sm:text-xl">check_circle</span>
                 </div>
               </div>
             </div>
 
-            <div className="glass-effect bg-white/10 rounded-2xl p-6 animate-enter" style={{animationDelay: '250ms'}}>
+            <div className="glass-effect bg-white/10 rounded-2xl p-4 sm:p-6 animate-enter" style={{animationDelay: '250ms'}}>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-white/70">Draft</p>
-                  <p className="text-2xl font-bold text-yellow-400">{invoices.filter(inv => inv.status === 'draft').length}</p>
+                  <p className="text-xs sm:text-sm font-medium text-white/70">Draft</p>
+                  <p className="text-xl sm:text-2xl font-bold text-yellow-400">{invoices.filter(inv => inv.status === 'draft').length}</p>
                 </div>
-                <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
-                  <span className="material-symbols-outlined text-yellow-400">schedule</span>
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-lg flex items-center justify-center">
+                  <span className="material-symbols-outlined text-yellow-400 text-lg sm:text-xl">schedule</span>
                 </div>
               </div>
             </div>
 
-            <div className="glass-effect bg-white/10 rounded-2xl p-6 animate-enter" style={{animationDelay: '300ms'}}>
+            <div className="glass-effect bg-white/10 rounded-2xl p-4 sm:p-6 animate-enter" style={{animationDelay: '300ms'}}>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-white/70">Sent</p>
-                  <p className="text-2xl font-bold text-blue-400">{invoices.filter(inv => inv.status === 'sent').length}</p>
+                  <p className="text-xs sm:text-sm font-medium text-white/70">Sent</p>
+                  <p className="text-xl sm:text-2xl font-bold text-blue-400">{invoices.filter(inv => inv.status === 'sent').length}</p>
                 </div>
-                <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
-                  <span className="material-symbols-outlined text-blue-400">send</span>
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-lg flex items-center justify-center">
+                  <span className="material-symbols-outlined text-blue-400 text-lg sm:text-xl">send</span>
                 </div>
               </div>
             </div>
@@ -165,14 +165,14 @@ export default function Invoices() {
 
           {/* Invoices List */}
           <div className="glass-effect bg-white/10 rounded-2xl shadow-sm border border-white/20 animate-enter" style={{animationDelay: '350ms'}}>
-            <div className="p-6">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                <h3 className="text-lg font-medium text-white">Recent Invoices</h3>
-                <div className="flex items-center gap-2">
-                  <div className="relative">
-                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-white/60">search</span>
+            <div className="p-4 sm:p-6">
+              <div className="flex flex-col gap-4 mb-6">
+                <h3 className="text-base sm:text-lg font-medium text-white">Recent Invoices</h3>
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                  <div className="relative flex-1">
+                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-white/60 text-sm">search</span>
                     <input 
-                      className="w-48 pl-10 pr-4 py-2 border border-white/20 rounded-lg text-sm bg-white/10 text-white placeholder-white/60 focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] transition-all focus:w-56" 
+                      className="w-full pl-10 pr-4 py-2 border border-white/20 rounded-lg text-sm bg-white/10 text-white placeholder-white/60 focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] transition-all" 
                       placeholder="Search invoices..." 
                       type="text"
                       value={searchTerm}
@@ -181,10 +181,10 @@ export default function Invoices() {
                   </div>
                   <div className="relative">
                     <button 
-                      className="flex items-center gap-2 px-3 py-2 border border-white/20 text-sm font-medium text-white/70 rounded-lg hover:bg-white/10 transition-colors"
+                      className="flex items-center gap-2 px-3 py-2 border border-white/20 text-sm font-medium text-white/70 rounded-lg hover:bg-white/10 transition-colors w-full sm:w-auto justify-center"
                       onClick={() => setShowFilterDropdown(!showFilterDropdown)}
                     >
-                      <span className="material-symbols-outlined text-base">filter_list</span>
+                      <span className="material-symbols-outlined text-sm">filter_list</span>
                       <span>Filter</span>
                     </button>
                     {showFilterDropdown && (

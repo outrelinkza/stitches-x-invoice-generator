@@ -55,7 +55,27 @@ export default function Home() {
     showTerms: true,
     spacing: 'normal',
     borderStyle: 'none',
-    sectionOrder: ['header', 'company', 'client', 'items', 'totals', 'notes', 'footer']
+    sectionOrder: ['header', 'company', 'client', 'items', 'totals', 'notes', 'footer'],
+    // Additional customization options
+    headerHeight: 'medium',
+    footerHeight: 'medium',
+    showPageNumbers: true,
+    showInvoiceDate: true,
+    showDueDate: true,
+    showInvoiceNumber: true,
+    showClientAddress: true,
+    showCompanyAddress: true,
+    showTaxBreakdown: true,
+    showDiscounts: true,
+    showPaymentInfo: true,
+    showNotes: true,
+    showThankYouMessage: true,
+    tableStyle: 'bordered',
+    headerBackground: 'transparent',
+    footerBackground: 'transparent',
+    accentStyle: 'subtle',
+    shadowStyle: 'none',
+    cornerRadius: 'medium'
   });
   const [lineItems, setLineItems] = useState([{ id: 1, description: '', quantity: 1, rate: 0, amount: 0 }]);
   const logoInputRef = useRef<HTMLInputElement>(null);

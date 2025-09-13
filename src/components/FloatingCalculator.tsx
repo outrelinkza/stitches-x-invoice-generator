@@ -132,18 +132,27 @@ const FloatingCalculator = React.memo(function FloatingCalculator() {
     <>
       {/* Floating Calculator Button */}
       <div
-        className="fixed z-50 cursor-move"
+        className="fixed z-50"
         style={{ left: position.x, top: position.y }}
-        onMouseDown={handleMouseDown}
-        onTouchStart={handleTouchStart}
       >
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="w-14 h-14 bg-gray-500/20 hover:bg-gray-500/30 backdrop-blur-sm border border-gray-400/30 rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110"
+        <div
+          className="w-14 h-14 bg-gray-500/20 hover:bg-gray-500/30 backdrop-blur-sm border border-gray-400/30 rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110 cursor-pointer relative"
           title="Quick Calculator"
         >
-          <span className="material-symbols-outlined text-white text-xl">calculate</span>
-        </button>
+          {/* Drag Handle */}
+          <div
+            className="absolute inset-0 cursor-move"
+            onMouseDown={handleMouseDown}
+            onTouchStart={handleTouchStart}
+          />
+          {/* Click Button */}
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="relative z-10 w-full h-full flex items-center justify-center"
+          >
+            <span className="material-symbols-outlined text-white text-xl">calculate</span>
+          </button>
+        </div>
       </div>
 
       {/* Calculator Popup */}
