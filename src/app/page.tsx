@@ -1174,13 +1174,7 @@ export default function Home() {
                           total: parseFloat(invoiceData.total || '0'),
                           additionalNotes: invoiceData.additionalNotes || '',
                           template: selectedTemplate,
-                          customColors: selectedTemplate === 'custom' ? {
-                            primary: customTemplate.primaryColor,
-                            secondary: customTemplate.secondaryColor,
-                            accent: customTemplate.accentColor,
-                            backgroundColor: customTemplate.backgroundColor,
-                            textColor: customTemplate.textColor
-                          } : undefined
+                          customTemplate: selectedTemplate === 'custom' ? customTemplate : undefined
                         };
                         
                         generateInvoicePDF(pdfData);

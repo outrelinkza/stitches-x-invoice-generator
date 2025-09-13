@@ -37,13 +37,46 @@ export interface InvoiceData {
   template: string;
   watermark?: string;
   
-  // Custom Template Colors
-  customColors?: {
-    primary: string;
-    secondary: string;
-    accent: string;
+  // Custom Template Options
+  customTemplate?: {
+    name: string;
+    primaryColor: string;
+    secondaryColor: string;
+    accentColor: string;
     backgroundColor: string;
     textColor: string;
+    fontFamily: string;
+    fontSize: string;
+    fontWeight: string;
+    layout: string;
+    headerStyle: string;
+    logoPosition: string;
+    showLogo: boolean;
+    showWatermark: boolean;
+    showSignature: boolean;
+    showTerms: boolean;
+    spacing: string;
+    borderStyle: string;
+    sectionOrder: string[];
+    headerHeight: string;
+    footerHeight: string;
+    showPageNumbers: boolean;
+    showInvoiceDate: boolean;
+    showDueDate: boolean;
+    showInvoiceNumber: boolean;
+    showClientAddress: boolean;
+    showCompanyAddress: boolean;
+    showTaxBreakdown: boolean;
+    showDiscounts: boolean;
+    showPaymentInfo: boolean;
+    showNotes: boolean;
+    showThankYouMessage: boolean;
+    tableStyle: string;
+    headerBackground: string;
+    footerBackground: string;
+    accentStyle: string;
+    shadowStyle: string;
+    cornerRadius: string;
   };
 }
 
@@ -55,11 +88,11 @@ export const generateInvoicePDF = (data: InvoiceData): void => {
   // Set up colors based on template
   const getTemplateColors = (template: string) => {
     // Use custom colors if available
-    if (template === 'custom' && data.customColors) {
+    if (template === 'custom' && data.customTemplate) {
       return {
-        primary: data.customColors.primary,
-        secondary: data.customColors.secondary,
-        accent: data.customColors.accent
+        primary: data.customTemplate.primaryColor,
+        secondary: data.customTemplate.secondaryColor,
+        accent: data.customTemplate.accentColor
       };
     }
     
@@ -81,12 +114,66 @@ export const generateInvoicePDF = (data: InvoiceData): void => {
   
   const colors = getTemplateColors(data.template);
   
+  // Set up typography based on custom template
+  const getTypography = () => {
+    if (data.template === 'custom' && data.customTemplate) {
+      return {
+        fontFamily: data.customTemplate.fontFamily,
+        fontSize: parseInt(data.customTemplate.fontSize.replace('px', '')),
+        fontWeight: data.customTemplate.fontWeight
+      };
+    }
+    return {
+      fontFamily: 'helvetica',
+      fontSize: 12,
+      fontWeight: 'normal'
+    };
+  };
+  
+  const typography = getTypography();
+  
+  // Set up layout options
+  const getLayoutOptions = () => {
+    if (data.template === 'custom' && data.customTemplate) {
+      return {
+        showLogo: data.customTemplate.showLogo,
+        showInvoiceNumber: data.customTemplate.showInvoiceNumber,
+        showInvoiceDate: data.customTemplate.showInvoiceDate,
+        showDueDate: data.customTemplate.showDueDate,
+        showClientAddress: data.customTemplate.showClientAddress,
+        showCompanyAddress: data.customTemplate.showCompanyAddress,
+        showTaxBreakdown: data.customTemplate.showTaxBreakdown,
+        showNotes: data.customTemplate.showNotes,
+        showThankYouMessage: data.customTemplate.showThankYouMessage,
+        showPageNumbers: data.customTemplate.showPageNumbers,
+        spacing: data.customTemplate.spacing,
+        tableStyle: data.customTemplate.tableStyle
+      };
+    }
+    return {
+      showLogo: true,
+      showInvoiceNumber: true,
+      showInvoiceDate: true,
+      showDueDate: true,
+      showClientAddress: true,
+      showCompanyAddress: true,
+      showTaxBreakdown: true,
+      showNotes: true,
+      showThankYouMessage: true,
+      showPageNumbers: true,
+      spacing: 'normal',
+      tableStyle: 'bordered'
+    };
+  };
+  
+  const layoutOptions = getLayoutOptions();
+  
   // Header
   doc.setFillColor(colors.primary);
   doc.rect(0, 0, pageWidth, 40, 'F');
   
-  // Logo placeholder (if logo exists)
-  if (data.logo) {
+  // Logo placeholder (if logo exists and showLogo is true)
+  if (data.logo && layoutOptions.showLogo) {
     // In a real implementation, you'd convert the logo to base64 and add it
     doc.setFontSize(16);
     doc.setTextColor(255, 255, 255);
@@ -96,7 +183,7 @@ export const generateInvoicePDF = (data: InvoiceData): void => {
   // Company name
   doc.setFontSize(20);
   doc.setTextColor(255, 255, 255);
-  doc.text(data.companyName, data.logo ? 60 : 20, 25);
+  doc.text(data.companyName, (data.logo && layoutOptions.showLogo) ? 60 : 20, 25);
   
   // Invoice title
   doc.setFontSize(24);
