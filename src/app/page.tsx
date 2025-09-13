@@ -26,7 +26,7 @@ import { showSuccess, showError, showInfo, showLoading, hideNotification } from 
 import NavHeader from '@/components/NavHeader';
 
 export default function Home() {
-  console.log('🎉 NEW CODE RUNNING - FIXED COLORS & BUTTON - VERSION 6.0 - CACHE BUST: ' + Date.now());
+  console.log('🎉 NEW CODE RUNNING - FIXED STANDARD TEMPLATE - VERSION 8.0 - CACHE BUST: ' + Date.now());
   const [invoiceType, setInvoiceType] = useState('product_sales');
   const [logo, setLogo] = useState<string | null>(null);
   const [isFormValid, setIsFormValid] = useState(false);
@@ -236,8 +236,12 @@ export default function Home() {
     switch (selectedTemplate) {
       case 'minimalist-dark':
         return 'text-white placeholder-white/60 bg-black/20 border-white/20';
+      case 'legal':
+      case 'restaurant':
+      case 'healthcare':
+        return 'text-gray-900 placeholder-gray-500 bg-white border-gray-300';
       default:
-        // All other templates use the same neutral colors as Standard
+        // Standard and other templates use white text on glass background
         return 'text-white placeholder-white/60';
     }
   };
@@ -247,8 +251,12 @@ export default function Home() {
     switch (selectedTemplate) {
       case 'minimalist-dark':
         return 'text-white';
+      case 'legal':
+      case 'restaurant':
+      case 'healthcare':
+        return 'text-gray-900';
       default:
-        // All other templates use the same neutral colors as Standard
+        // Standard and other templates use white text
         return 'text-white';
     }
   };
@@ -257,10 +265,14 @@ export default function Home() {
   const getTemplateLabelColor = () => {
     switch (selectedTemplate) {
       case 'minimalist-dark':
+        return 'text-white/80';
+      case 'legal':
+      case 'restaurant':
+      case 'healthcare':
         return 'text-gray-700';
       default:
-        // All other templates use the same neutral colors as Standard
-        return 'text-gray-700';
+        // Standard and other templates use white/80 labels
+        return 'text-white/80';
     }
   };
 
@@ -1694,7 +1706,7 @@ export default function Home() {
 
         {/* Pricing Section */}
         <section className="mb-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
             <div className="text-center mb-12">
               <h2 className="text-4xl font-bold text-white mb-4">Choose Your Plan</h2>
               <p className="text-xl text-gray-700 max-w-2xl mx-auto">
@@ -1728,7 +1740,7 @@ export default function Home() {
               </div>
             </div>
             
-            <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <div className="grid md:grid-cols-3 gap-6 max-w-7xl mx-auto">
               {/* Pay Per Invoice Plans */}
               {pricingMode === 'per-invoice' ? (
                 <>
@@ -1948,7 +1960,7 @@ export default function Home() {
 
         {/* Newsletter Section */}
         <section className="mt-8 mb-20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
             <div className="relative overflow-hidden text-white rounded-2xl">
               <div className="absolute inset-0 bg-gradient-to-r from-gray-800/40 via-gray-700/30 to-gray-800/40"></div>
               <div className="relative text-center pt-12 pr-8 pb-12 pl-8">
@@ -1976,7 +1988,7 @@ export default function Home() {
         </section>
 
         {/* Footer */}
-        <footer className="mt-auto py-6 sm:py-8 px-4 sm:px-6 lg:px-10 relative">
+        <footer className="mt-auto py-6 sm:py-8 px-2 sm:px-4 lg:px-6 relative">
           <div className="container mx-auto text-center text-sm text-white/60">
             <div className="flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-4 lg:space-x-6">
               <a className="hover:text-white transition-colors text-xs sm:text-sm" href="/about">About Us</a>
