@@ -154,11 +154,11 @@ export const redirectToCustomerPortal = async (customerId: string): Promise<bool
   }
 };
 
-// Simplified pricing configuration - easy to manage as one-person business
+// Pricing configuration - easy to manage as one-person business
 export const PRICING_PLANS = {
   pro: {
     name: 'Pro Monthly',
-    price: 9.99,
+    price: 12.00,
     currency: 'gbp',
     interval: 'month',
     priceId: process.env.STRIPE_PRO_PRICE_ID || 'price_1S5zElL3DcLmHFw9ponmDFdT',
@@ -170,18 +170,30 @@ export const PRICING_PLANS = {
       'Mobile optimized',
     ],
   },
-  payAsYouGo: {
-    name: 'Pay Per Invoice',
+  basic: {
+    name: 'Basic Per Invoice',
     price: 1.50,
     currency: 'gbp',
     interval: 'one-time',
     priceId: process.env.STRIPE_BASIC_PER_INVOICE_PRICE_ID || 'price_1S5zEjL3DcLmHFw9IffjgNLA',
     features: [
-      'Premium templates',
-      'Custom template builder',
+      'Basic templates',
       'PDF generation',
       'Email support',
-      'Perfect for occasional use',
+      'Perfect for small businesses',
+    ],
+  },
+  premium: {
+    name: 'Premium Per Invoice',
+    price: 3.50,
+    currency: 'gbp',
+    interval: 'one-time',
+    priceId: process.env.STRIPE_PREMIUM_PER_INVOICE_PRICE_ID || 'price_1S5zEjL3DcLmHFw94kuW31Bs',
+    features: [
+      'Premium templates',
+      'Auto-calculation',
+      'Priority support',
+      'Custom branding',
     ],
   },
 };

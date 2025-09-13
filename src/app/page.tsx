@@ -1151,7 +1151,7 @@ export default function Home() {
                       }}
                       className="w-full rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-3 text-sm font-bold text-white shadow-lg btn-hover-effect hover:from-purple-600 hover:to-pink-600"
                     >
-                      Unlimited Access (£29.99/month)
+                      Unlimited Access (£12/month)
                     </button>
                   </div>
                 ) : (
@@ -1292,8 +1292,8 @@ export default function Home() {
               </div>
             </div>
             
-            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-              {/* Simplified Pricing Plans */}
+            <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+              {/* Pay Per Invoice Plans */}
               {pricingMode === 'per-invoice' ? (
                 <>
                   {/* Basic Per Invoice */}
@@ -1328,7 +1328,7 @@ export default function Home() {
                       </ul>
                       
                       <button 
-                        onClick={() => handleStripeCheckout('basic-per-invoice')}
+                        onClick={() => createOneTimePayment('basic')}
                         className="w-full py-3 px-6 bg-white/10 text-white rounded-lg border border-white/20 hover:bg-white/20 transition-colors"
                       >
                         Pay £1.50 per Invoice
@@ -1380,7 +1380,7 @@ export default function Home() {
                         </ul>
                         
                         <button 
-                          onClick={() => handleStripeCheckout('premium-per-invoice')}
+                          onClick={() => createOneTimePayment('premium')}
                           className="w-full py-3 px-6 bg-[var(--primary-color)] text-white rounded-lg hover:bg-[var(--primary-color)]/80 transition-colors font-medium"
                         >
                           Pay £3.50 per Invoice
