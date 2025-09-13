@@ -24,8 +24,6 @@ const AuthModal = dynamic(() => import('@/components/AuthModal').then(mod => ({ 
 import { InvoiceService } from '@/utils/invoiceService';
 import { showSuccess, showError, showInfo, showLoading, hideNotification } from '@/utils/notifications';
 import NavHeader from '@/components/NavHeader';
-import { UsageTracker, UsageData } from '@/utils/usageTracker';
-import { UsageLock, UsageIndicator } from '@/components/UsageLock';
 
 export default function Home() {
   const [invoiceType, setInvoiceType] = useState('product_sales');
@@ -87,14 +85,6 @@ export default function Home() {
   });
   
   // Usage tracking state
-  const [usage, setUsage] = useState<UsageData>({
-    downloads_this_month: 0,
-    total_downloads: 0,
-    last_download_date: '',
-    is_guest: true
-  });
-  const [showUsageLock, setShowUsageLock] = useState(false);
-  const [lockType, setLockType] = useState<'download' | 'custom-template'>('download');
   const [lineItems, setLineItems] = useState([{ id: 1, description: '', quantity: 1, rate: 0, amount: 0 }]);
   const logoInputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
@@ -507,74 +497,8 @@ export default function Home() {
     }
   }, [user, invoiceNumber, generateInvoiceNumber]);
 
-  // Load usage tracking on component mount
-  React.useEffect(() => {
-    const loadUsage = async () => {
-      try {
-        console.log('Loading usage for user:', user?.id, 'email:', user?.email, 'isGuestMode:', isGuestMode);
-        const currentUsage = await UsageTracker.getCurrentUsage(
-          user?.id,
-          user?.email || (isGuestMode ? 'guest@example.com' : undefined)
-        );
-        console.log('Usage loaded successfully:', currentUsage);
-        setUsage(currentUsage);
-      } catch (error) {
-        console.error('Failed to load usage:', error);
-      }
-    };
 
-    if (typeof window !== 'undefined') {
-      loadUsage();
-    }
-  }, [user, isGuestMode]);
 
-  // Usage tracking functions
-  const checkDownloadLimit = async (): Promise<boolean> => {
-    const canDownload = await UsageTracker.canDownload(
-      user?.id,
-      user?.email || (isGuestMode ? 'guest@example.com' : undefined)
-    );
-    
-    if (!canDownload) {
-      setLockType('download');
-      setShowUsageLock(true);
-      return false;
-    }
-    
-    return true;
-  };
-
-  const checkCustomTemplateAccess = async (): Promise<boolean> => {
-    // Custom templates require paid subscription
-    if (!user) {
-      setLockType('custom-template');
-      setShowUsageLock(true);
-      return false;
-    }
-    
-    return true;
-  };
-
-  const trackDownload = async () => {
-    try {
-      const updatedUsage = await UsageTracker.trackDownload(
-        user?.id,
-        user?.email || (isGuestMode ? 'guest@example.com' : undefined)
-      );
-      setUsage(updatedUsage);
-    } catch (error) {
-      console.error('Failed to track download:', error);
-    }
-  };
-
-  const handleUpgrade = () => {
-    setShowUsageLock(false);
-    // Scroll to pricing section
-    const pricingSection = document.getElementById('pricing');
-    if (pricingSection) {
-      pricingSection.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
 
   // Smart Tax Rate Memory
   const getSuggestedTaxRates = () => {
@@ -741,12 +665,7 @@ export default function Home() {
                 </span>
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={async () => {
-                      const canAccess = await checkCustomTemplateAccess();
-                      if (canAccess) {
-                        setShowCustomBuilder(true);
-                      }
-                    }}
+                    onClick={() => setShowCustomBuilder(true)}
                     className="text-purple-400 hover:text-purple-300 text-sm font-medium transition-colors"
                   >
                     🎨 Create Custom
@@ -1384,10 +1303,6 @@ export default function Home() {
                       type="button"
                       onClick={async () => {
                         try {
-                          // Check download limit first
-                          const canDownload = await checkDownloadLimit();
-                          if (!canDownload) return;
-
                           // Logged user: Generate free invoice
                           const formData = new FormData(document.querySelector('form') as HTMLFormElement);
                           const invoiceData: Record<string, string> = {};
@@ -1429,11 +1344,8 @@ export default function Home() {
                           
                           generateInvoicePDF(pdfData);
                           
-                          // Track the download
-                          await trackDownload();
-                          
                           setIsFormValid(true);
-                          showSuccess('Free invoice generated! (2/2 this month)');
+                          showSuccess('Free invoice generated!');
                           
                           // Show sharing prompt for viral growth
                           setTimeout(() => {
@@ -1492,22 +1404,6 @@ export default function Home() {
         </div>
       </main>
 
-      {/* Usage Indicator */}
-      {!user && (
-        <UsageIndicator 
-          usage={usage} 
-          onUpgrade={handleUpgrade}
-        />
-      )}
-
-      {/* Usage Lock Modal */}
-      {showUsageLock && (
-        <UsageLock
-          usage={usage}
-          onUpgrade={handleUpgrade}
-          type={lockType}
-        />
-      )}
 
         {/* Pricing Section */}
         <section className="mb-16">
@@ -2425,11 +2321,7 @@ export default function Home() {
                     Save Template
                   </button>
                   <button
-                    onClick={async () => {
-                      // Check if user can use custom templates
-                      const canAccess = await checkCustomTemplateAccess();
-                      if (!canAccess) return;
-
+                    onClick={() => {
                       // Save custom template to localStorage
                       localStorage.setItem('customTemplate', JSON.stringify(customTemplate));
                       setSelectedTemplate('custom');
