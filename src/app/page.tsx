@@ -24,6 +24,8 @@ const AuthModal = dynamic(() => import('@/components/AuthModal').then(mod => ({ 
 import { InvoiceService } from '@/utils/invoiceService';
 import { showSuccess, showError, showInfo, showLoading, hideNotification } from '@/utils/notifications';
 import NavHeader from '@/components/NavHeader';
+import { UsageTracker, UsageData } from '@/utils/usageTracker';
+import { UsageLock, UsageIndicator } from '@/components/UsageLock';
 
 export default function Home() {
   const [invoiceType, setInvoiceType] = useState('product_sales');
@@ -84,6 +86,16 @@ export default function Home() {
     shadowStyle: 'none',
     cornerRadius: 'medium'
   });
+  
+  // Usage tracking state
+  const [usage, setUsage] = useState<UsageData>({
+    downloads_this_month: 0,
+    total_downloads: 0,
+    last_download_date: '',
+    is_guest: true
+  });
+  const [showUsageLock, setShowUsageLock] = useState(false);
+  const [lockType, setLockType] = useState<'download' | 'custom-template'>('download');
   const [lineItems, setLineItems] = useState([{ id: 1, description: '', quantity: 1, rate: 0, amount: 0 }]);
   const logoInputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
@@ -291,19 +303,6 @@ export default function Home() {
           PRICING_PLANS.premium.priceId,
           customerEmail
         );
-      } else if (plan === 'enterprise-per-invoice') {
-        // Enterprise per-invoice payment
-        success = await createOneTimePayment(
-          PRICING_PLANS.enterprise.priceId,
-          customerEmail
-        );
-      } else if (plan === 'enterprise') {
-        // Enterprise subscription
-        success = await createSubscription({
-          priceId: PRICING_PLANS.enterpriseSub.priceId,
-          customerEmail: customerEmail,
-          metadata: { plan: 'enterprise' },
-        });
       }
       
       // Remove loading message
@@ -367,7 +366,26 @@ export default function Home() {
       showTerms: true,
       spacing: 'normal',
       borderStyle: 'none',
-      sectionOrder: ['header', 'company', 'client', 'items', 'totals', 'notes', 'footer']
+      sectionOrder: ['header', 'company', 'client', 'items', 'totals', 'notes', 'footer'],
+      headerHeight: 'medium',
+      footerHeight: 'medium',
+      showPageNumbers: true,
+      showInvoiceDate: true,
+      showDueDate: true,
+      showInvoiceNumber: true,
+      showClientAddress: true,
+      showCompanyAddress: true,
+      showTaxBreakdown: true,
+      showDiscounts: true,
+      showPaymentInfo: true,
+      showNotes: true,
+      showThankYouMessage: true,
+      tableStyle: 'bordered',
+      headerBackground: 'transparent',
+      footerBackground: 'transparent',
+      accentStyle: 'subtle',
+      shadowStyle: 'none',
+      cornerRadius: 'medium'
     });
     setLineItems([{ id: 1, description: '', quantity: 1, rate: 0, amount: 0 }]);
     
@@ -412,7 +430,7 @@ export default function Home() {
       const formData = new FormData(formRef.current);
       const companyName = formData.get('companyName') as string;
       const clientName = formData.get('clientName') as string;
-      const hasValidData = companyName && clientName && companyName.trim() !== '' && clientName.trim() !== '';
+      const hasValidData = !!(companyName && clientName && companyName.trim() !== '' && clientName.trim() !== '');
       setIsFormValid(hasValidData);
     }
     
@@ -463,6 +481,73 @@ export default function Home() {
       generateInvoiceNumber().then(number => setInvoiceNumber(number));
     }
   }, [user, invoiceNumber, generateInvoiceNumber]);
+
+  // Load usage tracking on component mount
+  React.useEffect(() => {
+    const loadUsage = async () => {
+      try {
+        const currentUsage = await UsageTracker.getCurrentUsage(
+          user?.id,
+          user?.email || (isGuestMode ? 'guest@example.com' : undefined)
+        );
+        setUsage(currentUsage);
+      } catch (error) {
+        console.error('Failed to load usage:', error);
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      loadUsage();
+    }
+  }, [user, isGuestMode]);
+
+  // Usage tracking functions
+  const checkDownloadLimit = async (): Promise<boolean> => {
+    const canDownload = await UsageTracker.canDownload(
+      user?.id,
+      user?.email || (isGuestMode ? 'guest@example.com' : undefined)
+    );
+    
+    if (!canDownload) {
+      setLockType('download');
+      setShowUsageLock(true);
+      return false;
+    }
+    
+    return true;
+  };
+
+  const checkCustomTemplateAccess = async (): Promise<boolean> => {
+    // Custom templates require paid subscription
+    if (!user) {
+      setLockType('custom-template');
+      setShowUsageLock(true);
+      return false;
+    }
+    
+    return true;
+  };
+
+  const trackDownload = async () => {
+    try {
+      const updatedUsage = await UsageTracker.trackDownload(
+        user?.id,
+        user?.email || (isGuestMode ? 'guest@example.com' : undefined)
+      );
+      setUsage(updatedUsage);
+    } catch (error) {
+      console.error('Failed to track download:', error);
+    }
+  };
+
+  const handleUpgrade = () => {
+    setShowUsageLock(false);
+    // Scroll to pricing section
+    const pricingSection = document.getElementById('pricing');
+    if (pricingSection) {
+      pricingSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   // Smart Tax Rate Memory
   const getSuggestedTaxRates = () => {
@@ -629,7 +714,12 @@ export default function Home() {
                 </span>
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => setShowCustomBuilder(true)}
+                    onClick={async () => {
+                      const canAccess = await checkCustomTemplateAccess();
+                      if (canAccess) {
+                        setShowCustomBuilder(true);
+                      }
+                    }}
                     className="text-purple-400 hover:text-purple-300 text-sm font-medium transition-colors"
                   >
                     🎨 Create Custom
@@ -1159,54 +1249,67 @@ export default function Home() {
                     {/* Logged User: Free Invoice Generation */}
                     <button 
                       type="button"
-                      onClick={() => {
-                        // Logged user: Generate free invoice
-                        const formData = new FormData(document.querySelector('form') as HTMLFormElement);
-                        const invoiceData: Record<string, string> = {};
-                        
-                        for (const [key, value] of formData.entries()) {
-                          if (value && value.toString().trim() !== '') {
-                            invoiceData[key] = value.toString();
-                          }
-                        }
-                        
-                        const pdfData: InvoiceData = {
-                          companyName: invoiceData.companyName || 'InvoicePro',
-                          companyAddress: invoiceData.companyAddress || 'Your Business Address',
-                          companyContact: invoiceData.companyContact || 'stitchesx.service@gmail.com',
-                          logo: logo || undefined,
-                          clientName: invoiceData.clientName || 'Client Name',
-                          clientAddress: invoiceData.clientAddress || 'Client Address',
-                          clientContact: invoiceData.clientContact || 'client@email.com',
-                          invoiceNumber: invoiceData.invoiceNumber || 'INV-001',
-                          date: invoiceData.date || new Date().toISOString().split('T')[0],
-                          dueDate: invoiceData.dueDate || new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                          paymentTerms: invoiceData.paymentTerms || 'Net 15',
-                          items: [
-                            {
-                              description: invoiceData.itemDescription || invoiceData.serviceDescription || 'Service/Product',
-                              quantity: parseFloat(invoiceData.quantity || invoiceData.hours || '1'),
-                              rate: parseFloat(invoiceData.rate || invoiceData.hourlyRate || '0'),
-                              amount: parseFloat(invoiceData.quantity || '1') * parseFloat(invoiceData.rate || '0') || parseFloat(invoiceData.hours || '1') * parseFloat(invoiceData.hourlyRate || '0')
+                      onClick={async () => {
+                        try {
+                          // Check download limit first
+                          const canDownload = await checkDownloadLimit();
+                          if (!canDownload) return;
+
+                          // Logged user: Generate free invoice
+                          const formData = new FormData(document.querySelector('form') as HTMLFormElement);
+                          const invoiceData: Record<string, string> = {};
+                          
+                          for (const [key, value] of formData.entries()) {
+                            if (value && value.toString().trim() !== '') {
+                              invoiceData[key] = value.toString();
                             }
-                          ],
-                          subtotal: parseFloat(invoiceData.subtotal || '0'),
-                          taxRate: parseFloat(invoiceData.taxRate || '0'),
-                          taxAmount: parseFloat(invoiceData.taxAmount || '0'),
-                          total: parseFloat(invoiceData.total || '0'),
-                          additionalNotes: invoiceData.additionalNotes || '',
-                          template: selectedTemplate,
-                          customTemplate: selectedTemplate === 'custom' ? customTemplate : undefined
-                        };
-                        
-                        generateInvoicePDF(pdfData);
-                        setIsFormValid(true);
-                        showSuccess('Free invoice generated! (2/2 this month)');
-                        
-                        // Show sharing prompt for viral growth
-                        setTimeout(() => {
-                          showInfo('💡 Love this template? Share InvoicePro with other freelancers!');
-                        }, 2000);
+                          }
+                          
+                          const pdfData: InvoiceData = {
+                            companyName: invoiceData.companyName || 'InvoicePro',
+                            companyAddress: invoiceData.companyAddress || 'Your Business Address',
+                            companyContact: invoiceData.companyContact || 'stitchesx.service@gmail.com',
+                            logo: logo || undefined,
+                            clientName: invoiceData.clientName || 'Client Name',
+                            clientAddress: invoiceData.clientAddress || 'Client Address',
+                            clientContact: invoiceData.clientContact || 'client@email.com',
+                            invoiceNumber: invoiceData.invoiceNumber || 'INV-001',
+                            date: invoiceData.date || new Date().toISOString().split('T')[0],
+                            dueDate: invoiceData.dueDate || new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                            paymentTerms: invoiceData.paymentTerms || 'Net 15',
+                            items: [
+                              {
+                                description: invoiceData.itemDescription || invoiceData.serviceDescription || 'Service/Product',
+                                quantity: parseFloat(invoiceData.quantity || invoiceData.hours || '1'),
+                                rate: parseFloat(invoiceData.rate || invoiceData.hourlyRate || '0'),
+                                amount: parseFloat(invoiceData.quantity || '1') * parseFloat(invoiceData.rate || '0') || parseFloat(invoiceData.hours || '1') * parseFloat(invoiceData.hourlyRate || '0')
+                              }
+                            ],
+                            subtotal: parseFloat(invoiceData.subtotal || '0'),
+                            taxRate: parseFloat(invoiceData.taxRate || '0'),
+                            taxAmount: parseFloat(invoiceData.taxAmount || '0'),
+                            total: parseFloat(invoiceData.total || '0'),
+                            additionalNotes: invoiceData.additionalNotes || '',
+                            template: selectedTemplate,
+                            customTemplate: selectedTemplate === 'custom' ? customTemplate : undefined
+                          };
+                          
+                          generateInvoicePDF(pdfData);
+                          
+                          // Track the download
+                          await trackDownload();
+                          
+                          setIsFormValid(true);
+                          showSuccess('Free invoice generated! (2/2 this month)');
+                          
+                          // Show sharing prompt for viral growth
+                          setTimeout(() => {
+                            showInfo('💡 Love this template? Share InvoicePro with other freelancers!');
+                          }, 2000);
+                        } catch (error) {
+                          console.error('Error generating invoice:', error);
+                          showError('Failed to generate invoice. Please try again.');
+                        }
                       }} 
                       className="w-full rounded-lg bg-[var(--primary-color)] px-6 py-3 text-sm font-bold text-white shadow-lg sm:w-auto btn-hover-effect hover:bg-blue-600"
                     >
@@ -1255,6 +1358,23 @@ export default function Home() {
             </form>
         </div>
       </main>
+
+      {/* Usage Indicator */}
+      {!user && (
+        <UsageIndicator 
+          usage={usage} 
+          onUpgrade={handleUpgrade}
+        />
+      )}
+
+      {/* Usage Lock Modal */}
+      {showUsageLock && (
+        <UsageLock
+          usage={usage}
+          onUpgrade={handleUpgrade}
+          type={lockType}
+        />
+      )}
 
         {/* Pricing Section */}
         <section className="mb-16">
@@ -1426,12 +1546,6 @@ export default function Home() {
                         </li>
                       </ul>
                       
-                      <button 
-                        onClick={() => handleStripeCheckout('enterprise-per-invoice')}
-                        className="w-full py-3 px-6 bg-white/10 text-white rounded-lg border border-white/20 hover:bg-white/20 transition-colors"
-                      >
-                        Pay £7.50 per Invoice
-                      </button>
                     </div>
                   </div>
                 </>
@@ -1564,12 +1678,6 @@ export default function Home() {
                         </li>
                       </ul>
                       
-                      <button 
-                        onClick={() => handleStripeCheckout('enterprise')}
-                        className="w-full py-3 px-6 bg-white/10 text-white rounded-lg border border-white/20 hover:bg-white/20 transition-colors"
-                      >
-                        Contact Sales
-                      </button>
                     </div>
                   </div>
                 </>
@@ -1964,7 +2072,11 @@ export default function Home() {
                 </button>
                 <div className="flex items-center gap-3">
                   <button
-                    onClick={() => {
+                    onClick={async () => {
+                      // Check if user can use custom templates
+                      const canAccess = await checkCustomTemplateAccess();
+                      if (!canAccess) return;
+
                       // Save custom template to localStorage
                       localStorage.setItem('customTemplate', JSON.stringify(customTemplate));
                       setSelectedTemplate('custom');
