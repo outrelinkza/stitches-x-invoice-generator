@@ -237,67 +237,60 @@ export default function About() {
             
             {/* Interactive Feature Timeline */}
             <div className="relative">
-              {/* Central Line */}
-              <div className="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-gradient-to-b from-violet-500 via-fuchsia-500 to-indigo-500 rounded-full opacity-30"></div>
+              {/* Central Line - Hidden on mobile */}
+              <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-gradient-to-b from-violet-500 via-fuchsia-500 to-indigo-500 rounded-full opacity-30"></div>
               
               {/* Feature Items */}
               {[
                 {
-                  title: "AI-Powered Intelligence",
-                  description: "Our advanced AI learns from your patterns to auto-fill client information, suggest optimal templates, and calculate taxes automatically.",
-                  icon: "psychology",
-                  side: "left",
+                  title: "Professional Templates",
+                  description: "Choose from 10+ beautifully designed templates that adapt to your brand. From minimalist to corporate, we have the perfect look for your business.",
+                  icon: "palette",
                   color: "from-blue-400 to-cyan-500"
                 },
                 {
-                  title: "Document Scanner Magic",
-                  description: "Upload any paper invoice or PDF and watch our OCR technology extract all the details instantly. No more manual data entry.",
-                  icon: "scanner",
-                  side: "right", 
+                  title: "Smart Calculations",
+                  description: "Automatic tax calculations, line item totals, and invoice numbering. Focus on your business while we handle the math.",
+                  icon: "calculate",
                   color: "from-green-400 to-emerald-500"
                 },
                 {
                   title: "Multi-Currency Support",
-                  description: "Support for 12 major currencies with automatic conversion. Perfect for international businesses and freelancers worldwide.",
+                  description: "Support for major currencies with automatic conversion. Perfect for international businesses and freelancers worldwide.",
                   icon: "currency_exchange",
-                  side: "left",
                   color: "from-purple-400 to-pink-500"
                 },
                 {
-                  title: "Smart Numbering System",
-                  description: "Never worry about duplicate invoice numbers again. Our system automatically generates sequential numbers with your custom patterns.",
-                  icon: "tag",
-                  side: "right",
+                  title: "Easy Sharing",
+                  description: "Generate professional PDFs instantly and share them via email or download. Your clients will be impressed with the quality.",
+                  icon: "share",
                   color: "from-orange-400 to-red-500"
                 }
               ].map((feature, index) => (
                 <div
                   key={index}
-                  className={`relative flex items-center mb-16 ${
-                    feature.side === 'left' ? 'flex-row' : 'flex-row-reverse'
-                  } ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}
+                  className={`relative mb-8 md:mb-16 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}
                   style={{animationDelay: `${1200 + index * 300}ms`}}
                 >
-                  {/* Content */}
-                  <div className={`w-5/12 ${feature.side === 'left' ? 'pr-8' : 'pl-8'}`}>
-                    <div className="glass-effect rounded-2xl p-8 transform transition-all duration-500 hover:scale-105 cursor-pointer group">
-                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center mb-4 transform transition-all duration-300 group-hover:rotate-12 group-hover:scale-110`}>
-                        <span className="material-symbols-outlined text-white text-xl">{feature.icon}</span>
+                  {/* Mobile: Full width, Desktop: Centered with dot */}
+                  <div className="md:flex md:items-center md:justify-center">
+                    <div className="w-full md:w-5/12">
+                      <div className="glass-effect rounded-2xl p-6 md:p-8 transform transition-all duration-500 hover:scale-105 cursor-pointer group">
+                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center mb-4 transform transition-all duration-300 group-hover:rotate-12 group-hover:scale-110`}>
+                          <span className="material-symbols-outlined text-white text-xl">{feature.icon}</span>
+                        </div>
+                        <h3 className="text-xl md:text-2xl font-bold text-white mb-3 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-violet-400 group-hover:to-fuchsia-400 group-hover:bg-clip-text transition-all duration-300">
+                          {feature.title}
+                        </h3>
+                        <p className="text-white/70 leading-relaxed group-hover:text-white/90 transition-colors duration-300 text-sm md:text-base">
+                          {feature.description}
+                        </p>
                       </div>
-                      <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-violet-400 group-hover:to-fuchsia-400 group-hover:bg-clip-text transition-all duration-300">
-                        {feature.title}
-                      </h3>
-                      <p className="text-white/70 leading-relaxed group-hover:text-white/90 transition-colors duration-300">
-                        {feature.description}
-                      </p>
                     </div>
+                    
+                    {/* Center Dot - Hidden on mobile */}
+                    <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 w-6 h-6 bg-gradient-to-r from-violet-500 to-fuchsia-500 rounded-full border-4 border-slate-900 z-10"></div>
                   </div>
-                  
-                  {/* Center Dot */}
-                  <div className="absolute left-1/2 transform -translate-x-1/2 w-6 h-6 bg-gradient-to-r from-violet-500 to-fuchsia-500 rounded-full border-4 border-slate-900 z-10"></div>
-                  
-                  {/* Spacer */}
-                  <div className="w-5/12"></div>
                 </div>
               ))}
             </div>

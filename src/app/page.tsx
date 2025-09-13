@@ -16,6 +16,7 @@ const AuthModal = dynamic(() => import('@/components/AuthModal').then(mod => ({ 
 });
 import { InvoiceService } from '@/utils/invoiceService';
 import { showSuccess, showError, showInfo, showLoading, hideNotification } from '@/utils/notifications';
+import NavHeader from '@/components/NavHeader';
 
 export default function Home() {
   const [invoiceType, setInvoiceType] = useState('product_sales');
@@ -548,96 +549,11 @@ export default function Home() {
 
   return (
     <div className="relative flex size-full min-h-screen flex-col group/design-root overflow-x-hidden">
+      <NavHeader currentPage="/" />
       <div className="layout-container flex h-full grow flex-col">
-        {/* Header */}
-        <header className="fixed top-0 w-full bg-black/20 backdrop-blur-xl border-b border-white/10 z-40 animate-enter" style={{animationDelay: '50ms'}}>
-          <div className="container mx-auto px-1 sm:px-2 lg:px-3">
-            <div className="flex items-center justify-between whitespace-nowrap py-4">
-              <div className="flex items-center gap-3 text-white">
-                <svg className="h-8 w-8 text-black" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                  <path clipRule="evenodd" d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z" fill="currentColor" fillRule="evenodd"></path>
-                </svg>
-                <h2 className="text-xl font-bold tracking-tight text-white">InvoicePro</h2>
-              </div>
-              <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-                <a className="relative group text-white hover:text-white transition-colors" href="/dashboard">
-                  <span>Dashboard</span>
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-full"></span>
-                </a>
-                <a className="relative group text-white/70 hover:text-white transition-colors" href="/invoices">
-                  <span>Invoices</span>
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-full"></span>
-                </a>
-                <a className="relative group text-white/70 hover:text-white transition-colors" href="/templates">
-                  <span>Templates</span>
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-full"></span>
-                </a>
-                <a className="relative group text-white/70 hover:text-white transition-colors" href="/settings">
-                  <span>Settings</span>
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-full"></span>
-                </a>
-              </nav>
-              <div className="flex items-center gap-4">
-                {isGuestMode && !user ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-                      <span className="text-white text-sm font-medium">G</span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-white text-sm font-medium">Guest Mode</span>
-                      <span className="text-white/60 text-xs">Pay per download</span>
-                    </div>
-                    <button 
-                      onClick={() => setIsGuestMode(false)}
-                      className="text-white/70 hover:text-white transition-colors text-sm font-medium cursor-pointer"
-                    >
-                      Switch to Login
-                    </button>
-                  </div>
-                ) : user ? (
-                  <>
-                    <button 
-                      onClick={() => signOut()}
-                      className="text-white/70 hover:text-white transition-colors text-sm font-medium cursor-pointer"
-                    >
-                      Sign out
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button 
-                      onClick={() => setIsGuestMode(true)}
-                      className="text-white/70 hover:text-white transition-colors text-sm font-medium cursor-pointer"
-                    >
-                      Continue as Guest
-                    </button>
-                    <button 
-                      onClick={() => {
-                        setAuthMode('signin');
-                        setAuthModalOpen(true);
-                      }}
-                      className="text-white/70 hover:text-white transition-colors text-sm font-medium cursor-pointer"
-                    >
-                      Sign in
-                    </button>
-                    <button 
-                      onClick={() => {
-                        setAuthMode('signup');
-                        setAuthModalOpen(true);
-                      }}
-                      className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-white/20 cursor-pointer"
-                    >
-                      Sign up
-                    </button>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        </header>
 
         {/* Main Content */}
-        <main className="flex flex-1 justify-center pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+        <main className="flex flex-1 justify-center pt-20 pb-12 px-4 sm:px-6 lg:px-8">
           <div className="w-full max-w-4xl space-y-8">
             <div className="text-center animate-enter" style={{animationDelay: '200ms'}}>
               <h1 className="font-display text-5xl font-medium tracking-tight text-white sm:text-7xl/none">
