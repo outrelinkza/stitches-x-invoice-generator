@@ -1027,17 +1027,47 @@ export default function Home() {
                       <div className="col-span-2"><span className="text-sm font-medium text-white/90">Price</span></div>
                       <div className="col-span-2"><span className="text-sm font-medium text-white/90">Total</span></div>
                     </div>
-                    <div className="grid grid-cols-12 gap-4 items-center" data-line-item>
-                      <input name="itemDescription" className={`col-span-5 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="e.g., iPhone 15 Pro" type="text"/>
-                      <input name="quantity" className={`col-span-2 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="1" type="number" defaultValue="1" onChange={updateLineItemTotal}/>
-                      <input name="rate" className={`col-span-2 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="Rate" type="number" onChange={updateLineItemTotal}/>
-                      <span className="col-span-2 text-sm text-white" data-line-total>$0.00</span>
-                      <button type="button" onClick={() => removeLineItem(1)} className="col-span-1 text-white/60 hover:text-red-400 transition-transform duration-200 hover:scale-110">
-                        <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                          <path clipRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" fillRule="evenodd"></path>
-                        </svg>
-                      </button>
-                    </div>
+                    {lineItems.map((item) => (
+                      <div key={item.id} className="grid grid-cols-12 gap-4 items-center" data-line-item>
+                        <input 
+                          name="itemDescription" 
+                          className={`col-span-5 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} 
+                          style={getCustomInputStyles()}
+                          placeholder="e.g., iPhone 15 Pro" 
+                          type="text"
+                          value={item.description}
+                          onChange={(e) => updateLineItem(item.id, 'description', e.target.value)}
+                        />
+                        <input 
+                          name="quantity" 
+                          className={`col-span-2 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} 
+                          style={getCustomInputStyles()}
+                          placeholder="1" 
+                          type="number" 
+                          value={item.quantity}
+                          onChange={(e) => updateLineItem(item.id, 'quantity', parseFloat(e.target.value) || 0)}
+                        />
+                        <input 
+                          name="rate" 
+                          className={`col-span-2 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} 
+                          style={getCustomInputStyles()}
+                          placeholder="Rate" 
+                          type="number" 
+                          value={item.rate}
+                          onChange={(e) => updateLineItem(item.id, 'rate', parseFloat(e.target.value) || 0)}
+                        />
+                        <span className="col-span-2 text-sm text-white" data-line-total>${item.amount.toFixed(2)}</span>
+                        <button 
+                          type="button" 
+                          onClick={() => removeLineItem(item.id)} 
+                          className="col-span-1 text-white/60 hover:text-red-400 transition-transform duration-200 hover:scale-110"
+                        >
+                          <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path clipRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" fillRule="evenodd"></path>
+                          </svg>
+                        </button>
+                      </div>
+                    ))}
                     <button type="button" onClick={addLineItem} className="text-sm font-medium text-[var(--primary-color)] hover:text-blue-300 transition-transform duration-200 hover:scale-105">+ Add Line Item</button>
                   </div>
                 </section>
@@ -1054,17 +1084,47 @@ export default function Home() {
                       <div className="col-span-2"><span className="text-sm font-medium text-white/90">Rate</span></div>
                       <div className="col-span-2"><span className="text-sm font-medium text-white/90">Total</span></div>
                     </div>
-                    <div className="grid grid-cols-12 gap-4 items-center" data-line-item>
-                      <input name="serviceDescription" className={`col-span-5 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="e.g., UI/UX Design" type="text"/>
-                      <input name="quantity" className={`col-span-2 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="Qty" type="number" onChange={updateLineItemTotal}/>
-                      <input name="rate" className={`col-span-2 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} placeholder="Rate" type="number" onChange={updateLineItemTotal}/>
-                      <span className="col-span-2 text-sm text-white" data-line-total>$0.00</span>
-                      <button type="button" onClick={() => removeLineItem(1)} className="col-span-1 text-white/60 hover:text-red-400 transition-transform duration-200 hover:scale-110">
-                        <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                          <path clipRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" fillRule="evenodd"></path>
-                        </svg>
-                      </button>
-                    </div>
+                    {lineItems.map((item) => (
+                      <div key={item.id} className="grid grid-cols-12 gap-4 items-center" data-line-item>
+                        <input 
+                          name="serviceDescription" 
+                          className={`col-span-5 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} 
+                          style={getCustomInputStyles()}
+                          placeholder="e.g., UI/UX Design" 
+                          type="text"
+                          value={item.description}
+                          onChange={(e) => updateLineItem(item.id, 'description', e.target.value)}
+                        />
+                        <input 
+                          name="quantity" 
+                          className={`col-span-2 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} 
+                          style={getCustomInputStyles()}
+                          placeholder="Qty" 
+                          type="number" 
+                          value={item.quantity}
+                          onChange={(e) => updateLineItem(item.id, 'quantity', parseFloat(e.target.value) || 0)}
+                        />
+                        <input 
+                          name="rate" 
+                          className={`col-span-2 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} 
+                          style={getCustomInputStyles()}
+                          placeholder="Rate" 
+                          type="number" 
+                          value={item.rate}
+                          onChange={(e) => updateLineItem(item.id, 'rate', parseFloat(e.target.value) || 0)}
+                        />
+                        <span className="col-span-2 text-sm text-white" data-line-total>${item.amount.toFixed(2)}</span>
+                        <button 
+                          type="button" 
+                          onClick={() => removeLineItem(item.id)} 
+                          className="col-span-1 text-white/60 hover:text-red-400 transition-transform duration-200 hover:scale-110"
+                        >
+                          <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path clipRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" fillRule="evenodd"></path>
+                          </svg>
+                        </button>
+                      </div>
+                    ))}
                     <button type="button" onClick={addLineItem} className="text-sm font-medium text-[var(--primary-color)] hover:text-blue-300 transition-transform duration-200 hover:scale-105">+ Add Service</button>
                   </div>
                 </section>
