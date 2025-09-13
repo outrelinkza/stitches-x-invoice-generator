@@ -192,7 +192,7 @@ export default function Home() {
       case 'consulting':
         return 'border-gray-400/30 bg-gray-800/20 focus:border-gray-300 px-3 py-2 box-border';
       case 'custom':
-        return `border-[${customTemplate.primaryColor}]/30 bg-[${customTemplate.primaryColor}]/10 focus:border-[${customTemplate.primaryColor}]/50 px-3 py-2 box-border`;
+        return 'border-white/20 bg-white/10 focus:border-white/40 px-3 py-2 box-border';
       case 'modern-tech':
         return 'border-cyan-400/30 bg-cyan-900/20 focus:border-cyan-300 px-3 py-2 box-border';
       case 'elegant-luxury':
@@ -206,6 +206,18 @@ export default function Home() {
       default:
         return 'border-white/20 bg-white/10 input-focus-glow px-3 py-2 box-border';
     }
+  };
+
+  // Get custom input styles for custom template
+  const getCustomInputStyles = () => {
+    if (selectedTemplate === 'custom') {
+      return {
+        borderColor: `${customTemplate.primaryColor}30`,
+        backgroundColor: `${customTemplate.primaryColor}10`,
+        color: customTemplate.textColor,
+      };
+    }
+    return {};
   };
 
   // Get template-specific features
@@ -817,6 +829,7 @@ export default function Home() {
                         <input 
                           name="companyName" 
                           className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} 
+                          style={getCustomInputStyles()}
                           placeholder="Company name" 
                           type="text" 
                           aria-label="Company Name" 
@@ -828,6 +841,7 @@ export default function Home() {
                         <input 
                           name="companyContact" 
                           className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} 
+                          style={getCustomInputStyles()}
                           placeholder="Company email" 
                           type="text" 
                           aria-label="Company Contact" 
@@ -841,6 +855,7 @@ export default function Home() {
                     <textarea 
                       name="companyAddress" 
                       className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} 
+                      style={getCustomInputStyles()}
                       placeholder="Company address" 
                       rows={2} 
                       aria-label="Company Address" 
@@ -860,6 +875,7 @@ export default function Home() {
                       <input 
                         name="clientName" 
                         className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white placeholder-white/60 ${getInputStyles()}`} 
+                        style={getCustomInputStyles()}
                         placeholder="Client Name" aria-label="Client Name" required 
                         type="text"
                       />
