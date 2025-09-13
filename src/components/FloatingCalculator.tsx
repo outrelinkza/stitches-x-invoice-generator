@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 
 const FloatingCalculator = React.memo(function FloatingCalculator() {
   const [isOpen, setIsOpen] = useState(false);
-  const [position, setPosition] = useState({ x: 20, y: 100 });
+  const [position, setPosition] = useState({ x: 20, y: 80 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [results, setResults] = useState<{[key: string]: any}>({});

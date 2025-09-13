@@ -221,6 +221,45 @@ export default function Invoices() {
                 </div>
               </div>
               
+              {/* Clear All Drafts Button */}
+              {invoices.filter(inv => inv.status === 'draft').length > 0 && (
+                <div className="mb-4 flex justify-end">
+                  <button
+                    onClick={async () => {
+                      if (confirm(`Are you sure you want to delete all ${invoices.filter(inv => inv.status === 'draft').length} draft invoices? This action cannot be undone.`)) {
+                        try {
+                          const draftInvoices = invoices.filter(inv => inv.status === 'draft');
+                          for (const invoice of draftInvoices) {
+                            await InvoiceService.deleteInvoice(invoice.id);
+                          }
+                          setInvoices(invoices.filter(inv => inv.status !== 'draft'));
+                          
+                          // Show success notification
+                          const successMsg = document.createElement('div');
+                          successMsg.className = 'fixed top-20 right-4 bg-green-500/90 text-white px-4 py-3 rounded-lg shadow-lg z-50 transition-all';
+                          successMsg.innerHTML = `
+                            <div class="font-semibold">✅ Success!</div>
+                            <div class="text-sm">Deleted ${draftInvoices.length} draft invoices</div>
+                          `;
+                          document.body.appendChild(successMsg);
+                          setTimeout(() => {
+                            if (document.body.contains(successMsg)) {
+                              document.body.removeChild(successMsg);
+                            }
+                          }, 3000);
+                        } catch (error) {
+                          console.error('Failed to delete drafts:', error);
+                          alert('Failed to delete some drafts. Please try again.');
+                        }
+                      }
+                    }}
+                    className="px-4 py-2 bg-red-500/20 text-red-400 border border-red-400/30 rounded-lg hover:bg-red-500/30 transition-colors text-sm font-medium"
+                  >
+                    🗑️ Clear All Drafts ({invoices.filter(inv => inv.status === 'draft').length})
+                  </button>
+                </div>
+              )}
+              
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>

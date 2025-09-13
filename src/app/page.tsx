@@ -1,6 +1,13 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+
+// Extend Window interface for auto-save timeout
+declare global {
+  interface Window {
+    autoSaveTimeout?: NodeJS.Timeout;
+  }
+}
 import { useRouter } from 'next/navigation';
 import FloatingCalculator from '@/components/FloatingCalculator';
 import { generateInvoicePDF, InvoiceData } from '@/utils/pdfGenerator';
@@ -409,10 +416,25 @@ export default function Home() {
       setIsFormValid(hasValidData);
     }
     
-    // Auto-save after a short delay
-    setTimeout(() => {
-      handleSaveDraft();
-    }, 2000);
+    // Auto-save only if there's meaningful content and after a longer delay
+    if (formRef.current) {
+      const formData = new FormData(formRef.current);
+      const hasContent = Array.from(formData.entries()).some(([key, value]) => 
+        value && value.toString().trim() !== '' && key !== 'logo'
+      );
+      
+      if (hasContent) {
+        // Clear any existing timeout
+        if (window.autoSaveTimeout) {
+          clearTimeout(window.autoSaveTimeout);
+        }
+        
+        // Set new timeout for 30 seconds (only save if user stops typing)
+        window.autoSaveTimeout = setTimeout(() => {
+          handleSaveDraft();
+        }, 30000);
+      }
+    }
   }, [handleSaveDraft]);
 
   const isFieldEmpty = (value: string | null | undefined) => {
