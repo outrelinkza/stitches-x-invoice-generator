@@ -1569,48 +1569,6 @@ export default function Home() {
         </section>
 
         {/* CTA Section */}
-        {/* Viral Sharing Section */}
-        <section className="mt-8 mb-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="relative overflow-hidden text-white rounded-2xl">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-800/40 via-purple-700/30 to-pink-800/40"></div>
-              <div className="relative text-center pt-12 pr-8 pb-12 pl-8">
-                <h2 className="text-3xl font-serif font-medium mb-4">Share InvoicePro with Fellow Freelancers</h2>
-                <p className="text-lg opacity-90 mb-6 max-w-xl mx-auto">Help other freelancers create professional invoices in seconds. Share the love! 💙</p>
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
-                  <button 
-                    onClick={() => {
-                      if (typeof window !== 'undefined' && navigator.share) {
-                        navigator.share({
-                          title: 'InvoicePro - Professional Invoice Generator',
-                          text: 'Create beautiful, professional invoices in seconds! Perfect for freelancers and small businesses.',
-                          url: window.location.origin
-                        });
-                      } else if (typeof window !== 'undefined') {
-                        navigator.clipboard.writeText(window.location.origin);
-                        showSuccess('Link copied to clipboard! Share it with your network.');
-                      }
-                    }}
-                    className="px-6 py-3 bg-white/20 hover:bg-white/30 text-white rounded-full font-medium transition-colors border border-white/30 flex items-center gap-2"
-                  >
-                    <span className="material-symbols-outlined text-lg">share</span>
-                    Share InvoicePro
-                  </button>
-                  <a 
-                    href={`https://twitter.com/intent/tweet?text=Just%20created%20a%20professional%20invoice%20in%20seconds%20with%20@InvoicePro!%20Perfect%20for%20freelancers%20and%20small%20businesses.%20Check%20it%20out:&url=${typeof window !== 'undefined' ? encodeURIComponent(window.location.origin) : 'https://stitchesx.vercel.app'}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-6 py-3 bg-blue-500/20 hover:bg-blue-500/30 text-white rounded-full font-medium transition-colors border border-blue-400/30 flex items-center gap-2"
-                  >
-                    <span className="material-symbols-outlined text-lg">chat</span>
-                    Tweet About It
-                  </a>
-                </div>
-                <p className="text-sm opacity-70">Help grow the freelancer community! 🚀</p>
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* Newsletter Section */}
         <section className="mt-8 mb-20">
@@ -1642,13 +1600,31 @@ export default function Home() {
         </section>
 
         {/* Footer */}
-        <footer className="mt-auto py-8 px-10">
+        <footer className="mt-auto py-8 px-4 sm:px-10">
           <div className="container mx-auto text-center text-sm text-white/60">
-            <div className="flex justify-center items-center space-x-6">
+            <div className="flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-6">
               <a className="hover:text-white transition-colors" href="/about">About Us</a>
               <a className="hover:text-white transition-colors" href="/terms">Terms of Service</a>
               <a className="hover:text-white transition-colors" href="/privacy">Privacy Policy</a>
               <a className="hover:text-white transition-colors" href="/contacts">Contact Us</a>
+              <button 
+                onClick={() => {
+                  if (typeof window !== 'undefined' && navigator.share) {
+                    navigator.share({
+                      title: 'InvoicePro - Professional Invoice Generator',
+                      text: 'Create beautiful, professional invoices in seconds!',
+                      url: window.location.origin
+                    });
+                  } else if (typeof window !== 'undefined') {
+                    navigator.clipboard.writeText(window.location.origin);
+                    showSuccess('Link copied! Share InvoicePro with others 💙');
+                  }
+                }}
+                className="hover:text-white transition-colors flex items-center gap-1"
+              >
+                <span className="material-symbols-outlined text-sm">share</span>
+                Share
+              </button>
             </div>
             <p className="mt-4">© 2025 InvoicePro. All rights reserved.</p>
           </div>

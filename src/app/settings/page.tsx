@@ -520,20 +520,20 @@ export default function Settings() {
 
   return (
     <AuthGuard>
-      <div className="min-h-screen flex">
+      <div className="min-h-screen flex flex-col lg:flex-row">
         <NavHeader currentPage="/settings" />
         <SettingsSidebar currentSection={currentSection} onSectionChange={setCurrentSection} />
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto pt-24">
-        <div className="max-w-4xl mx-auto p-8">
+      <main className="flex-1 overflow-y-auto pt-24 lg:pt-24">
+        <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
           <header className="mb-6 animate-enter" style={{animationDelay: '200ms'}}>
-            <h1 className="text-4xl font-bold tracking-tight text-white">Settings</h1>
-            <p className="mt-1 text-lg text-white/70">Manage your AI Invoice Generator preferences.</p>
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">Settings</h1>
+            <p className="mt-1 text-base sm:text-lg text-white/70">Manage your InvoicePro preferences.</p>
           </header>
 
           {/* Settings Content */}
-          <div className="space-y-8">
+          <div className="space-y-6 sm:space-y-8">
             {renderSectionContent()}
           </div>
         </div>
