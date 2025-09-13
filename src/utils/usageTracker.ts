@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+// import { supabase } from '@/lib/supabase'; // Disabled for testing
 
 export interface UsageData {
   downloads_this_month: number;
@@ -13,55 +13,33 @@ export class UsageTracker {
   private static readonly MONTHLY_RESET_KEY = 'invoicepro_monthly_reset';
 
   /**
-   * Get current usage for user (hybrid: LocalStorage + Supabase)
+   * Get current usage for user (LocalStorage only - Supabase disabled)
    */
   static async getCurrentUsage(userId?: string, email?: string): Promise<UsageData> {
     try {
-      // Get LocalStorage data first (fast)
-      const localUsage = this.getLocalUsage();
-      
-      // Get Supabase data (reliable)
-      const serverUsage = await this.getServerUsage(userId, email);
-      
-      // Use the higher count (most restrictive)
-      const downloads_this_month = Math.max(
-        localUsage.downloads_this_month,
-        serverUsage.downloads_this_month
-      );
-      
-      const total_downloads = Math.max(
-        localUsage.total_downloads,
-        serverUsage.total_downloads
-      );
-
-      return {
-        downloads_this_month,
-        total_downloads,
-        last_download_date: serverUsage.last_download_date || localUsage.last_download_date,
-        is_guest: !userId && !email
-      };
+      // Use LocalStorage only (Supabase disabled for testing)
+      console.log('UsageTracker: Using LocalStorage only (Supabase disabled)');
+      return this.getLocalUsage();
     } catch (error) {
       console.error('Error getting usage:', error);
-      // Fallback to LocalStorage only
-      return this.getLocalUsage();
+      // Fallback to default usage
+      return this.getDefaultUsage();
     }
   }
 
   /**
-   * Track a download (update both LocalStorage and Supabase)
+   * Track a download (LocalStorage only - Supabase disabled)
    */
   static async trackDownload(userId?: string, email?: string): Promise<UsageData> {
     try {
-      // Update LocalStorage first (instant feedback)
+      // Update LocalStorage only (Supabase disabled for testing)
+      console.log('UsageTracker: Tracking download with LocalStorage only (Supabase disabled)');
       const localUsage = this.incrementLocalUsage();
-      
-      // Update Supabase (reliable storage)
-      const serverUsage = await this.incrementServerUsage(userId, email);
       
       // Return the updated usage
       return {
-        downloads_this_month: Math.max(localUsage.downloads_this_month, serverUsage.downloads_this_month),
-        total_downloads: Math.max(localUsage.total_downloads, serverUsage.total_downloads),
+        downloads_this_month: localUsage.downloads_this_month,
+        total_downloads: localUsage.total_downloads,
         last_download_date: new Date().toISOString(),
         is_guest: !userId && !email
       };
@@ -77,6 +55,7 @@ export class UsageTracker {
    */
   static async canDownload(userId?: string, email?: string): Promise<boolean> {
     const usage = await this.getCurrentUsage(userId, email);
+    console.log('UsageTracker: Checking download limit - current usage:', usage.downloads_this_month, 'limit:', this.FREE_DOWNLOAD_LIMIT);
     return usage.downloads_this_month < this.FREE_DOWNLOAD_LIMIT;
   }
 
@@ -167,187 +146,27 @@ export class UsageTracker {
   }
 
   /**
-   * Get server usage data from Supabase
+   * Get server usage data from Supabase (DISABLED FOR TESTING)
    */
   private static async getServerUsage(userId?: string, email?: string): Promise<UsageData> {
-    try {
-      if (!userId && !email) {
-        return this.getDefaultUsage();
-      }
-
-      console.log('UsageTracker: Querying user_usage table with userId:', userId, 'email:', email);
-
-      // Test table existence first
-      const { data: testData, error: testError } = await supabase
-        .from('user_usage')
-        .select('count')
-        .limit(1);
-      
-      console.log('UsageTracker: Table test - data:', testData, 'error:', testError);
-
-      let query = supabase.from('user_usage').select('*');
-      
-      if (userId) {
-        query = query.eq('user_id', userId);
-      } else if (email) {
-        query = query.eq('email', email).is('user_id', null);
-      }
-
-      const { data, error } = await query.single();
-      
-      console.log('UsageTracker: Query result - data:', data, 'error:', error);
-      
-      // Log the full error details
-      if (error) {
-        console.error('UsageTracker: Full error details:', {
-          code: error.code,
-          message: error.message,
-          details: error.details,
-          hint: error.hint
-        });
-      }
-
-      // Handle 406 error specifically (RLS policy issues)
-      if (error && error.code === '406') {
-        console.warn('RLS policy error (406) - falling back to LocalStorage only');
-        return this.getDefaultUsage();
-      }
-
-      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows found
-        console.warn('Supabase query error:', error);
-        return this.getDefaultUsage();
-      }
-
-      if (data) {
-        // Check if we need to reset for new month
-        if (this.shouldResetMonthly(data.last_download_date)) {
-          await this.resetServerUsage();
-          return this.getDefaultUsage();
-        }
-        
-        return {
-          downloads_this_month: data.downloads_this_month || 0,
-          total_downloads: data.total_downloads || 0,
-          last_download_date: data.last_download_date,
-          is_guest: !userId
-        };
-      }
-
-      return this.getDefaultUsage();
-    } catch (error) {
-      console.error('Error getting server usage:', error);
-      return this.getDefaultUsage();
-    }
+    console.log('UsageTracker: getServerUsage disabled for testing');
+    return this.getDefaultUsage();
   }
 
   /**
-   * Increment server usage in Supabase
+   * Increment server usage in Supabase (DISABLED FOR TESTING)
    */
   private static async incrementServerUsage(userId?: string, email?: string): Promise<UsageData> {
-    try {
-      if (!userId && !email) {
-        return this.getDefaultUsage();
-      }
-
-      const now = new Date().toISOString();
-      
-      // Try to update existing record
-      let query = supabase.from('user_usage').select('*');
-      
-      if (userId) {
-        query = query.eq('user_id', userId);
-      } else if (email) {
-        query = query.eq('email', email).is('user_id', null);
-      }
-
-      const { data: existing, error: selectError } = await query.single();
-
-      // Handle 406 error specifically (RLS policy issues)
-      if (selectError && selectError.code === '406') {
-        console.warn('RLS policy error (406) - falling back to LocalStorage only');
-        return this.getDefaultUsage();
-      }
-
-      if (existing && !selectError) {
-        // Update existing record
-        const { data, error } = await supabase
-          .from('user_usage')
-          .update({
-            downloads_this_month: existing.downloads_this_month + 1,
-            total_downloads: existing.total_downloads + 1,
-            last_download_date: now,
-            updated_at: now
-          })
-          .eq('id', existing.id)
-          .select()
-          .single();
-
-        if (error) {
-          if (error.code === '406') {
-            console.warn('RLS policy error (406) - falling back to LocalStorage only');
-            return this.getDefaultUsage();
-          }
-          throw error;
-        }
-
-        return {
-          downloads_this_month: data.downloads_this_month,
-          total_downloads: data.total_downloads,
-          last_download_date: data.last_download_date,
-          is_guest: !userId
-        };
-      } else {
-        // Create new record
-        const { data, error } = await supabase
-          .from('user_usage')
-          .insert({
-            user_id: userId || null,
-            email: email || null,
-            downloads_this_month: 1,
-            total_downloads: 1,
-            last_download_date: now
-          })
-          .select()
-          .single();
-
-        if (error) {
-          if (error.code === '406') {
-            console.warn('RLS policy error (406) - falling back to LocalStorage only');
-            return this.getDefaultUsage();
-          }
-          throw error;
-        }
-
-        return {
-          downloads_this_month: data.downloads_this_month,
-          total_downloads: data.total_downloads,
-          last_download_date: data.last_download_date,
-          is_guest: !userId
-        };
-      }
-    } catch (error) {
-      console.error('Error incrementing server usage:', error);
-      return this.getDefaultUsage();
-    }
+    console.log('UsageTracker: incrementServerUsage disabled for testing');
+    return this.getDefaultUsage();
   }
 
   /**
-   * Reset server usage (monthly reset)
+   * Reset server usage (monthly reset) - DISABLED FOR TESTING
    */
   private static async resetServerUsage(): Promise<void> {
-    try {
-      const { error } = await supabase
-        .from('user_usage')
-        .update({
-          downloads_this_month: 0,
-          updated_at: new Date().toISOString()
-        })
-        .neq('id', '00000000-0000-0000-0000-000000000000'); // Update all records
-
-      if (error) throw error;
-    } catch (error) {
-      console.error('Error resetting server usage:', error);
-    }
+    console.log('UsageTracker: resetServerUsage disabled for testing');
+    // Supabase calls disabled for testing
   }
 
   /**
