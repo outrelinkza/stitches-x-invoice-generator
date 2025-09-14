@@ -770,6 +770,13 @@ export default function Home() {
                   {selectedTemplate === 'healthcare' && 'Healthcare Template'}
                   {selectedTemplate === 'legal' && 'Legal Template'}
                   {selectedTemplate === 'restaurant' && 'Restaurant Template'}
+                  {selectedTemplate === 'business-professional' && 'Business Professional Template'}
+                  {selectedTemplate === 'freelancer-creative' && 'Freelancer Creative Template'}
+                  {selectedTemplate === 'modern-gradient' && 'Modern Gradient Template'}
+                  {selectedTemplate === 'product-invoice' && 'Product Invoice Template'}
+                  {selectedTemplate === 'international-invoice' && 'International Invoice Template'}
+                  {selectedTemplate === 'receipt-paid' && 'Receipt / Paid Template'}
+                  {selectedTemplate === 'subscription-invoice' && 'Subscription Invoice Template'}
                 </span>
                 <div className="flex items-center gap-2">
                   <select
@@ -790,6 +797,13 @@ export default function Home() {
                     <option value="healthcare" className="bg-gray-800">Healthcare</option>
                     <option value="legal" className="bg-gray-800">Legal</option>
                     <option value="restaurant" className="bg-gray-800">Restaurant</option>
+                    <option value="business-professional" className="bg-gray-800">Business Professional</option>
+                    <option value="freelancer-creative" className="bg-gray-800">Freelancer Creative</option>
+                    <option value="modern-gradient" className="bg-gray-800">Modern Gradient</option>
+                    <option value="product-invoice" className="bg-gray-800">Product Invoice</option>
+                    <option value="international-invoice" className="bg-gray-800">International Invoice</option>
+                    <option value="receipt-paid" className="bg-gray-800">Receipt / Paid</option>
+                    <option value="subscription-invoice" className="bg-gray-800">Subscription Invoice</option>
                     <option value="custom" className="bg-gray-800">Custom</option>
                   </select>
                   <button
