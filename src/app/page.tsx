@@ -41,6 +41,9 @@ export default function Home() {
   const [invoiceNumber, setInvoiceNumber] = useState('');
   const [currentTotal, setCurrentTotal] = useState('0.00');
   const [pricingMode, setPricingMode] = useState<'per-invoice' | 'subscription'>('subscription');
+  const [currency, setCurrency] = useState('USD');
+  const [discountRate, setDiscountRate] = useState(0);
+  const [discountAmount, setDiscountAmount] = useState(0);
   const [selectedTemplate, setSelectedTemplate] = useState('standard');
   const [showCustomBuilder, setShowCustomBuilder] = useState(false);
   const [customTemplate, setCustomTemplate] = useState({
@@ -317,6 +320,52 @@ export default function Home() {
           showRestaurantFields: true,
           defaultPaymentTerms: 'Net 15'
         };
+      case 'business-professional':
+        return {
+          showBrandingFields: true,
+          showLogoOptions: true,
+          defaultPaymentTerms: 'Net 30'
+        };
+      case 'freelancer-creative':
+        return {
+          showProjectFields: true,
+          showPortfolioLink: true,
+          showHourlyRates: true,
+          defaultPaymentTerms: '50% upfront, 50% on completion'
+        };
+      case 'modern-gradient':
+        return {
+          showProjectFields: true,
+          showColorCustomization: true,
+          defaultPaymentTerms: 'Net 15'
+        };
+      case 'product-invoice':
+        return {
+          showProductFields: true,
+          showSKUFields: true,
+          showShippingFields: true,
+          defaultPaymentTerms: 'Net 15'
+        };
+      case 'international-invoice':
+        return {
+          showInternationalFields: true,
+          showVATFields: true,
+          showMultiCurrency: true,
+          defaultPaymentTerms: 'Net 30'
+        };
+      case 'receipt-paid':
+        return {
+          showReceiptFields: true,
+          showPaymentConfirmation: true,
+          defaultPaymentTerms: 'Paid'
+        };
+      case 'subscription-invoice':
+        return {
+          showSubscriptionFields: true,
+          showRecurringOptions: true,
+          showBillingCycle: true,
+          defaultPaymentTerms: 'Monthly'
+        };
       default:
         return {
           showStandardFields: true,
@@ -544,6 +593,23 @@ export default function Home() {
     return [8, 10, 15, 20, 25];
   };
 
+  // Get currency symbol based on selected currency
+  const getCurrencySymbol = () => {
+    const symbols: { [key: string]: string } = {
+      'USD': '$',
+      'EUR': '€',
+      'GBP': '£',
+      'CAD': '$',
+      'AUD': '$',
+      'JPY': '¥',
+      'CHF': 'CHF',
+      'SEK': 'kr',
+      'NOK': 'kr',
+      'DKK': 'kr'
+    };
+    return symbols[currency] || '$';
+  };
+
 
 
 
@@ -634,16 +700,20 @@ export default function Home() {
       subtotalInput.value = subtotal.toFixed(2);
     }
     
+    // Calculate discount
+    const discount = discountAmount > 0 ? discountAmount : (subtotal * discountRate / 100);
+    const subtotalAfterDiscount = subtotal - discount;
+    
     const taxRate = parseFloat(taxRateInput?.value) || 0;
-    const taxAmount = (subtotal * taxRate) / 100;
-    const total = subtotal + taxAmount;
+    const taxAmount = (subtotalAfterDiscount * taxRate) / 100;
+    const total = subtotalAfterDiscount + taxAmount;
     
     if (totalSpan) {
-      totalSpan.textContent = `$${total.toFixed(2)}`;
+      totalSpan.textContent = total.toFixed(2);
     }
     
     setCurrentTotal(total.toFixed(2));
-  }, [calculateSubtotal]);
+  }, [calculateSubtotal, discountRate, discountAmount]);
 
   // Calculate total with tax (memoized for performance)
   const calculateTotal = useCallback((invoiceData: Record<string, string | number>) => {
@@ -1173,6 +1243,138 @@ export default function Home() {
                 </section>
               )}
 
+              {/* New Template-Specific Sections */}
+              {getTemplateFeatures().showBrandingFields && (
+                <section className="space-y-6 p-6 bg-slate-900/20 rounded-lg border border-slate-500/20">
+                  <h3 className="text-lg font-semibold text-slate-200">Business Professional Features</h3>
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <label className="block">
+                      <span className="text-sm font-medium text-slate-200">Company Tagline</span>
+                      <input type="text" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 ${getTemplateInputClasses()} ${getInputStyles()}`} placeholder="Your company tagline" />
+                    </label>
+                    <label className="block">
+                      <span className="text-sm font-medium text-slate-200">Business Type</span>
+                      <select className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white ${getInputStyles()}`}>
+                        <option value="corporation">Corporation</option>
+                        <option value="llc">LLC</option>
+                        <option value="partnership">Partnership</option>
+                        <option value="sole-proprietorship">Sole Proprietorship</option>
+                      </select>
+                    </label>
+                  </div>
+                </section>
+              )}
+
+              {getTemplateFeatures().showPortfolioLink && (
+                <section className="space-y-6 p-6 bg-indigo-900/20 rounded-lg border border-indigo-500/20">
+                  <h3 className="text-lg font-semibold text-indigo-200">Freelancer Creative Features</h3>
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <label className="block">
+                      <span className="text-sm font-medium text-indigo-200">Portfolio Website</span>
+                      <input type="url" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 ${getTemplateInputClasses()} ${getInputStyles()}`} placeholder="https://yourportfolio.com" />
+                    </label>
+                    <label className="block">
+                      <span className="text-sm font-medium text-indigo-200">Social Media</span>
+                      <input type="text" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 ${getTemplateInputClasses()} ${getInputStyles()}`} placeholder="@yourhandle" />
+                    </label>
+                  </div>
+                </section>
+              )}
+
+              {getTemplateFeatures().showColorCustomization && (
+                <section className="space-y-6 p-6 bg-pink-900/20 rounded-lg border border-pink-500/20">
+                  <h3 className="text-lg font-semibold text-pink-200">Modern Gradient Features</h3>
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <label className="block">
+                      <span className="text-sm font-medium text-pink-200">Primary Color</span>
+                      <input type="color" className={`mt-1 block w-full h-10 rounded-md shadow-sm focus:ring-0 ${getInputStyles()}`} defaultValue="#7C3AED" />
+                    </label>
+                    <label className="block">
+                      <span className="text-sm font-medium text-pink-200">Secondary Color</span>
+                      <input type="color" className={`mt-1 block w-full h-10 rounded-md shadow-sm focus:ring-0 ${getInputStyles()}`} defaultValue="#EC4899" />
+                    </label>
+                  </div>
+                </section>
+              )}
+
+              {getTemplateFeatures().showProductFields && (
+                <section className="space-y-6 p-6 bg-emerald-900/20 rounded-lg border border-emerald-500/20">
+                  <h3 className="text-lg font-semibold text-emerald-200">Product Invoice Features</h3>
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <label className="block">
+                      <span className="text-sm font-medium text-emerald-200">Shipping Address</span>
+                      <textarea className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 ${getTemplateInputClasses()} ${getInputStyles()}`} rows={3} placeholder="Shipping address"></textarea>
+                    </label>
+                    <label className="block">
+                      <span className="text-sm font-medium text-emerald-200">Shipping Method</span>
+                      <select className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white ${getInputStyles()}`}>
+                        <option value="standard">Standard Shipping</option>
+                        <option value="express">Express Shipping</option>
+                        <option value="overnight">Overnight</option>
+                        <option value="pickup">Store Pickup</option>
+                      </select>
+                    </label>
+                  </div>
+                </section>
+              )}
+
+              {getTemplateFeatures().showInternationalFields && (
+                <section className="space-y-6 p-6 bg-blue-900/20 rounded-lg border border-blue-500/20">
+                  <h3 className="text-lg font-semibold text-blue-200">International Invoice Features</h3>
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <label className="block">
+                      <span className="text-sm font-medium text-blue-200">VAT/GST Number</span>
+                      <input type="text" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 ${getTemplateInputClasses()} ${getInputStyles()}`} placeholder="VAT123456789" />
+                    </label>
+                    <label className="block">
+                      <span className="text-sm font-medium text-blue-200">IBAN/SWIFT</span>
+                      <input type="text" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 ${getTemplateInputClasses()} ${getInputStyles()}`} placeholder="GB29 NWBK 6016 1331 9268 19" />
+                    </label>
+                  </div>
+                </section>
+              )}
+
+              {getTemplateFeatures().showReceiptFields && (
+                <section className="space-y-6 p-6 bg-green-900/20 rounded-lg border border-green-500/20">
+                  <h3 className="text-lg font-semibold text-green-200">Receipt Features</h3>
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <label className="block">
+                      <span className="text-sm font-medium text-green-200">Payment Method</span>
+                      <select className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white ${getInputStyles()}`}>
+                        <option value="cash">Cash</option>
+                        <option value="card">Credit/Debit Card</option>
+                        <option value="bank-transfer">Bank Transfer</option>
+                        <option value="check">Check</option>
+                      </select>
+                    </label>
+                    <label className="block">
+                      <span className="text-sm font-medium text-green-200">Payment Date</span>
+                      <input type="date" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 ${getInputStyles()}`} defaultValue={new Date().toISOString().split('T')[0]} />
+                    </label>
+                  </div>
+                </section>
+              )}
+
+              {getTemplateFeatures().showBillingCycle && (
+                <section className="space-y-6 p-6 bg-violet-900/20 rounded-lg border border-violet-500/20">
+                  <h3 className="text-lg font-semibold text-violet-200">Subscription Features</h3>
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <label className="block">
+                      <span className="text-sm font-medium text-violet-200">Billing Cycle</span>
+                      <select className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 text-white ${getInputStyles()}`}>
+                        <option value="monthly">Monthly</option>
+                        <option value="quarterly">Quarterly</option>
+                        <option value="yearly">Yearly</option>
+                      </select>
+                    </label>
+                    <label className="block">
+                      <span className="text-sm font-medium text-violet-200">Next Billing Date</span>
+                      <input type="date" className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 ${getInputStyles()}`} />
+                    </label>
+                  </div>
+                </section>
+              )}
+
               {/* Invoice Details Section */}
               <section className="space-y-6">
                 <h3 className="text-lg font-semibold text-white">Invoice Details</h3>
@@ -1221,6 +1423,74 @@ export default function Home() {
                       <option value="time_tracking" className="bg-slate-800 text-white">Time-Based Invoice</option>
                       <option value="simple_receipt" className="bg-slate-800 text-white">Simple Receipt</option>
                     </select>
+                  </label>
+                </div>
+                
+                {/* Currency and Additional Details Row */}
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
+                  <label className="block">
+                    <span className="text-sm font-medium ${getTemplateLabelColor()}">Currency</span>
+                    <select 
+                      name="currency"
+                      className="mt-1 block w-full rounded-md border-white/20 bg-white/10 shadow-sm focus:ring-0 input-focus-glow text-white" 
+                      value={currency}
+                      onChange={(e) => setCurrency(e.target.value)}
+                    >
+                      <option value="USD" className="bg-slate-800 text-white">$ USD</option>
+                      <option value="EUR" className="bg-slate-800 text-white">€ EUR</option>
+                      <option value="GBP" className="bg-slate-800 text-white">£ GBP</option>
+                      <option value="CAD" className="bg-slate-800 text-white">$ CAD</option>
+                      <option value="AUD" className="bg-slate-800 text-white">$ AUD</option>
+                      <option value="JPY" className="bg-slate-800 text-white">¥ JPY</option>
+                      <option value="CHF" className="bg-slate-800 text-white">CHF</option>
+                      <option value="SEK" className="bg-slate-800 text-white">kr SEK</option>
+                      <option value="NOK" className="bg-slate-800 text-white">kr NOK</option>
+                      <option value="DKK" className="bg-slate-800 text-white">kr DKK</option>
+                    </select>
+                  </label>
+                  <label className="block">
+                    <span className="text-sm font-medium ${getTemplateLabelColor()}">Payment Terms</span>
+                    <select 
+                      name="paymentTerms"
+                      className="mt-1 block w-full rounded-md border-white/20 bg-white/10 shadow-sm focus:ring-0 input-focus-glow text-white" 
+                      defaultValue="Net 15"
+                    >
+                      <option value="Due on Receipt" className="bg-slate-800 text-white">Due on Receipt</option>
+                      <option value="Net 7" className="bg-slate-800 text-white">Net 7</option>
+                      <option value="Net 15" className="bg-slate-800 text-white">Net 15</option>
+                      <option value="Net 30" className="bg-slate-800 text-white">Net 30</option>
+                      <option value="Net 45" className="bg-slate-800 text-white">Net 45</option>
+                      <option value="Net 60" className="bg-slate-800 text-white">Net 60</option>
+                    </select>
+                  </label>
+                  <label className="block">
+                    <span className="text-sm font-medium ${getTemplateLabelColor()}">Discount (%)</span>
+                    <input 
+                      name="discountRate"
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="0.01"
+                      value={discountRate}
+                      onChange={(e) => setDiscountRate(parseFloat(e.target.value) || 0)}
+                      className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 ${getTemplateInputClasses()} ${getInputStyles()}`} 
+                      style={getCustomInputStyles()}
+                      placeholder="0.00"
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="text-sm font-medium ${getTemplateLabelColor()}">Discount Amount</span>
+                    <input 
+                      name="discountAmount"
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={discountAmount}
+                      onChange={(e) => setDiscountAmount(parseFloat(e.target.value) || 0)}
+                      className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 ${getTemplateInputClasses()} ${getInputStyles()}`} 
+                      style={getCustomInputStyles()}
+                      placeholder="0.00"
+                    />
                   </label>
 
         </div>
@@ -1458,10 +1728,11 @@ export default function Home() {
                       <div className="w-full md:w-1/2 lg:w-1/3 space-y-3">
                         <div className="flex justify-between items-center">
                           <span className="text-sm font-medium ${getTemplateLabelColor()}">Subtotal</span>
-                          <div className="relative w-24">
+                          <div className="flex items-center">
+                            <span className="text-sm text-white/70 mr-1">{getCurrencySymbol()}</span>
                             <input 
                               name="subtotal"
-                              className="w-full rounded-md border-white/20 bg-white/10 shadow-sm focus:ring-0 input-focus-glow text-right pr-2 text-white placeholder-white/60" 
+                              className="w-20 rounded-md border-white/20 bg-white/10 shadow-sm focus:ring-0 input-focus-glow text-right pr-2 text-white placeholder-white/60" 
                               placeholder="0.00" 
                               type="number"
                               readOnly
@@ -1469,6 +1740,19 @@ export default function Home() {
                             />
                           </div>
                         </div>
+                        
+                        {(discountRate > 0 || discountAmount > 0) && (
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-medium ${getTemplateLabelColor()}">Discount</span>
+                            <div className="flex items-center">
+                              <span className="text-sm text-white/70 mr-1">{getCurrencySymbol()}</span>
+                              <span className="text-sm text-white">
+                                {discountAmount > 0 ? discountAmount.toFixed(2) : (calculateSubtotal() * discountRate / 100).toFixed(2)}
+                              </span>
+                            </div>
+                          </div>
+                        )}
+                        
                         <div className="flex justify-between items-center">
                           <span className="text-sm font-medium ${getTemplateLabelColor()}">Tax (%)</span>
                           <div className="relative w-24">
@@ -1487,10 +1771,14 @@ export default function Home() {
                             </datalist>
                           </div>
                         </div>
+                        
                         <div className="border-t border-white/30 my-2"></div>
                         <div className="flex justify-between items-center">
                           <span className="text-lg font-bold text-white">Total</span>
-                          <span className="text-lg font-bold text-white" data-total-display>${currentTotal}</span>
+                          <div className="flex items-center">
+                            <span className="text-lg font-bold text-white mr-1">{getCurrencySymbol()}</span>
+                            <span className="text-lg font-bold text-white" data-total-display>{currentTotal}</span>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -1505,6 +1793,19 @@ export default function Home() {
                 <label className="block">
                   <span className="text-sm font-medium ${getTemplateLabelColor()}">Additional Notes</span>
                   <textarea name="additionalNotes" className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 input-focus-glow ${getTemplateInputClasses()} px-3 py-2 box-border" placeholder="Thank you for your business." rows={3}></textarea>
+                </label>
+              </section>
+
+              {/* Terms & Conditions Section */}
+              <section>
+                <label className="block">
+                  <span className="text-sm font-medium ${getTemplateLabelColor()}">Terms & Conditions</span>
+                  <textarea 
+                    name="termsAndConditions" 
+                    className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 input-focus-glow ${getTemplateInputClasses()} px-3 py-2 box-border" 
+                    placeholder="Payment is due within the specified terms. Late payments may incur additional fees. All work is subject to our standard terms and conditions." 
+                    rows={3}
+                  ></textarea>
                 </label>
               </section>
 

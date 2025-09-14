@@ -340,7 +340,169 @@ export default function Templates() {
               </div>
             </div>
 
-            <div className="glass-effect rounded-2xl shadow-sm border border-white/20 p-6 border-dashed border-2 border-white/30 animate-enter hover-tilt" style={{animationDelay: '1300ms'}}>
+            {/* New Professional Templates */}
+            <div className="glass-effect rounded-2xl shadow-sm border border-white/20 p-6 animate-enter hover-tilt" style={{animationDelay: '1300ms'}}>
+              <div className="w-full h-32 bg-gradient-to-br from-slate-900/30 to-gray-900/30 rounded-lg flex items-center justify-center mb-4">
+                <span className="material-symbols-outlined text-slate-300 text-4xl">business</span>
+              </div>
+              <h3 className="text-lg font-semibold text-white mb-2">Business Professional</h3>
+              <p className="text-sm text-white/70 mb-4">Corporate branding space with logo and color scheme.</p>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-white/60">Available</span>
+                <button 
+                  className="px-4 py-2 bg-[var(--primary-color)] text-white text-sm font-medium rounded-lg hover:bg-blue-600 transition-colors"
+                  onClick={() => {
+                    if (typeof window !== 'undefined') {
+                      localStorage.setItem('selectedTemplate', 'business-professional');
+                      setSelectedTemplate('business-professional');
+                      window.location.href = '/';
+                    }
+                  }}
+                >
+                  Use Template
+                </button>
+              </div>
+            </div>
+
+            <div className="glass-effect rounded-2xl shadow-sm border border-white/20 p-6 animate-enter hover-tilt" style={{animationDelay: '1400ms'}}>
+              <div className="w-full h-32 bg-gradient-to-br from-indigo-900/30 to-purple-900/30 rounded-lg flex items-center justify-center mb-4">
+                <span className="material-symbols-outlined text-indigo-300 text-4xl">palette</span>
+              </div>
+              <h3 className="text-lg font-semibold text-white mb-2">Freelancer Creative</h3>
+              <p className="text-sm text-white/70 mb-4">Includes project name, hourly rate, and portfolio link.</p>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-white/60">Available</span>
+                <button 
+                  className="px-4 py-2 bg-[var(--primary-color)] text-white text-sm font-medium rounded-lg hover:bg-blue-600 transition-colors"
+                  onClick={() => {
+                    if (typeof window !== 'undefined') {
+                      localStorage.setItem('selectedTemplate', 'freelancer-creative');
+                      setSelectedTemplate('freelancer-creative');
+                      window.location.href = '/';
+                    }
+                  }}
+                >
+                  Use Template
+                </button>
+              </div>
+            </div>
+
+            <div className="glass-effect rounded-2xl shadow-sm border border-white/20 p-6 animate-enter hover-tilt" style={{animationDelay: '1500ms'}}>
+              <div className="w-full h-32 bg-gradient-to-br from-pink-500/20 to-purple-500/20 rounded-lg flex items-center justify-center mb-4">
+                <span className="material-symbols-outlined text-pink-300 text-4xl">gradient</span>
+              </div>
+              <h3 className="text-lg font-semibold text-white mb-2">Modern Gradient</h3>
+              <p className="text-sm text-white/70 mb-4">Trendy design with pastels and gradients for creatives.</p>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-white/60">Available</span>
+                <button 
+                  className="px-4 py-2 bg-[var(--primary-color)] text-white text-sm font-medium rounded-lg hover:bg-blue-600 transition-colors"
+                  onClick={() => {
+                    if (typeof window !== 'undefined') {
+                      localStorage.setItem('selectedTemplate', 'modern-gradient');
+                      setSelectedTemplate('modern-gradient');
+                      window.location.href = '/';
+                    }
+                  }}
+                >
+                  Use Template
+                </button>
+              </div>
+            </div>
+
+            <div className="glass-effect rounded-2xl shadow-sm border border-white/20 p-6 animate-enter hover-tilt" style={{animationDelay: '1600ms'}}>
+              <div className="w-full h-32 bg-gradient-to-br from-emerald-900/30 to-teal-900/30 rounded-lg flex items-center justify-center mb-4">
+                <span className="material-symbols-outlined text-emerald-300 text-4xl">inventory</span>
+              </div>
+              <h3 className="text-lg font-semibold text-white mb-2">Product Invoice</h3>
+              <p className="text-sm text-white/70 mb-4">Table optimized for quantity, SKU, and shipping address.</p>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-white/60">Available</span>
+                <button 
+                  className="px-4 py-2 bg-[var(--primary-color)] text-white text-sm font-medium rounded-lg hover:bg-blue-600 transition-colors"
+                  onClick={() => {
+                    if (typeof window !== 'undefined') {
+                      localStorage.setItem('selectedTemplate', 'product-invoice');
+                      setSelectedTemplate('product-invoice');
+                      window.location.href = '/';
+                    }
+                  }}
+                >
+                  Use Template
+                </button>
+              </div>
+            </div>
+
+            <div className="glass-effect rounded-2xl shadow-sm border border-white/20 p-6 animate-enter hover-tilt" style={{animationDelay: '1700ms'}}>
+              <div className="w-full h-32 bg-gradient-to-br from-blue-900/30 to-cyan-900/30 rounded-lg flex items-center justify-center mb-4">
+                <span className="material-symbols-outlined text-blue-300 text-4xl">public</span>
+              </div>
+              <h3 className="text-lg font-semibold text-white mb-2">International Invoice</h3>
+              <p className="text-sm text-white/70 mb-4">Supports multiple currencies, VAT/GST fields, and IBAN/SWIFT.</p>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-white/60">Available</span>
+                <button 
+                  className="px-4 py-2 bg-[var(--primary-color)] text-white text-sm font-medium rounded-lg hover:bg-blue-600 transition-colors"
+                  onClick={() => {
+                    if (typeof window !== 'undefined') {
+                      localStorage.setItem('selectedTemplate', 'international-invoice');
+                      setSelectedTemplate('international-invoice');
+                      window.location.href = '/';
+                    }
+                  }}
+                >
+                  Use Template
+                </button>
+              </div>
+            </div>
+
+            <div className="glass-effect rounded-2xl shadow-sm border border-white/20 p-6 animate-enter hover-tilt" style={{animationDelay: '1800ms'}}>
+              <div className="w-full h-32 bg-gradient-to-br from-green-900/30 to-emerald-900/30 rounded-lg flex items-center justify-center mb-4">
+                <span className="material-symbols-outlined text-green-300 text-4xl">receipt</span>
+              </div>
+              <h3 className="text-lg font-semibold text-white mb-2">Receipt / Paid Invoice</h3>
+              <p className="text-sm text-white/70 mb-4">Slim format confirming payment received.</p>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-white/60">Available</span>
+                <button 
+                  className="px-4 py-2 bg-[var(--primary-color)] text-white text-sm font-medium rounded-lg hover:bg-blue-600 transition-colors"
+                  onClick={() => {
+                    if (typeof window !== 'undefined') {
+                      localStorage.setItem('selectedTemplate', 'receipt-paid');
+                      setSelectedTemplate('receipt-paid');
+                      window.location.href = '/';
+                    }
+                  }}
+                >
+                  Use Template
+                </button>
+              </div>
+            </div>
+
+            <div className="glass-effect rounded-2xl shadow-sm border border-white/20 p-6 animate-enter hover-tilt" style={{animationDelay: '1900ms'}}>
+              <div className="w-full h-32 bg-gradient-to-br from-violet-900/30 to-purple-900/30 rounded-lg flex items-center justify-center mb-4">
+                <span className="material-symbols-outlined text-violet-300 text-4xl">repeat</span>
+              </div>
+              <h3 className="text-lg font-semibold text-white mb-2">Subscription Invoice</h3>
+              <p className="text-sm text-white/70 mb-4">Recurring billing style layout for monthly services.</p>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-white/60">Available</span>
+                <button 
+                  className="px-4 py-2 bg-[var(--primary-color)] text-white text-sm font-medium rounded-lg hover:bg-blue-600 transition-colors"
+                  onClick={() => {
+                    if (typeof window !== 'undefined') {
+                      localStorage.setItem('selectedTemplate', 'subscription-invoice');
+                      setSelectedTemplate('subscription-invoice');
+                      window.location.href = '/';
+                    }
+                  }}
+                >
+                  Use Template
+                </button>
+              </div>
+            </div>
+
+            <div className="glass-effect rounded-2xl shadow-sm border border-white/20 p-6 border-dashed border-2 border-white/30 animate-enter hover-tilt" style={{animationDelay: '2000ms'}}>
               <div className="w-full h-32 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-lg flex items-center justify-center mb-4">
                 <span className="material-symbols-outlined text-purple-300 text-4xl">palette</span>
               </div>
