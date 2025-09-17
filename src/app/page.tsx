@@ -13,39 +13,73 @@ import FloatingCalculator from '@/components/FloatingCalculator';
 import { generateInvoicePDF, InvoiceData } from '@/utils/pdfGenerator';
 import { createOneTimePayment, createSubscription, PRICING_PLANS } from '@/utils/paymentService';
 import { useAuth } from '@/contexts/AuthContext';
-import dynamic from 'next/dynamic';
-
-const AuthModal = dynamic(() => import('@/components/AuthModal').then(mod => ({ default: mod.AuthModal })), {
-  ssr: false,
-  loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
-  </div>
-});
+import { AuthModal } from '@/components/AuthModal';
+import { PaymentGateModal } from '@/components/PaymentGateModal';
+import { canDownloadPDF, incrementInvoiceCount, markInvoiceAsPaid, markSubscriptionActive } from '@/utils/paymentGate';
 import { InvoiceService } from '@/utils/invoiceService';
 import { showSuccess, showError, showInfo, showLoading, hideNotification } from '@/utils/notifications';
 import NavHeader from '@/components/NavHeader';
+import LivePreviewWithSettings from '@/components/LivePreviewWithSettings';
+import { useUnifiedInvoiceState } from '@/hooks/useUnifiedInvoiceState';
 
 export default function Home() {
-  console.log('🚨 EMERGENCY DEPLOY - VERSION 16.0 - FORCE CACHE CLEAR: ' + Date.now() + ' - NEW TEMPLATES & CURRENCY SUPPORT ADDED');
-  const [invoiceType, setInvoiceType] = useState('product_sales');
-  const [logo, setLogo] = useState<string | null>(null);
-  const [isFormValid, setIsFormValid] = useState(false);
+  // Unified state management
+  const {
+    selectedTemplate,
+    currentTemplateState,
+    currentInvoiceData,
+    isFormValid,
+    hasUnsavedChanges,
+    switchTemplate,
+    updateTemplateState,
+    toggleElement,
+    updateCustomField,
+    addCustomField,
+    removeCustomField,
+    updateInvoiceItem,
+    addInvoiceItem,
+    removeInvoiceItem,
+    calculateTotals,
+    resetTemplate,
+    saveChanges,
+  } = useUnifiedInvoiceState('standard');
+
+  // UI state (not related to invoice data)
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const [isGuestMode, setIsGuestMode] = useState(false);
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
-  const [showTotals, setShowTotals] = useState(true);
   const [showResetModal, setShowResetModal] = useState(false);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [showCustomizationModal, setShowCustomizationModal] = useState(false);
+  const [pricingMode, setPricingMode] = useState<'per-invoice' | 'subscription'>('subscription');
+  
+  // Payment gate state
+  const [showPaymentGate, setShowPaymentGate] = useState(false);
+  const [paymentGateStatus, setPaymentGateStatus] = useState({
+    isGuest: true,
+    remainingFreeInvoices: 1,
+  });
+  // showCustomBuilder removed - now using unified TemplateManager
+  
+  // Download limitations
+  const [guestInvoiceCount, setGuestInvoiceCount] = useState(0);
+  const [showGuestLimitModal, setShowGuestLimitModal] = useState(false);
+  const GUEST_INVOICE_LIMIT = 1; // Only 1 free download for guests
+  const REGISTERED_INVOICE_LIMIT = 2; // Exactly 2 free downloads for registered users
+  
+  // Legacy state variables (temporary - will be removed after full migration)
+  const [logo, setLogo] = useState<string | null>(null);
   const [invoiceNumber, setInvoiceNumber] = useState('');
   const [currentTotal, setCurrentTotal] = useState('0.00');
-  const [pricingMode, setPricingMode] = useState<'per-invoice' | 'subscription'>('subscription');
   const [currency, setCurrency] = useState('USD');
   const [discountRate, setDiscountRate] = useState(0);
   const [discountAmount, setDiscountAmount] = useState(0);
-  const [selectedTemplate, setSelectedTemplate] = useState('standard');
-  const [showCustomBuilder, setShowCustomBuilder] = useState(false);
+  const [showTotals, setShowTotals] = useState(true);
+  const [lineItems, setLineItems] = useState([{ id: 1, description: '', quantity: 1, rate: 0, amount: 0 }]);
+  const [invoiceType, setInvoiceType] = useState('product_sales');
+  
+  // Legacy custom template state (temporary)
   const [customTemplate, setCustomTemplate] = useState({
     name: 'My Custom Template',
     primaryColor: '#7C3AED',
@@ -53,70 +87,126 @@ export default function Home() {
     accentColor: '#A78BFA',
     backgroundColor: '#ffffff',
     textColor: '#1a1a2e',
-    fontFamily: 'Inter',
-    fontSize: '14px',
+    borderStyle: 'solid',
+    cornerRadius: 'medium',
+    fontFamily: 'Helvetica',
+    fontSize: '12px',
     fontWeight: '400',
+    headerStyle: 'modern',
     layout: 'standard',
-    headerStyle: 'full-width',
-    logoPosition: 'left',
+    tableStyle: 'bordered',
+    spacing: 'comfortable',
     showLogo: true,
+    logoPosition: 'left',
+    showCompanyInfo: true,
+    showClientInfo: true,
+    showInvoiceDetails: true,
+    showLineItems: true,
+    showTotals: true,
+    showPaymentTerms: true,
+    showAdditionalNotes: true,
+    showTermsAndConditions: true,
     showWatermark: false,
-    showSignature: true,
-    showTerms: true,
-    spacing: 'normal',
-    borderStyle: 'none',
-    sectionOrder: ['header', 'company', 'client', 'items', 'totals', 'notes', 'footer'],
-    // Additional customization options
-    headerHeight: 'medium',
-    footerHeight: 'medium',
-    showPageNumbers: true,
+    showSignature: false,
+    showTerms: false,
+    sectionOrder: ['header', 'items', 'totals', 'footer'],
+    headerHeight: 'auto',
+    footerHeight: 'auto',
+    showPageNumbers: false,
     showInvoiceDate: true,
     showDueDate: true,
     showInvoiceNumber: true,
     showClientAddress: true,
     showCompanyAddress: true,
-    showTaxBreakdown: true,
-    showDiscounts: true,
-    showPaymentInfo: true,
-    showNotes: true,
-    showThankYouMessage: true,
-    tableStyle: 'bordered',
+    showTaxBreakdown: false,
+    showDiscounts: false,
+    showPaymentInfo: false,
+    showNotes: false,
+    showThankYouMessage: false,
     headerBackground: 'transparent',
     footerBackground: 'transparent',
     accentStyle: 'subtle',
     shadowStyle: 'none',
-    cornerRadius: 'medium'
+    showFooter: true
   });
   
-  // Usage tracking state
-  const [lineItems, setLineItems] = useState([{ id: 1, description: '', quantity: 1, rate: 0, amount: 0 }]);
+  // Legacy functions (temporary)
+  const generateInvoiceNumber = useCallback(async () => {
+    return `INV-${Date.now()}`;
+  }, []);
+  
+  const addLineItem = useCallback(() => {
+    const newId = Math.max(...lineItems.map(item => item.id), 0) + 1;
+    setLineItems([...lineItems, { id: newId, description: '', quantity: 1, rate: 0, amount: 0 }]);
+  }, [lineItems]);
+  
+  // Refs for form handling
   const logoInputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   
 
   // No redirect - let authenticated users stay on invoice page
 
-  // Handle payment success/cancel messages
+  // Handle payment success/cancel messages and return to original location
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const urlParams = new URLSearchParams(window.location.search);
       const paymentStatus = urlParams.get('payment');
       const subscriptionStatus = urlParams.get('subscription');
+      const returnUrl = urlParams.get('return');
       
       if (paymentStatus === 'success') {
         showSuccess('Payment successful! Your invoice is ready for download.');
+        
+        // Mark payment as successful
+        markInvoiceAsPaid();
+        
+        // Return to original location if available
+        if (returnUrl) {
+          setTimeout(() => {
+            window.location.href = decodeURIComponent(returnUrl);
+          }, 2000);
+        }
+        
         // Clean up URL
         window.history.replaceState({}, '', window.location.pathname);
       } else if (paymentStatus === 'cancelled') {
         showError('Payment was cancelled. You can try again anytime.');
+        
+        // Return to original location if available
+        if (returnUrl) {
+          setTimeout(() => {
+            window.location.href = decodeURIComponent(returnUrl);
+          }, 2000);
+        }
+        
         // Clean up URL
         window.history.replaceState({}, '', window.location.pathname);
       } else if (subscriptionStatus === 'success') {
         showSuccess('Subscription activated! You now have unlimited access.');
+        
+        // Mark subscription as active
+        markSubscriptionActive();
+        
+        // Return to original location if available
+        if (returnUrl) {
+          setTimeout(() => {
+            window.location.href = decodeURIComponent(returnUrl);
+          }, 2000);
+        }
+        
         // Clean up URL
         window.history.replaceState({}, '', window.location.pathname);
       } else if (subscriptionStatus === 'cancelled') {
         showError('Subscription was cancelled. You can try again anytime.');
+        
+        // Return to original location if available
+        if (returnUrl) {
+          setTimeout(() => {
+            window.location.href = decodeURIComponent(returnUrl);
+          }, 2000);
+        }
+        
         // Clean up URL
         window.history.replaceState({}, '', window.location.pathname);
       }
@@ -126,13 +216,30 @@ export default function Home() {
   // Load selected template on component mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      // Load guest invoice count
+      const savedGuestCount = localStorage.getItem('guestInvoiceCount');
+      if (savedGuestCount) {
+        setGuestInvoiceCount(parseInt(savedGuestCount) || 0);
+      }
+
+      // Listen for guest mode event from auth modal
+      const handleGuestMode = () => {
+        setIsGuestMode(true);
+      };
+      
+      window.addEventListener('enableGuestMode', handleGuestMode);
+      
+      return () => {
+        window.removeEventListener('enableGuestMode', handleGuestMode);
+      };
+      
       // Load custom template if it exists
       const savedCustomTemplate = localStorage.getItem('customTemplate');
       if (savedCustomTemplate) {
         try {
-          setCustomTemplate(JSON.parse(savedCustomTemplate));
+          setCustomTemplate(JSON.parse(savedCustomTemplate as string));
           // If custom template exists, set selected template to custom
-          setSelectedTemplate('custom');
+          switchTemplate('custom');
         } catch (error) {
           console.error('Failed to parse custom template:', error);
         }
@@ -140,7 +247,7 @@ export default function Home() {
         // Only load saved template if no custom template exists
         const savedTemplate = localStorage.getItem('selectedTemplate');
         if (savedTemplate) {
-          setSelectedTemplate(savedTemplate);
+          switchTemplate(savedTemplate as string);
         }
       }
       
@@ -377,6 +484,11 @@ export default function Home() {
   // Real Stripe checkout handler
   const handleStripeCheckout = async (plan: string) => {
     try {
+      // Check guest limit before processing payment
+      if (!checkGuestLimit()) {
+        return;
+      }
+      
       // Show loading notification
       showInfo(`Redirecting to ${plan} checkout...`);
       
@@ -440,15 +552,15 @@ export default function Home() {
 
   const handleReset = () => {
     // Reset all state variables
-    setIsFormValid(false);
+    // setIsFormValid(false); // Not available in hook
     setShowTotals(true);
     setShowResetModal(false);
-    setHasUnsavedChanges(false);
+    // setHasUnsavedChanges(false); // Not available in hook
     setLogo(null);
     setInvoiceNumber('');
     setCurrentTotal('0.00');
-    setSelectedTemplate('standard');
-    setShowCustomBuilder(false);
+    switchTemplate('standard');
+    // setShowCustomBuilder removed - now using unified TemplateManager
     setCustomTemplate({
       name: 'My Custom Template',
       primaryColor: '#7C3AED',
@@ -463,6 +575,14 @@ export default function Home() {
       headerStyle: 'full-width',
       logoPosition: 'left',
       showLogo: true,
+      showCompanyInfo: true,
+      showClientInfo: true,
+      showInvoiceDetails: true,
+      showLineItems: true,
+      showTotals: true,
+      showPaymentTerms: true,
+      showAdditionalNotes: true,
+      showTermsAndConditions: true,
       showWatermark: false,
       showSignature: true,
       showTerms: true,
@@ -487,7 +607,8 @@ export default function Home() {
       footerBackground: 'transparent',
       accentStyle: 'subtle',
       shadowStyle: 'none',
-      cornerRadius: 'medium'
+      cornerRadius: 'medium',
+      showFooter: true
     });
     setLineItems([{ id: 1, description: '', quantity: 1, rate: 0, amount: 0 }]);
     
@@ -508,13 +629,117 @@ export default function Home() {
     }
   };
 
+  // Handle PDF generation with payment gating
+  const handleGeneratePDF = async () => {
+    const paymentCheck = canDownloadPDF(user);
+    
+    if (!paymentCheck.canDownload) {
+      // Show payment gate modal
+      setPaymentGateStatus({
+        isGuest: !user,
+        remainingFreeInvoices: paymentCheck.requiresPayment ? 0 : 1,
+      });
+      setShowPaymentGate(true);
+      return;
+    }
+
+    // User can download - proceed with PDF generation
+    try {
+      // Generate PDF
+      generateInvoicePDF(currentInvoiceData);
+      incrementInvoiceCount(!user);
+      
+      // Save invoice to database if user is registered
+      if (user) {
+        try {
+          await InvoiceService.saveInvoice({
+            invoice_number: currentInvoiceData.invoiceNumber || `INV-${Date.now()}`,
+            company_name: currentInvoiceData.companyName || '',
+            company_address: currentInvoiceData.companyAddress || '',
+            company_contact: currentInvoiceData.companyContact || '',
+            client_name: currentInvoiceData.clientName || '',
+            client_address: currentInvoiceData.clientAddress || '',
+            client_contact: currentInvoiceData.clientContact || '',
+            date: currentInvoiceData.date || new Date().toISOString().split('T')[0],
+            due_date: currentInvoiceData.dueDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            payment_terms: currentInvoiceData.paymentTerms || 'Net 30',
+            items: currentInvoiceData.items || [],
+            subtotal: currentInvoiceData.subtotal || 0,
+            tax_rate: currentInvoiceData.taxRate || 0,
+            tax_amount: currentInvoiceData.taxAmount || 0,
+            total: currentInvoiceData.total || 0,
+            additional_notes: currentInvoiceData.additionalNotes || '',
+            template: selectedTemplate || 'standard',
+            status: 'sent' // Mark as sent when PDF is generated
+          });
+          
+          showSuccess('Invoice generated and saved successfully!');
+        } catch (saveError) {
+          console.error('Failed to save invoice:', saveError);
+          showSuccess('Invoice generated successfully! (Note: Could not save to database)');
+        }
+      } else {
+        showSuccess('Invoice generated successfully!');
+      }
+    } catch (error) {
+      console.error('Error generating invoice:', error);
+      showError('Failed to generate invoice. Please try again.');
+    }
+  };
+
+  // Handle payment success
+  const handlePaymentSuccess = async () => {
+    markInvoiceAsPaid();
+    
+    try {
+      // Generate PDF
+      generateInvoicePDF(currentInvoiceData);
+      
+      // Save invoice to database if user is registered
+      if (user) {
+        try {
+          await InvoiceService.saveInvoice({
+            invoice_number: currentInvoiceData.invoiceNumber || `INV-${Date.now()}`,
+            company_name: currentInvoiceData.companyName || '',
+            company_address: currentInvoiceData.companyAddress || '',
+            company_contact: currentInvoiceData.companyContact || '',
+            client_name: currentInvoiceData.clientName || '',
+            client_address: currentInvoiceData.clientAddress || '',
+            client_contact: currentInvoiceData.clientContact || '',
+            date: currentInvoiceData.date || new Date().toISOString().split('T')[0],
+            due_date: currentInvoiceData.dueDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            payment_terms: currentInvoiceData.paymentTerms || 'Net 30',
+            items: currentInvoiceData.items || [],
+            subtotal: currentInvoiceData.subtotal || 0,
+            tax_rate: currentInvoiceData.taxRate || 0,
+            tax_amount: currentInvoiceData.taxAmount || 0,
+            total: currentInvoiceData.total || 0,
+            additional_notes: currentInvoiceData.additionalNotes || '',
+            template: selectedTemplate || 'standard',
+            status: 'paid' // Mark as paid since payment was successful
+          });
+          
+          showSuccess('Payment successful! Invoice generated and saved.');
+        } catch (saveError) {
+          console.error('Failed to save invoice:', saveError);
+          showSuccess('Payment successful! Invoice generated. (Note: Could not save to database)');
+        }
+      } else {
+        showSuccess('Payment successful! Invoice generated.');
+      }
+    } catch (error) {
+      console.error('Error generating invoice after payment:', error);
+      showError('Payment successful, but failed to generate invoice. Please try again.');
+    }
+  };
+
   const handleSaveDraft = useCallback(async () => {
     if (typeof window === 'undefined' || !user) return;
     
     try {
       const formData = new FormData(document.querySelector('form') as HTMLFormElement);
       await InvoiceService.saveDraft(formData);
-      setHasUnsavedChanges(false);
+      // setHasUnsavedChanges(false); // Not available in hook
       // Silent save - no popup notification
     } catch (error) {
       console.error('Failed to save draft:', error);
@@ -523,7 +748,7 @@ export default function Home() {
   }, [user]);
 
   const handleFormChange = useCallback(() => {
-    setHasUnsavedChanges(true);
+    // setHasUnsavedChanges(true); // Not available in hook
     // Update total in real-time
     setCurrentTotal(calculateTotal({}));
     
@@ -533,7 +758,7 @@ export default function Home() {
       const companyName = formData.get('companyName') as string;
       const clientName = formData.get('clientName') as string;
       const hasValidData = !!(companyName && clientName && companyName.trim() !== '' && clientName.trim() !== '');
-      setIsFormValid(hasValidData);
+      // setIsFormValid(hasValidData); // Not available in hook
     }
     
     // Auto-save only if there's meaningful content and after a longer delay
@@ -561,21 +786,42 @@ export default function Home() {
     return !value || value.trim() === '';
   };
 
-  // Smart Invoice Numbering
-  const generateInvoiceNumber = useCallback(async () => {
-    if (typeof window === 'undefined') return 'INV-001';
+  // Guest limitation functions
+  const incrementGuestInvoiceCount = () => {
+    const newCount = guestInvoiceCount + 1;
+    setGuestInvoiceCount(newCount);
+    localStorage.setItem('guestInvoiceCount', newCount.toString());
     
-    try {
-      if (user) {
-        return await InvoiceService.getNextInvoiceNumber();
-      }
-    } catch (error) {
-      console.error('Failed to get next invoice number from Supabase:', error);
+    // Check if guest has reached limit
+    if (newCount >= GUEST_INVOICE_LIMIT && !user) {
+      setShowGuestLimitModal(true);
     }
-    
-    // Default invoice number if no user or database fails
-    return 'INV-001';
-  }, [user]);
+  };
+
+  const checkDownloadLimit = () => {
+    if (!user && guestInvoiceCount >= GUEST_INVOICE_LIMIT) {
+      setShowGuestLimitModal(true);
+      return false;
+    }
+    if (user) {
+      const registeredCount = parseInt(localStorage.getItem('registeredInvoiceCount') || '0');
+      if (registeredCount >= REGISTERED_INVOICE_LIMIT) {
+        setShowPaymentGate(true);
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const checkGuestLimit = () => {
+    if (!user && guestInvoiceCount >= GUEST_INVOICE_LIMIT) {
+      setShowGuestLimitModal(true);
+      return false;
+    }
+    return true;
+  };
+
+  // Smart Invoice Numbering (duplicate removed)
 
   // Auto-generate invoice number on component mount
   React.useEffect(() => {
@@ -623,11 +869,7 @@ export default function Home() {
     return (quantity * rate).toFixed(2);
   }, []);
 
-  // Add new line item
-  const addLineItem = useCallback(() => {
-    const newId = Math.max(...lineItems.map(item => item.id), 0) + 1;
-    setLineItems([...lineItems, { id: newId, description: '', quantity: 1, rate: 0, amount: 0 }]);
-  }, [lineItems]);
+  // Add new line item (duplicate removed)
 
   // Remove line item
   const removeLineItem = useCallback((id: number) => {
@@ -742,78 +984,28 @@ export default function Home() {
         <main className="flex flex-1 justify-center pt-20 pb-12 px-4 sm:px-6 lg:px-8">
           <div className="w-full max-w-4xl space-y-8">
             <div className="text-center animate-enter" style={{animationDelay: '200ms'}}>
-              <h1 className="font-display text-5xl font-medium tracking-tight text-white sm:text-7xl/none">
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-red-200 via-red-300 to-yellow-200">Professional Invoice Generator</span>
-              </h1>
-              <p className="mt-8 max-w-2xl mx-auto text-lg/8 text-white/80">Create beautiful, professional invoices in seconds. Multiple templates, auto-calculation, and instant PDF generation.</p>
-              
-              {/* Mobile-Optimized CTA */}
-              <div className="mt-6 p-4 rounded-lg bg-gradient-to-r from-green-500/20 to-blue-500/20 border border-green-400/30 animate-enter" style={{animationDelay: '200ms'}}>
-                <p className="${getTemplateLabelColor()} text-sm font-medium text-center">
-                  📱 <strong>Mobile-Friendly:</strong> Create invoices on your phone, tablet, or desktop. Perfect for freelancers on the go!
-                </p>
-              </div>
-              
-              {/* Selected Template Display */}
-              <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full border border-white/20">
-                <span className="material-symbols-outlined text-white/70 text-sm">image</span>
-                <span className="text-white/80 text-sm">Using:</span>
-                <span className="text-white font-medium text-sm">
-                  {selectedTemplate === 'standard' && 'Standard Template'}
-                  {selectedTemplate === 'minimalist-dark' && 'Minimalist Dark Template'}
-                  {selectedTemplate === 'recurring-clients' && 'Recurring Clients Template'}
-                  {selectedTemplate === 'creative-agency' && 'Creative Agency Template'}
-                  {selectedTemplate === 'consulting' && 'Consulting Template'}
-                  {selectedTemplate === 'custom' && (customTemplate.name || 'Custom Template')}
-                  {selectedTemplate === 'modern-tech' && 'Modern Tech Template'}
-                  {selectedTemplate === 'elegant-luxury' && 'Elegant Luxury Template'}
-                  {selectedTemplate === 'healthcare' && 'Healthcare Template'}
-                  {selectedTemplate === 'legal' && 'Legal Template'}
-                  {selectedTemplate === 'restaurant' && 'Restaurant Template'}
-                  {selectedTemplate === 'business-professional' && 'Business Professional Template'}
-                  {selectedTemplate === 'freelancer-creative' && 'Freelancer Creative Template'}
-                  {selectedTemplate === 'modern-gradient' && 'Modern Gradient Template'}
-                  {selectedTemplate === 'product-invoice' && 'Product Invoice Template'}
-                  {selectedTemplate === 'international-invoice' && 'International Invoice Template'}
-                  {selectedTemplate === 'receipt-paid' && 'Receipt / Paid Template'}
-                  {selectedTemplate === 'subscription-invoice' && 'Subscription Invoice Template'}
+              <h1 className="font-display text-4xl font-bold tracking-tight text-white sm:text-6xl">
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 animate-gradient">
+                  Create Professional Invoices in Seconds
                 </span>
-                <div className="flex items-center gap-2">
-                  <select
-                    value={selectedTemplate}
-                    onChange={(e) => {
-                      setSelectedTemplate(e.target.value);
-                      localStorage.setItem('selectedTemplate', e.target.value);
-                    }}
-                    className="px-3 py-1 bg-white/10 border border-white/20 rounded text-white text-sm focus:border-white/40 focus:outline-none"
-                  >
-                    <option value="standard" className="bg-gray-800">Standard</option>
-                    <option value="minimalist-dark" className="bg-gray-800">Minimalist Dark</option>
-                    <option value="recurring-clients" className="bg-gray-800">Recurring Clients</option>
-                    <option value="creative-agency" className="bg-gray-800">Creative Agency</option>
-                    <option value="consulting" className="bg-gray-800">Consulting</option>
-                    <option value="modern-tech" className="bg-gray-800">Modern Tech</option>
-                    <option value="elegant-luxury" className="bg-gray-800">Elegant Luxury</option>
-                    <option value="healthcare" className="bg-gray-800">Healthcare</option>
-                    <option value="legal" className="bg-gray-800">Legal</option>
-                    <option value="restaurant" className="bg-gray-800">Restaurant</option>
-                    <option value="business-professional" className="bg-gray-800">Business Professional</option>
-                    <option value="freelancer-creative" className="bg-gray-800">Freelancer Creative</option>
-                    <option value="modern-gradient" className="bg-gray-800">Modern Gradient</option>
-                    <option value="product-invoice" className="bg-gray-800">Product Invoice</option>
-                    <option value="international-invoice" className="bg-gray-800">International Invoice</option>
-                    <option value="receipt-paid" className="bg-gray-800">Receipt / Paid</option>
-                    <option value="subscription-invoice" className="bg-gray-800">Subscription Invoice</option>
-                    <option value="custom" className="bg-gray-800">Custom</option>
-                  </select>
+              </h1>
+              <p className="mt-6 max-w-xl mx-auto text-lg text-white/80">
+                No signup required. Choose a template, customize, and download your PDF instantly.
+              </p>
+              
+              {/* Single Primary CTA */}
+              <div className="mt-8 animate-enter" style={{animationDelay: '300ms'}}>
                   <button
-                    onClick={() => setShowCustomBuilder(true)}
-                    className="text-purple-400 hover:text-purple-300 text-sm font-medium transition-colors"
+                  onClick={() => router.push('/templates')}
+                  className="px-8 py-4 bg-white text-gray-900 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-all duration-200 shadow-lg"
                   >
-                    Create Custom
+                  Start Creating Free Invoice
                   </button>
+                <p className="mt-3 text-white/60 text-sm">
+                  ✓ 20+ Professional Templates ✓ Instant PDF Download ✓ No Account Required
+                </p>
                 </div>
-              </div>
+              
             </div>
 
             <form ref={formRef} onChange={handleFormChange} className={`rounded-2xl shadow-lg p-6 space-y-8 animate-enter ${
@@ -827,16 +1019,23 @@ export default function Home() {
                     <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
                       <span className="text-white text-sm font-medium">G</span>
                     </div>
-                    <div>
+                    <div className="flex-1">
                       <h4 className="text-white font-medium">Guest Mode Active</h4>
-                      <p className="text-white/70 text-sm">Choose your plan • No account needed • Instant access</p>
+                      <p className="text-white/70 text-sm">
+                        Choose your plan • No account needed • Instant access
+                        {guestInvoiceCount > 0 && (
+                          <span className="ml-2 text-yellow-400">
+                            • {guestInvoiceCount}/{GUEST_INVOICE_LIMIT} invoices used
+                          </span>
+                        )}
+                      </p>
                     </div>
                     <button 
                       onClick={() => {
                         setAuthMode('signup');
                         setAuthModalOpen(true);
                       }}
-                      className="ml-auto px-3 py-1 bg-white/10 hover:bg-white/20 text-white text-sm rounded-lg border border-white/20 transition-colors"
+                      className="px-3 py-1 bg-white/10 hover:bg-white/20 text-white text-sm rounded-lg border border-white/20 transition-colors"
                     >
                       Create Account
                     </button>
@@ -844,127 +1043,6 @@ export default function Home() {
                 </div>
               )}
               
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                {/* Company Info Section */}
-                <section className="space-y-6">
-                  <div className="flex items-center justify-between">
-                    <h3 className={`text-lg font-semibold ${getTemplateTextColor()}`}>Your Company Info</h3>
-                  </div>
-                  <div className="flex items-center space-x-6">
-                    <div className="flex-shrink-0">
-                      {logo ? (
-                        <div className="relative group">
-                          <img src={logo} alt="Company Logo" className="h-20 w-20 rounded-full object-cover" loading="lazy"/>
-                          <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button 
-                              type="button"
-                              onClick={handleRemoveLogo} 
-                              className="text-white"
-                            >
-                              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
-                              </svg>
-                            </button>
-                          </div>
-                        </div>
-                      ) : (
-                        <label className="cursor-pointer" htmlFor="logo-upload">
-                          <div className="h-20 w-20 rounded-full bg-white/10 flex items-center justify-center border-2 border-dashed border-white/30 hover:border-[var(--primary-color)] transition-colors">
-                            <svg className="h-8 w-8 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M12 4v16m8-8H4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5"></path>
-                            </svg>
-                          </div>
-                        </label>
-                      )}
-                      <input 
-                        ref={logoInputRef}
-                        onChange={handleLogoChange}
-                        accept="image/*" 
-                        className="hidden" 
-                        id="logo-upload" 
-                        type="file"
-                      />
-                    </div>
-                    <div className="space-y-4 flex-1">
-                      <label className="block">
-                        <span className={`text-sm font-medium ${getTemplateLabelColor()}`}>Company Name</span>
-                        <input 
-                          name="companyName" 
-                          className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 ${getTemplateInputClasses()} ${getInputStyles()}`} 
-                          style={getCustomInputStyles()}
-                          placeholder="Company name" 
-                          type="text" 
-                          aria-label="Company Name" 
-                          required
-                        />
-                      </label>
-                      <label className="block">
-                        <span className="text-sm font-medium ${getTemplateLabelColor()}">Email/Phone</span>
-                        <input 
-                          name="companyContact" 
-                          className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 ${getTemplateInputClasses()} ${getInputStyles()}`} 
-                          style={getCustomInputStyles()}
-                          placeholder="Company email" 
-                          type="text" 
-                          aria-label="Company Contact" 
-                          required
-                        />
-                      </label>
-                    </div>
-                  </div>
-                  <label className="block">
-                    <span className="text-sm font-medium ${getTemplateLabelColor()}">Address</span>
-                    <textarea 
-                      name="companyAddress" 
-                      className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 ${getTemplateInputClasses()} ${getInputStyles()}`} 
-                      style={getCustomInputStyles()}
-                      placeholder="Company address" 
-                      rows={2} 
-                      aria-label="Company Address" 
-                      required
-                    ></textarea>
-                  </label>
-                </section>
-
-                {/* Client Info Section */}
-                <section className="space-y-6">
-                  <div className="flex items-center justify-between">
-                    <h3 className={`text-lg font-semibold ${getTemplateTextColor()}`}>Client Info</h3>
-                  </div>
-                  <div className="space-y-4">
-                    <label className="block">
-                      <span className="text-sm font-medium ${getTemplateLabelColor()}">Client Name</span>
-                      <input 
-                        name="clientName" 
-                        className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 ${getTemplateInputClasses()} ${getInputStyles()}`} 
-                        style={getCustomInputStyles()}
-                        placeholder="Client Name" aria-label="Client Name" required 
-                        type="text"
-                      />
-                    </label>
-                    <label className="block">
-                      <span className="text-sm font-medium ${getTemplateLabelColor()}">Address</span>
-                      <textarea 
-                        name="clientAddress" 
-                        className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 ${getTemplateInputClasses()} ${getInputStyles()}`} 
-                        style={getCustomInputStyles()}
-                        placeholder="Client Address" 
-                        rows={2}
-                      ></textarea>
-                    </label>
-                    <label className="block">
-                      <span className="text-sm font-medium ${getTemplateLabelColor()}">Email/Phone</span>
-                      <input 
-                        name="clientContact" 
-                        className={`mt-1 block w-full rounded-md shadow-sm focus:ring-0 ${getTemplateInputClasses()} ${getInputStyles()}`} 
-                        style={getCustomInputStyles()}
-                        placeholder="Client email" 
-                        type="text"
-                      />
-                    </label>
-                  </div>
-                </section>
-              </div>
 
               {/* Legal Template Specific Section */}
               {selectedTemplate === 'legal' && (
@@ -1194,7 +1272,221 @@ export default function Home() {
                 </section>
               )}
 
-              {/* Template-Specific Sections */}
+              {/* Template Showcase Section */}
+              <div className="space-y-6 animate-enter" style={{animationDelay: '400ms'}}>
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold text-white mb-3">Professional Templates</h2>
+                  <p className="text-white/70 text-base">Choose from 20+ industry-specific designs</p>
+                </div>
+                
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {/* Simplified Template Cards */}
+                  <div 
+                    onClick={() => router.push('/templates')}
+                    className="bg-white/5 rounded-lg p-4 border border-white/10 hover:bg-white/10 transition-all cursor-pointer"
+                  >
+                    <div className="w-full h-16 bg-white/10 rounded mb-3 flex items-center justify-center">
+                      <span className="material-symbols-outlined text-3xl text-white/80">business</span>
+                    </div>
+                    <h3 className="text-white font-medium text-sm">Business Professional</h3>
+                  </div>
+                  
+                  <div 
+                    onClick={() => router.push('/templates')}
+                    className="bg-white/5 rounded-lg p-4 border border-white/10 hover:bg-white/10 transition-all cursor-pointer"
+                  >
+                    <div className="w-full h-16 bg-white/10 rounded mb-3 flex items-center justify-center">
+                      <span className="material-symbols-outlined text-3xl text-white/80">gavel</span>
+                    </div>
+                    <h3 className="text-white font-medium text-sm">Legal Services</h3>
+                  </div>
+                  
+                  <div 
+                    onClick={() => router.push('/templates')}
+                    className="bg-white/5 rounded-lg p-4 border border-white/10 hover:bg-white/10 transition-all cursor-pointer"
+                  >
+                    <div className="w-full h-16 bg-white/10 rounded mb-3 flex items-center justify-center">
+                      <span className="material-symbols-outlined text-3xl text-white/80">palette</span>
+                    </div>
+                    <h3 className="text-white font-medium text-sm">Creative Agency</h3>
+                  </div>
+                  
+                  <div 
+                    onClick={() => router.push('/templates')}
+                    className="bg-white/5 rounded-lg p-4 border border-white/10 hover:bg-white/10 transition-all cursor-pointer"
+                  >
+                    <div className="w-full h-16 bg-white/10 rounded mb-3 flex items-center justify-center">
+                      <span className="material-symbols-outlined text-3xl text-white/80">restaurant</span>
+                    </div>
+                    <h3 className="text-white font-medium text-sm">Restaurant</h3>
+                  </div>
+                  
+                  <div 
+                    onClick={() => router.push('/templates')}
+                    className="bg-white/5 rounded-lg p-4 border border-white/10 hover:bg-white/10 transition-all cursor-pointer"
+                  >
+                    <div className="w-full h-16 bg-white/10 rounded mb-3 flex items-center justify-center">
+                      <span className="material-symbols-outlined text-3xl text-white/80">medical_services</span>
+                    </div>
+                    <h3 className="text-white font-medium text-sm">Healthcare</h3>
+                  </div>
+                  
+                  <div 
+                    onClick={() => router.push('/templates')}
+                    className="bg-white/5 rounded-lg p-4 border border-white/10 hover:bg-white/10 transition-all cursor-pointer"
+                  >
+                    <div className="w-full h-16 bg-white/10 rounded mb-3 flex items-center justify-center">
+                      <span className="text-white/80 font-medium text-sm">+ More</span>
+                    </div>
+                    <h3 className="text-white font-medium text-sm">15+ More</h3>
+                  </div>
+                </div>
+                
+                <div className="text-center">
+                  <button
+                    onClick={() => router.push('/templates')}
+                    className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg border border-white/20 transition-all text-sm"
+                  >
+                    View All Templates
+                  </button>
+                </div>
+              </div>
+
+              {/* Feature Highlights Section */}
+              <div className="space-y-6 animate-enter" style={{animationDelay: '500ms'}}>
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold text-white mb-3">Key Features</h2>
+                  <p className="text-white/70 text-base">Everything you need for professional invoicing</p>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                    <div className="flex items-start space-x-3">
+                      <div className="w-8 h-8 bg-white/10 rounded flex items-center justify-center flex-shrink-0 mt-1">
+                        <svg className="w-4 h-4 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className="text-white font-medium mb-1">20+ Professional Templates</h3>
+                        <p className="text-white/60 text-sm">Industry-specific designs for every business type</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                    <div className="flex items-start space-x-3">
+                      <div className="w-8 h-8 bg-white/10 rounded flex items-center justify-center flex-shrink-0 mt-1">
+                        <svg className="w-4 h-4 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className="text-white font-medium mb-1">Instant Payment Processing</h3>
+                        <p className="text-white/60 text-sm">Accept payments through secure Stripe integration</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                    <div className="flex items-start space-x-3">
+                      <div className="w-8 h-8 bg-white/10 rounded flex items-center justify-center flex-shrink-0 mt-1">
+                        <svg className="w-4 h-4 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className="text-white font-medium mb-1">Cross-Platform Compatibility</h3>
+                        <p className="text-white/60 text-sm">Create and manage invoices on any device</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                    <div className="flex items-start space-x-3">
+                      <div className="w-8 h-8 bg-white/10 rounded flex items-center justify-center flex-shrink-0 mt-1">
+                        <svg className="w-4 h-4 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className="text-white font-medium mb-1">Professional PDF Export</h3>
+                        <p className="text-white/60 text-sm">Download high-quality PDF invoices instantly</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* How It Works Section */}
+              <div className="space-y-6 animate-enter" style={{animationDelay: '600ms'}}>
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold text-white mb-3">Simple 3-Step Process</h2>
+                  <p className="text-white/70 text-base">Get started in minutes</p>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="text-center">
+                    <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-3 text-white text-lg font-bold">
+                      1
+                    </div>
+                    <h3 className="text-white font-medium mb-2">Choose Template</h3>
+                    <p className="text-white/60 text-sm mb-3">Select from 20+ professional designs</p>
+                    <button
+                      onClick={() => router.push('/templates')}
+                      className="px-3 py-1 bg-white/10 hover:bg-white/20 text-white rounded border border-white/20 transition-all text-xs"
+                    >
+                      Browse Templates
+                    </button>
+                  </div>
+                  
+                  <div className="text-center">
+                    <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-3 text-white text-lg font-bold">
+                      2
+                    </div>
+                    <h3 className="text-white font-medium mb-2">Customize Content</h3>
+                    <p className="text-white/60 text-sm mb-3">Add your information and branding</p>
+                    <button
+                      onClick={() => setIsGuestMode(true)}
+                      className="px-3 py-1 bg-white/10 hover:bg-white/20 text-white rounded border border-white/20 transition-all text-xs"
+                    >
+                      Start Editing
+                    </button>
+                  </div>
+                  
+                  <div className="text-center">
+                    <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-3 text-white text-lg font-bold">
+                      3
+                    </div>
+                    <h3 className="text-white font-medium mb-2">Export PDF</h3>
+                    <p className="text-white/60 text-sm mb-3">Download and send to clients</p>
+                    <button
+                      onClick={() => setIsGuestMode(true)}
+                      className="px-3 py-1 bg-white/10 hover:bg-white/20 text-white rounded border border-white/20 transition-all text-xs"
+                    >
+                      Generate PDF
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Live Preview Section */}
+              <div className="space-y-6 animate-enter" style={{animationDelay: '700ms'}}>
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold text-white mb-2">Live Preview</h2>
+                  <p className="text-white/80">Experience our template system - no registration required</p>
+                </div>
+              </div>
+
+              {/* Live Preview with Settings */}
+              <div className="bg-gray-900 rounded-lg p-4 h-[600px]">
+                <LivePreviewWithSettings 
+                  templateState={currentTemplateState}
+                  updateTemplateState={updateTemplateState}
+                />
+              </div>
+              
+              {/* Legacy Template Sections - Keep for fallback */}
               {getTemplateFeatures().showSubscriptionFields && (
                 <section className="space-y-6 p-6 bg-blue-900/20 rounded-lg border border-blue-500/20">
                   <h3 className="text-lg font-semibold text-blue-200">Recurring Client Features</h3>
@@ -1389,8 +1681,8 @@ export default function Home() {
                 </section>
               )}
 
-              {/* Invoice Details Section */}
-              <section className="space-y-6">
+              {/* Invoice Details Section - Hidden when using new template system */}
+              <section className="space-y-6" style={{ display: 'none' }}>
                 <h3 className="text-lg font-semibold text-white">Invoice Details</h3>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
                   <label className="block">
@@ -1510,8 +1802,8 @@ export default function Home() {
         </div>
               </section>
 
-              {/* Product Sales Section */}
-              {invoiceType === 'product_sales' && (
+              {/* Product Sales Section - Hidden */}
+              {false && invoiceType === 'product_sales' && (
                 <section className="space-y-4">
                   <h3 className="text-lg font-semibold text-white">Line Items</h3>
                   <div className="space-y-4">
@@ -1723,346 +2015,81 @@ export default function Home() {
                 </section>
               )}
 
-              {/* Totals Section */}
-              <section className="space-y-6 pt-4 border-t border-white/50">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-semibold text-white">Totals</h3>
-                  <label className="flex items-center space-x-2 cursor-pointer">
-                    <span className="text-sm font-medium ${getTemplateLabelColor()}">Show Details</span>
-                    <div onClick={() => setShowTotals(!showTotals)} className="relative">
-                      <input className="sr-only" type="checkbox" checked={showTotals} readOnly/>
-                      <div className="block bg-white/20 w-10 h-6 rounded-full"></div>
-                      <div className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${showTotals ? 'translate-x-full !bg-[var(--primary-color)]' : ''}`}></div>
-                    </div>
-                  </label>
-                </div>
-                {showTotals && (
-                  <div className="space-y-4">
-                    <div className="flex justify-end items-center">
-                      <div className="w-full md:w-1/2 lg:w-1/3 space-y-3">
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm font-medium ${getTemplateLabelColor()}">Subtotal</span>
-                          <div className="flex items-center">
-                            <span className="text-sm text-white/70 mr-1">{getCurrencySymbol()}</span>
-                            <input 
-                              name="subtotal"
-                              className="w-20 rounded-md border-white/20 bg-white/10 shadow-sm focus:ring-0 input-focus-glow text-right pr-2 text-white placeholder-white/60" 
-                              placeholder="0.00" 
-                              type="number"
-                              readOnly
-                              value={calculateSubtotal().toFixed(2)}
-                            />
-                          </div>
-                        </div>
-                        
-                        {(discountRate > 0 || discountAmount > 0) && (
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm font-medium ${getTemplateLabelColor()}">Discount</span>
-                            <div className="flex items-center">
-                              <span className="text-sm text-white/70 mr-1">{getCurrencySymbol()}</span>
-                              <span className="text-sm text-white">
-                                {discountAmount > 0 ? discountAmount.toFixed(2) : (calculateSubtotal() * discountRate / 100).toFixed(2)}
-                              </span>
-                            </div>
-                          </div>
-                        )}
-                        
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm font-medium ${getTemplateLabelColor()}">Tax (%)</span>
-                          <div className="relative w-24">
-                            <input 
-                              name="taxRate"
-                              className="w-full rounded-md border-white/20 bg-white/10 shadow-sm focus:ring-0 input-focus-glow text-right pr-2 text-white placeholder-white/60" 
-                              placeholder="Tax rate" 
-                              type="number"
-                              list="taxRates"
-                              onChange={handleFormChange}
-                            />
-                            <datalist id="taxRates">
-                              {getSuggestedTaxRates().map((rate) => (
-                                <option key={rate} value={rate} />
-                              ))}
-                            </datalist>
-                          </div>
-                        </div>
-                        
-                        <div className="border-t border-white/30 my-2"></div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-lg font-bold text-white">Total</span>
-                          <div className="flex items-center">
-                            <span className="text-lg font-bold text-white mr-1">{getCurrencySymbol()}</span>
-                            <span className="text-lg font-bold text-white" data-total-display>{currentTotal}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </section>
 
 
 
-              {/* Additional Notes Section */}
-              <section>
-                <label className="block">
-                  <span className="text-sm font-medium ${getTemplateLabelColor()}">Additional Notes</span>
-                  <textarea name="additionalNotes" className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 input-focus-glow ${getTemplateInputClasses()} px-3 py-2 box-border" placeholder="Thank you for your business." rows={3}></textarea>
-                </label>
-              </section>
 
-              {/* Terms & Conditions Section */}
-              <section>
-                <label className="block">
-                  <span className="text-sm font-medium ${getTemplateLabelColor()}">Terms & Conditions</span>
-                  <textarea 
-                    name="termsAndConditions" 
-                    className="mt-1 block w-full rounded-md shadow-sm focus:ring-0 input-focus-glow ${getTemplateInputClasses()} px-3 py-2 box-border" 
-                    placeholder="Payment is due within the specified terms. Late payments may incur additional fees. All work is subject to our standard terms and conditions." 
-                    rows={3}
-                  ></textarea>
-                </label>
-              </section>
-
-              {/* Action Buttons */}
-              <div className="flex flex-col items-center gap-4 pt-6 sm:flex-row sm:justify-center">
-                {/* Guest Mode: Payment Options */}
-                {isGuestMode && !user ? (
-                  <div className="flex flex-col gap-3 w-full">
-                    {/* One-time Payment */}
-                    <button 
-                      type="button"
-                      onClick={async () => {
-                        try {
-                          showLoading('Processing payment...');
-                          
-                          const success = await createOneTimePayment(
-                            PRICING_PLANS.premium.priceId, // £3.50 per invoice
-                            undefined
-                          );
-                          
-                          if (success) {
-                            hideNotification();
-                          } else {
-                            showError('Payment failed. Please try again.');
-                          }
-                        } catch (error) {
-                          console.error('Payment error:', error);
-                          showError('Payment processing failed. Please try again.');
-                        }
-                      }}
-                      className="w-full rounded-lg bg-gradient-to-r from-green-500 to-blue-500 px-6 py-3 text-sm font-bold text-white shadow-lg btn-hover-effect hover:from-green-600 hover:to-blue-600"
-                    >
-                      Pay Per Invoice (£3.50)
-                    </button>
-                    
-                    {/* Subscription Option */}
-                    <button 
-                      type="button"
-                      onClick={async () => {
-                        try {
-                          showLoading('Setting up subscription...');
-                          
-                          const success = await createSubscription({
-                            priceId: PRICING_PLANS.pro.priceId, // £29.99/month
-                            customerEmail: undefined,
-                            metadata: { plan: 'guest_pro' }
-                          });
-                          
-                          if (success) {
-                            hideNotification();
-                          } else {
-                            showError('Subscription setup failed. Please try again.');
-                          }
-                        } catch (error) {
-                          console.error('Subscription error:', error);
-                          showError('Subscription setup failed. Please try again.');
-                        }
-                      }}
-                      className="w-full rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-3 text-sm font-bold text-white shadow-lg btn-hover-effect hover:from-purple-600 hover:to-pink-600"
-                    >
-                      Unlimited Access (£12/month)
-                    </button>
-                  </div>
-                ) : (
-                  <>
-                    {/* Logged User: Free Invoice Generation */}
-                    <button 
-                      type="button"
-                      disabled={!isFormValid}
-                      onClick={async () => {
-                        try {
-                          // Logged user: Generate free invoice
-                          const formData = new FormData(document.querySelector('form') as HTMLFormElement);
-                          const invoiceData: Record<string, string> = {};
-                          
-                          for (const [key, value] of formData.entries()) {
-                            if (value && value.toString().trim() !== '') {
-                              invoiceData[key] = value.toString();
-                            }
-                          }
-                          
-                          const pdfData: InvoiceData = {
-                            companyName: invoiceData.companyName || 'StitchInvoice',
-                            companyAddress: invoiceData.companyAddress || 'Your Business Address',
-                            companyContact: invoiceData.companyContact || 'hello@stitchinvoice.com',
-                            logo: logo || undefined,
-                            clientName: invoiceData.clientName || 'Client Name',
-                            clientAddress: invoiceData.clientAddress || 'Client Address',
-                            clientContact: invoiceData.clientContact || 'client@email.com',
-                            invoiceNumber: invoiceData.invoiceNumber || 'INV-001',
-                            date: invoiceData.date || new Date().toISOString().split('T')[0],
-                            dueDate: invoiceData.dueDate || new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                            paymentTerms: invoiceData.paymentTerms || 'Net 15',
-                            items: [
-                              {
-                                description: invoiceData.itemDescription || invoiceData.serviceDescription || 'Service/Product',
-                                quantity: parseFloat(invoiceData.quantity || invoiceData.hours || '1'),
-                                rate: parseFloat(invoiceData.rate || invoiceData.hourlyRate || '0'),
-                                amount: parseFloat(invoiceData.quantity || '1') * parseFloat(invoiceData.rate || '0') || parseFloat(invoiceData.hours || '1') * parseFloat(invoiceData.hourlyRate || '0')
-                              }
-                            ],
-                            subtotal: parseFloat(invoiceData.subtotal || '0'),
-                            taxRate: parseFloat(invoiceData.taxRate || '0'),
-                            taxAmount: parseFloat(invoiceData.taxAmount || '0'),
-                            total: parseFloat(invoiceData.total || '0'),
-                            additionalNotes: invoiceData.additionalNotes || '',
-                            template: selectedTemplate,
-                            customTemplate: selectedTemplate === 'custom' ? customTemplate : undefined
-                          };
-                          
-                          generateInvoicePDF(pdfData);
-                          
-                          setIsFormValid(true);
-                          showSuccess('Free invoice generated!');
-                          
-                          // Show sharing prompt for viral growth
-                          setTimeout(() => {
-                            showInfo('Love this template? Share StitchInvoice with other freelancers!');
-                          }, 2000);
-                        } catch (error) {
-                          console.error('Error generating invoice:', error);
-                          showError('Failed to generate invoice. Please try again.');
-                        }
-                      }} 
-                      className={`w-full rounded-lg px-6 py-3 text-sm font-bold text-white shadow-lg sm:w-auto btn-hover-effect transition-colors ${
-                        isFormValid 
-                          ? 'bg-[var(--primary-color)] hover:bg-blue-600' 
-                          : 'bg-gray-400 cursor-not-allowed'
-                      }`}
-                    >
-                      Generate Free Invoice
-                    </button>
-                    
-                    {/* Logged User: Premium Download */}
-                    <button 
-                      type="button"
-                      onClick={async () => {
-                        try {
-                          showLoading('Processing premium payment...');
-                          
-                          // Use your existing Stripe integration for premium downloads
-                          const success = await createOneTimePayment(
-                            PRICING_PLANS.basic.priceId, // £1.50 per invoice (premium for logged users)
-                            user?.email || undefined
-                          );
-                          
-                          if (success) {
-                            // Payment will redirect to Stripe checkout
-                            hideNotification();
-                          } else {
-                            showError('Payment failed. Please try again.');
-                          }
-                        } catch (error) {
-                          console.error('Payment error:', error);
-                          showError('Payment processing failed. Please try again.');
-                        }
-                      }}
-                      className={`w-full rounded-lg px-6 py-3 text-sm font-bold shadow-lg sm:w-auto btn-hover-effect ${isFormValid ? 'btn-glass-enabled text-white' : 'btn-disabled'}`}
-                      disabled={!isFormValid}
-                    >
-                      Premium Download (£1.50)
-                    </button>
-                  </>
-                )}
-                <button 
-                  type="button"
-                  onClick={() => setShowResetModal(true)} 
-                  className="w-full rounded-lg bg-transparent px-6 py-3 text-sm font-bold text-white/70 sm:w-auto btn-hover-effect hover:bg-white/10 border border-white/20"
-                >
-                  Reset Form
-                </button>
-              </div>
             </form>
-        </div>
+                  </div>
       </main>
 
 
-        {/* Pricing Section */}
-        <section className="mb-16">
-          <div className="max-w-7xl mx-auto px-0 sm:px-1 lg:px-2">
-            <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold text-white mb-4">Choose Your Plan</h2>
-              <p className="text-xl text-white/80 max-w-2xl mx-auto">
-                Pay per invoice or subscribe for unlimited access. No hidden fees.
-              </p>
-            </div>
-            
-            {/* Pricing Toggle */}
-            <div className="flex justify-center mb-8">
-              <div className="glass-effect rounded-full p-1 flex">
-                <button 
-                  onClick={() => setPricingMode('subscription')}
-                  className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
-                    pricingMode === 'subscription' 
-                      ? 'bg-[var(--primary-color)] text-white' 
-                      : 'text-white/70 hover:text-white'
+          {/* Pricing Section */}
+          <section className="mb-16">
+            <div className="max-w-7xl mx-auto px-0 sm:px-1 lg:px-2">
+              <div className="text-center mb-12">
+                <h2 className="text-4xl font-bold text-white mb-4">Choose Your Plan</h2>
+                <p className="text-xl text-white/80 max-w-2xl mx-auto">
+                  Pay per invoice or subscribe for unlimited access. No hidden fees.
+                </p>
+              </div>
+              
+              {/* Pricing Toggle */}
+              <div className="flex justify-center mb-8">
+                <div className="glass-effect rounded-full p-1 flex">
+                  <button 
+                    onClick={() => setPricingMode('subscription')}
+                    className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
+                      pricingMode === 'subscription' 
+                        ? 'bg-[var(--primary-color)] text-white' 
+                        : 'text-white/70 hover:text-white'
                   }`}
                 >
                   Monthly
                 </button>
-                <button 
-                  onClick={() => setPricingMode('per-invoice')}
-                  className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
-                    pricingMode === 'per-invoice' 
-                      ? 'bg-[var(--primary-color)] text-white' 
-                      : 'text-white/70 hover:text-white'
+                  <button 
+                    onClick={() => setPricingMode('per-invoice')}
+                    className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
+                      pricingMode === 'per-invoice' 
+                        ? 'bg-[var(--primary-color)] text-white' 
+                        : 'text-white/70 hover:text-white'
                   }`}
                 >
                   Pay Per Invoice
                 </button>
+                </div>
               </div>
-            </div>
-            
-            <div className="grid md:grid-cols-3 gap-6 max-w-full mx-auto">
-              {/* Pay Per Invoice Plans */}
-              {pricingMode === 'per-invoice' ? (
-                <>
-                  {/* Basic Per Invoice */}
-                  <div className="glass-effect rounded-2xl p-6 relative">
-                    <div className="text-center">
-                      <h3 className="text-2xl font-bold text-white mb-2">Basic</h3>
-                      <div className="mb-4">
-                        <span className="text-4xl font-bold text-white">£1.50</span>
-                        <span className="text-white/60">/invoice</span>
-                      </div>
-                      <p className="text-white/70 mb-6">Perfect for occasional use</p>
-                      
-                      <ul className="space-y-3 mb-8 text-left">
-                        <li className="flex items-center text-white/80">
-                          <svg className="w-5 h-5 text-green-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
-                          Basic templates
-          </li>
-                        <li className="flex items-center text-white/80">
-                          <svg className="w-5 h-5 text-green-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
-                          PDF download
-          </li>
-                        <li className="flex items-center text-white/80">
-                          <svg className="w-5 h-5 text-green-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              
+              <div className="flex flex-col md:flex-row justify-center gap-6 max-w-4xl mx-auto">
+                {/* Pay Per Invoice Plans */}
+                {pricingMode === 'per-invoice' ? (
+                  <>
+                    {/* Basic Per Invoice */}
+                    <div className="glass-effect rounded-2xl p-6 relative">
+                      <div className="text-center">
+                        <h3 className="text-2xl font-bold text-white mb-2">Basic</h3>
+                        <div className="mb-4">
+                          <span className="text-4xl font-bold text-white">£1.50</span>
+                          <span className="text-white/60">/invoice</span>
+                        </div>
+                        <p className="text-white/70 mb-6">Perfect for occasional use</p>
+                        
+                        <ul className="space-y-3 mb-8 text-left">
+                          <li className="flex items-center text-white/80">
+                            <svg className="w-5 h-5 text-green-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                            Basic templates
+                          </li>
+                          <li className="flex items-center text-white/80">
+                            <svg className="w-5 h-5 text-green-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                            PDF download
+                          </li>
+                          <li className="flex items-center text-white/80">
+                            <svg className="w-5 h-5 text-green-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                           </svg>
                           Email support
                         </li>
@@ -2280,7 +2307,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Footer */}
+      {/* Footer */}
         <footer className="mt-auto py-6 sm:py-8 px-2 sm:px-4 lg:px-6 relative">
           <div className="container mx-auto text-center text-sm text-white/60">
             <div className="flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-4 lg:space-x-6">
@@ -2343,6 +2370,348 @@ export default function Home() {
         </div>
       )}
       
+      {/* Customization Modal */}
+      {showCustomizationModal && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-900 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-gray-600">
+            <div className="p-6 bg-gray-900">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-white">Template Customization</h2>
+                <button
+                  onClick={() => setShowCustomizationModal(false)}
+                  className="text-gray-300 hover:text-white"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Company Information */}
+              <div className="mb-8 p-6 bg-gray-800 rounded-lg border border-gray-600">
+                <h3 className="text-lg font-semibold text-white mb-4">Company Information</h3>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">Company Name</label>
+                        <input
+                          type="text"
+                      value={currentTemplateState.companyName}
+                      onChange={(e) => updateTemplateState({ companyName: e.target.value })}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-500 rounded-md text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                        />
+                      </div>
+                      <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">Email</label>
+                    <input
+                      type="email"
+                      value={currentTemplateState.companyEmail}
+                      onChange={(e) => updateTemplateState({ companyEmail: e.target.value })}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-500 rounded-md text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    />
+                  </div>
+                          <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">Phone</label>
+                              <input
+                      type="text"
+                      value={currentTemplateState.companyPhone}
+                      onChange={(e) => updateTemplateState({ companyPhone: e.target.value })}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-500 rounded-md text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">Address</label>
+                              <input
+                                type="text"
+                      value={currentTemplateState.companyAddress}
+                      onChange={(e) => updateTemplateState({ companyAddress: e.target.value })}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-500 rounded-md text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                              />
+                            </div>
+                          </div>
+              </div>
+
+              {/* Client Information */}
+              <div className="mb-8 p-6 bg-gray-800 rounded-lg border border-gray-600">
+                <h3 className="text-lg font-semibold text-white mb-4">Client Information</h3>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                          <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">Client Name</label>
+                              <input
+                      type="text"
+                      value={currentTemplateState.clientName}
+                      onChange={(e) => updateTemplateState({ clientName: e.target.value })}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-500 rounded-md text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">Client Email</label>
+                              <input
+                      type="email"
+                      value={currentTemplateState.clientEmail}
+                      onChange={(e) => updateTemplateState({ clientEmail: e.target.value })}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-500 rounded-md text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    />
+                          </div>
+                          <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">Client Phone</label>
+                              <input
+                      type="text"
+                      value={currentTemplateState.clientPhone}
+                      onChange={(e) => updateTemplateState({ clientPhone: e.target.value })}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-500 rounded-md text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">Client Address</label>
+                              <input
+                                type="text"
+                      value={currentTemplateState.clientAddress}
+                      onChange={(e) => updateTemplateState({ clientAddress: e.target.value })}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-500 rounded-md text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    />
+                          </div>
+                        </div>
+                      </div>
+
+              {/* Invoice Items */}
+              <div className="mb-8 p-6 bg-gray-800 rounded-lg border border-gray-600">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-semibold text-white">Invoice Items</h3>
+                  <button
+                    onClick={() => {
+                      const newItem = {
+                        id: Date.now(),
+                        description: '',
+                        quantity: 1,
+                        rate: 0,
+                        amount: 0
+                      };
+                      updateTemplateState({ 
+                        items: [...currentTemplateState.items, newItem] 
+                      });
+                    }}
+                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
+                  >
+                    + Add Item
+                  </button>
+                        </div>
+                <div className="space-y-4">
+                  {currentTemplateState.items.map((item) => (
+                    <div key={item.id} className="p-4 bg-gray-700 rounded-lg border-2 border-gray-500 shadow-sm">
+                      <div className="grid grid-cols-1 gap-4">
+                      <div>
+                          <label className="block text-sm font-medium text-gray-300 mb-1">Description</label>
+                          <input
+                            type="text"
+                            value={item.description}
+                            onChange={(e) => {
+                              const updatedItems = currentTemplateState.items.map(i => 
+                                i.id === item.id ? { ...i, description: e.target.value } : i
+                              );
+                              updateTemplateState({ items: updatedItems });
+                            }}
+                            className="w-full px-3 py-2 bg-gray-600 border border-gray-400 rounded-md text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                          />
+                      </div>
+                        <div className="grid grid-cols-2 gap-4">
+                      <div>
+                            <label className="block text-sm font-medium text-gray-300 mb-1">Quantity</label>
+                            <input
+                              type="number"
+                              value={item.quantity}
+                              onChange={(e) => {
+                                const quantity = parseFloat(e.target.value) || 0;
+                                const amount = quantity * item.rate;
+                                const updatedItems = currentTemplateState.items.map(i => 
+                                  i.id === item.id ? { ...i, quantity, amount } : i
+                                );
+                                updateTemplateState({ items: updatedItems });
+                              }}
+                              className="w-full px-3 py-2 bg-gray-600 border border-gray-400 rounded-md text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                            />
+                      </div>
+                      <div>
+                            <label className="block text-sm font-medium text-gray-300 mb-1">Rate</label>
+                            <input
+                              type="number"
+                              value={item.rate}
+                              onChange={(e) => {
+                                const rate = parseFloat(e.target.value) || 0;
+                                const amount = item.quantity * rate;
+                                const updatedItems = currentTemplateState.items.map(i => 
+                                  i.id === item.id ? { ...i, rate, amount } : i
+                                );
+                                updateTemplateState({ items: updatedItems });
+                              }}
+                              className="w-full px-3 py-2 bg-gray-600 border border-gray-400 rounded-md text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                            />
+                      </div>
+                    </div>
+                      <div>
+                          <label className="block text-sm font-medium text-gray-300 mb-1">Amount</label>
+                          <input
+                            type="number"
+                            value={item.amount}
+                            readOnly
+                            className="w-full px-3 py-2 border border-gray-400 rounded-md bg-gray-500 text-white"
+                          />
+                        </div>
+                            <button
+                          onClick={() => {
+                            const updatedItems = currentTemplateState.items.filter(i => i.id !== item.id);
+                            updateTemplateState({ items: updatedItems });
+                          }}
+                          className="text-red-400 hover:text-red-300 text-sm"
+                        >
+                          Remove Item
+                            </button>
+                        </div>
+                      </div>
+                  ))}
+                    </div>
+                  </div>
+
+              {/* Visual Element Toggles */}
+              <div className="mb-8 p-6 bg-gray-800 rounded-lg border border-gray-600">
+                <h3 className="text-lg font-semibold text-white mb-4">Show/Hide Elements</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                  <label className="flex items-center space-x-2">
+                            <input
+                              type="checkbox"
+                      checked={currentTemplateState.logoVisible}
+                      onChange={() => toggleElement('logoVisible')}
+                      className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                    />
+                    <span className="text-gray-300">Show Logo</span>
+                          </label>
+                  
+                  <label className="flex items-center space-x-2">
+                            <input
+                              type="checkbox"
+                      checked={currentTemplateState.thankYouNoteVisible}
+                      onChange={() => toggleElement('thankYouNoteVisible')}
+                      className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                    />
+                    <span className="text-gray-300">Show Thank You Note</span>
+                          </label>
+                  
+                  <label className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      checked={currentTemplateState.termsAndConditionsVisible}
+                      onChange={() => toggleElement('termsAndConditionsVisible')}
+                      className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                    />
+                    <span className="text-gray-300">Show Terms & Conditions</span>
+                  </label>
+                  
+                  <label className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      checked={currentTemplateState.signatureVisible}
+                      onChange={() => toggleElement('signatureVisible')}
+                      className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                    />
+                    <span className="text-gray-300">Show Signature</span>
+                  </label>
+                      </div>
+                    </div>
+
+              {/* Styling Options */}
+              <div className="mb-8 p-6 bg-gray-800 rounded-lg border border-gray-600">
+                <h3 className="text-lg font-semibold text-white mb-4">Styling Options</h3>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">Primary Color</label>
+                    <input
+                      type="text"
+                      value={currentTemplateState.primaryColor}
+                      onChange={(e) => updateTemplateState({ primaryColor: e.target.value })}
+                      placeholder="#7C3AED"
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-500 rounded-md text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    />
+                  </div>
+                            <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">Secondary Color</label>
+                    <input
+                      type="text"
+                      value={currentTemplateState.secondaryColor}
+                      onChange={(e) => updateTemplateState({ secondaryColor: e.target.value })}
+                      placeholder="#8B5CF6"
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-500 rounded-md text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    />
+                </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">Font Family</label>
+                    <select
+                      value={currentTemplateState.fontFamily}
+                      onChange={(e) => updateTemplateState({ fontFamily: e.target.value })}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-500 rounded-md text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    >
+                      <option value="Inter">Inter</option>
+                      <option value="Roboto">Roboto</option>
+                      <option value="Open Sans">Open Sans</option>
+                      <option value="Lato">Lato</option>
+                      <option value="Montserrat">Montserrat</option>
+                      <option value="Poppins">Poppins</option>
+                    </select>
+                        </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">Layout Style</label>
+                    <select
+                      value={currentTemplateState.layout}
+                      onChange={(e) => updateTemplateState({ layout: e.target.value as "minimal" | "modern" | "standard" | "detailed" })}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-500 rounded-md text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    >
+                      <option value="standard">Standard</option>
+                      <option value="minimal">Minimal</option>
+                      <option value="detailed">Detailed</option>
+                      <option value="modern">Modern</option>
+                    </select>
+                        </div>
+                            <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">Table Style</label>
+                    <select
+                      value={currentTemplateState.tableStyle}
+                      onChange={(e) => updateTemplateState({ tableStyle: e.target.value as "minimal" | "bordered" | "striped" | "modern" })}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-500 rounded-md text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    >
+                      <option value="bordered">Bordered</option>
+                      <option value="striped">Striped</option>
+                      <option value="minimal">Minimal</option>
+                      <option value="modern">Modern</option>
+                    </select>
+                            </div>
+                            <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">Corner Radius</label>
+                    <select
+                      value={currentTemplateState.cornerRadius}
+                      onChange={(e) => updateTemplateState({ cornerRadius: e.target.value as "small" | "none" | "medium" | "large" })}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-500 rounded-md text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    >
+                      <option value="none">None</option>
+                      <option value="small">Small</option>
+                      <option value="medium">Medium</option>
+                      <option value="large">Large</option>
+                    </select>
+                            </div>
+                        </div>
+                          </div>
+
+              {/* Close Button */}
+              <div className="flex justify-end">
+                  <button
+                  onClick={() => setShowCustomizationModal(false)}
+                  className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                >
+                  Done
+                  </button>
+                        </div>
+                          </div>
+                          </div>
+                          </div>
+                        )}
+                        
       {/* Floating Calculator */}
       <FloatingCalculator />
 
@@ -2353,607 +2722,62 @@ export default function Home() {
         mode={authMode}
       />
 
-      {/* Advanced Custom Template Builder Modal */}
-      {showCustomBuilder && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 max-w-7xl w-full max-h-[95vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h2 className="text-2xl font-bold text-white">Advanced Template Builder</h2>
-                  <p className="text-white/60 text-sm mt-1">Create professional invoices with complete customization</p>
-                </div>
-                <button
-                  onClick={() => setShowCustomBuilder(false)}
-                  className="text-white/60 hover:text-white transition-colors"
+      {/* Legacy Custom Builder Modal removed - now using unified TemplateManager */}
+
+      {/* Guest Limit Modal */}
+      {showGuestLimitModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 w-full max-w-md">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-gradient-to-br from-yellow-400/20 to-orange-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-yellow-400/30">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 19.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+              </div>
+
+              <h3 className="text-xl font-bold text-white mb-2">Guest Limit Reached</h3>
+              <p className="text-white/70 mb-6">
+                You've created {GUEST_INVOICE_LIMIT} invoices as a guest. Sign up for free to create unlimited invoices and access premium features!
+              </p>
+              
+              <div className="space-y-3">
+                  <button
+                    onClick={() => {
+                    setAuthMode('signup');
+                    setAuthModalOpen(true);
+                    setShowGuestLimitModal(false);
+                  }}
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-blue-500/25 transform hover:scale-[1.02]"
                 >
-                  <span className="material-symbols-outlined text-2xl">close</span>
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Customization Options */}
-                <div className="lg:col-span-2 space-y-6">
-                  {/* Template Presets */}
-                  <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-                    <h3 className="text-white/80 text-sm font-medium mb-3 flex items-center gap-2">
-                      <span className="material-symbols-outlined text-lg">palette</span>
-                      Quick Presets
-                    </h3>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                      {[
-                        { name: 'Professional', colors: ['#1E40AF', '#3B82F6', '#60A5FA'] },
-                        { name: 'Creative', colors: ['#BE185D', '#EC4899', '#F472B6'] },
-                        { name: 'Minimal', colors: ['#374151', '#6B7280', '#9CA3AF'] },
-                        { name: 'Vibrant', colors: ['#059669', '#10B981', '#34D399'] }
-                      ].map((preset) => (
-                        <button
-                          key={preset.name}
-                          onClick={() => setCustomTemplate({
-                            ...customTemplate,
-                            primaryColor: preset.colors[0],
-                            secondaryColor: preset.colors[1],
-                            accentColor: preset.colors[2]
-                          })}
-                          className="p-3 rounded-lg border border-white/20 hover:border-white/40 transition-colors"
-                        >
-                          <div className="flex gap-1 mb-2">
-                            {preset.colors.map((color, i) => (
-                              <div key={i} className="w-4 h-4 rounded" style={{ backgroundColor: color }}></div>
-                            ))}
-                          </div>
-                          <span className="text-white/70 text-xs">{preset.name}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Branding & Appearance */}
-                  <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-                    <h3 className="text-white/80 text-sm font-medium mb-3 flex items-center gap-2">
-                      <span className="material-symbols-outlined text-lg">brush</span>
-                      Branding & Appearance
-                    </h3>
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-white/80 text-sm font-medium mb-2">Template Name</label>
-                        <input
-                          type="text"
-                          value={customTemplate.name}
-                          onChange={(e) => setCustomTemplate({...customTemplate, name: e.target.value})}
-                          className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:border-white/40 focus:outline-none text-sm"
-                          placeholder="My Professional Template"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-white/80 text-sm font-medium mb-2">Brand Colors</label>
-                        <div className="grid grid-cols-3 gap-3">
-                          <div>
-                            <label className="block text-white/60 text-xs mb-1">Primary Color</label>
-                            <div className="flex gap-2">
-                              <input
-                                type="color"
-                                value={customTemplate.primaryColor}
-                                onChange={(e) => setCustomTemplate({...customTemplate, primaryColor: e.target.value})}
-                                className="w-12 h-8 rounded border border-white/20 cursor-pointer"
-                              />
-                              <input
-                                type="text"
-                                value={customTemplate.primaryColor}
-                                onChange={(e) => setCustomTemplate({...customTemplate, primaryColor: e.target.value})}
-                                className="flex-1 px-2 py-1 bg-white/10 border border-white/20 rounded text-white text-xs"
-                                placeholder="#7C3AED"
-                              />
-                            </div>
-                          </div>
-                          <div>
-                            <label className="block text-white/60 text-xs mb-1">Secondary Color</label>
-                            <div className="flex gap-2">
-                              <input
-                                type="color"
-                                value={customTemplate.secondaryColor}
-                                onChange={(e) => setCustomTemplate({...customTemplate, secondaryColor: e.target.value})}
-                                className="w-12 h-8 rounded border border-white/20 cursor-pointer"
-                              />
-                              <input
-                                type="text"
-                                value={customTemplate.secondaryColor}
-                                onChange={(e) => setCustomTemplate({...customTemplate, secondaryColor: e.target.value})}
-                                className="flex-1 px-2 py-1 bg-white/10 border border-white/20 rounded text-white text-xs"
-                                placeholder="#8B5CF6"
-                              />
-                            </div>
-                          </div>
-                          <div>
-                            <label className="block text-white/60 text-xs mb-1">Accent Color</label>
-                            <div className="flex gap-2">
-                              <input
-                                type="color"
-                                value={customTemplate.accentColor}
-                                onChange={(e) => setCustomTemplate({...customTemplate, accentColor: e.target.value})}
-                                className="w-12 h-8 rounded border border-white/20 cursor-pointer"
-                              />
-                              <input
-                                type="text"
-                                value={customTemplate.accentColor}
-                                onChange={(e) => setCustomTemplate({...customTemplate, accentColor: e.target.value})}
-                                className="flex-1 px-2 py-1 bg-white/10 border border-white/20 rounded text-white text-xs"
-                                placeholder="#A78BFA"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-white/80 text-sm font-medium mb-2">Background & Borders</label>
-                        <div className="grid grid-cols-2 gap-2">
-                          <select
-                            value={customTemplate.borderStyle}
-                            onChange={(e) => setCustomTemplate({...customTemplate, borderStyle: e.target.value})}
-                            className="px-3 py-2 bg-white/10 border border-white/20 rounded text-white text-sm focus:border-white/40 focus:outline-none"
-                          >
-                            <option value="none" className="bg-gray-800">No Borders</option>
-                            <option value="minimal" className="bg-gray-800">Minimal Lines</option>
-                            <option value="bordered" className="bg-gray-800">Boxed Layout</option>
-                            <option value="full-bleed" className="bg-gray-800">Full Bleed</option>
-                          </select>
-                          <select
-                            value={customTemplate.cornerRadius}
-                            onChange={(e) => setCustomTemplate({...customTemplate, cornerRadius: e.target.value})}
-                            className="px-3 py-2 bg-white/10 border border-white/20 rounded text-white text-sm focus:border-white/40 focus:outline-none"
-                          >
-                            <option value="none" className="bg-gray-800">Sharp Corners</option>
-                            <option value="small" className="bg-gray-800">Small Radius</option>
-                            <option value="medium" className="bg-gray-800">Medium Radius</option>
-                            <option value="large" className="bg-gray-800">Large Radius</option>
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Typography */}
-                  <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-                    <h3 className="text-white/80 text-sm font-medium mb-3 flex items-center gap-2">
-                      <span className="material-symbols-outlined text-lg">format_size</span>
-                      Typography
-                    </h3>
-                    <div className="grid grid-cols-3 gap-3">
-                      <div>
-                        <label className="block text-white/60 text-xs mb-1">Font Family</label>
-                        <select
-                          value={customTemplate.fontFamily}
-                          onChange={(e) => setCustomTemplate({...customTemplate, fontFamily: e.target.value})}
-                          className="w-full px-2 py-2 bg-white/10 border border-white/20 rounded text-white text-sm focus:border-white/40 focus:outline-none"
-                        >
-                          <option value="Helvetica" className="bg-gray-800">Helvetica (Clean)</option>
-                          <option value="Times" className="bg-gray-800">Times (Classic)</option>
-                          <option value="Courier" className="bg-gray-800">Courier (Monospace)</option>
-                          <option value="Inter" className="bg-gray-800">Inter (Modern)</option>
-                          <option value="Roboto" className="bg-gray-800">Roboto (Friendly)</option>
-                          <option value="Poppins" className="bg-gray-800">Poppins (Rounded)</option>
-                          <option value="Montserrat" className="bg-gray-800">Montserrat (Elegant)</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-white/60 text-xs mb-1">Font Size</label>
-                        <select
-                          value={customTemplate.fontSize}
-                          onChange={(e) => setCustomTemplate({...customTemplate, fontSize: e.target.value})}
-                          className="w-full px-2 py-2 bg-white/10 border border-white/20 rounded text-white text-sm focus:border-white/40 focus:outline-none"
-                        >
-                          <option value="10px" className="bg-gray-800">10px (Compact)</option>
-                          <option value="11px" className="bg-gray-800">11px (Small)</option>
-                          <option value="12px" className="bg-gray-800">12px (Standard)</option>
-                          <option value="13px" className="bg-gray-800">13px (Medium)</option>
-                          <option value="14px" className="bg-gray-800">14px (Large)</option>
-                          <option value="15px" className="bg-gray-800">15px (XL)</option>
-                          <option value="16px" className="bg-gray-800">16px (XXL)</option>
-                          <option value="18px" className="bg-gray-800">18px (Huge)</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-white/60 text-xs mb-1">Font Weight</label>
-                        <select
-                          value={customTemplate.fontWeight}
-                          onChange={(e) => setCustomTemplate({...customTemplate, fontWeight: e.target.value})}
-                          className="w-full px-2 py-2 bg-white/10 border border-white/20 rounded text-white text-sm focus:border-white/40 focus:outline-none"
-                        >
-                          <option value="300" className="bg-gray-800">Light (300)</option>
-                          <option value="400" className="bg-gray-800">Normal (400)</option>
-                          <option value="500" className="bg-gray-800">Medium (500)</option>
-                          <option value="600" className="bg-gray-800">Semi Bold (600)</option>
-                          <option value="700" className="bg-gray-800">Bold (700)</option>
-                          <option value="800" className="bg-gray-800">Extra Bold (800)</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Layout & Structure */}
-                  <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-                    <h3 className="text-white/80 text-sm font-medium mb-3 flex items-center gap-2">
-                      <span className="material-symbols-outlined text-lg">view_quilt</span>
-                      Layout & Structure
-                    </h3>
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-white/80 text-sm font-medium mb-2">Header Style</label>
-                        <div className="grid grid-cols-3 gap-2">
-                          {[
-                            { value: 'full-width', label: 'Full Width', icon: 'fullscreen' },
-                            { value: 'centered', label: 'Centered', icon: 'center_focus_strong' },
-                            { value: 'minimal', label: 'Minimal', icon: 'minimize' }
-                          ].map((style) => (
-                            <button
-                              key={style.value}
-                              onClick={() => setCustomTemplate({...customTemplate, headerStyle: style.value})}
-                              className={`p-3 rounded-lg border text-xs transition-colors flex flex-col items-center gap-1 ${
-                                customTemplate.headerStyle === style.value 
-                                  ? 'border-white/40 bg-white/10 text-white' 
-                                  : 'border-white/20 bg-white/5 text-white/70 hover:bg-white/10'
-                              }`}
-                            >
-                              <span className="material-symbols-outlined text-sm">{style.icon}</span>
-                              {style.label}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-white/80 text-sm font-medium mb-2">Spacing</label>
-                        <div className="grid grid-cols-3 gap-2">
-                          {[
-                            { value: 'compact', label: 'Compact' },
-                            { value: 'normal', label: 'Normal' },
-                            { value: 'spacious', label: 'Spacious' }
-                          ].map((spacing) => (
-                            <button
-                              key={spacing.value}
-                              onClick={() => setCustomTemplate({...customTemplate, spacing: spacing.value})}
-                              className={`p-2 rounded border text-xs transition-colors ${
-                                customTemplate.spacing === spacing.value 
-                                  ? 'border-white/40 bg-white/10 text-white' 
-                                  : 'border-white/20 bg-white/5 text-white/70 hover:bg-white/10'
-                              }`}
-                            >
-                              {spacing.label}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Content Elements */}
-                  <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-                    <h3 className="text-white/80 text-sm font-medium mb-3 flex items-center gap-2">
-                      <span className="material-symbols-outlined text-lg">tune</span>
-                      Content Elements
-                    </h3>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <h4 className="text-white/70 text-xs font-medium">Header Elements</h4>
-                        {[
-                          { key: 'showLogo', label: 'Company Logo', tooltip: 'Display your company logo in the header' },
-                          { key: 'showInvoiceNumber', label: 'Invoice Number', tooltip: 'Show invoice number prominently' },
-                          { key: 'showInvoiceDate', label: 'Invoice Date', tooltip: 'Display the invoice date' },
-                          { key: 'showDueDate', label: 'Due Date', tooltip: 'Show payment due date' }
-                        ].map((element) => (
-                          <label key={element.key} className="flex items-center gap-2 group">
-                            <input
-                              type="checkbox"
-                              checked={customTemplate[element.key as keyof typeof customTemplate] as boolean}
-                              onChange={(e) => setCustomTemplate({...customTemplate, [element.key]: e.target.checked})}
-                              className="w-4 h-4 text-purple-600 bg-white/10 border-white/20 rounded focus:ring-purple-500"
-                            />
-                            <span className="text-white/70 text-xs">{element.label}</span>
-                            <span 
-                              className="material-symbols-outlined text-xs text-white/60 hover:text-white transition-colors cursor-help" 
-                              title={element.tooltip}
-                            >
-                              help
-                            </span>
-                          </label>
-                        ))}
-                      </div>
-                      <div className="space-y-2">
-                        <h4 className="text-white/70 text-xs font-medium">Content Elements</h4>
-                        {[
-                          { key: 'showCompanyAddress', label: 'Company Address', tooltip: 'Include your business address' },
-                          { key: 'showClientAddress', label: 'Client Address', tooltip: 'Show billing address' },
-                          { key: 'showTaxBreakdown', label: 'Tax Breakdown', tooltip: 'Detailed tax calculations' },
-                          { key: 'showNotes', label: 'Notes Section', tooltip: 'Additional notes or terms' },
-                          { key: 'showThankYouMessage', label: 'Thank You Message', tooltip: 'Professional closing message' },
-                          { key: 'showPageNumbers', label: 'Page Numbers', tooltip: 'Add page numbers for multi-page invoices' }
-                        ].map((element) => (
-                          <label key={element.key} className="flex items-center gap-2 group">
-                            <input
-                              type="checkbox"
-                              checked={customTemplate[element.key as keyof typeof customTemplate] as boolean}
-                              onChange={(e) => setCustomTemplate({...customTemplate, [element.key]: e.target.checked})}
-                              className="w-4 h-4 text-purple-600 bg-white/10 border-white/20 rounded focus:ring-purple-500"
-                            />
-                            <span className="text-white/70 text-xs">{element.label}</span>
-                            <span 
-                              className="material-symbols-outlined text-xs text-white/60 hover:text-white transition-colors cursor-help" 
-                              title={element.tooltip}
-                            >
-                              help
-                            </span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Live Preview */}
-                <div className="lg:col-span-1">
-                  <div className="sticky top-4">
-                    <h3 className="text-white/80 text-sm font-medium mb-4 flex items-center gap-2">
-                      <span className="material-symbols-outlined text-lg">visibility</span>
-                      Live Preview
-                    </h3>
-                    <div className="bg-white rounded-lg shadow-xl overflow-hidden">
-                      {/* PDF Preview */}
-                      <div className="p-4 border-b border-gray-200">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-gray-600 text-xs font-medium">PDF Preview</span>
-                          <button
-                            onClick={() => {
-                              // Generate a preview PDF
-                              const previewData = {
-                                companyName: 'Your Company',
-                                companyAddress: '123 Business St\nCity, State 12345',
-                                companyContact: 'hello@stitchinvoice.com',
-                                clientName: 'Client Name',
-                                clientAddress: '456 Client Ave\nClient City, State 67890',
-                                clientContact: 'client@email.com',
-                                invoiceNumber: 'INV-001',
-                                date: new Date().toISOString().split('T')[0],
-                                dueDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                                paymentTerms: 'Net 15',
-                                items: [
-                                  { description: 'Sample Service', quantity: 1, rate: 100, amount: 100 },
-                                  { description: 'Additional Item', quantity: 2, rate: 50, amount: 100 }
-                                ],
-                                subtotal: 200,
-                                taxRate: 10,
-                                taxAmount: 20,
-                                total: 220,
-                                additionalNotes: 'Thank you for your business!',
-                                template: 'custom',
-                                customTemplate: customTemplate
-                              };
-                              generateInvoicePDF(previewData);
-                            }}
-                            className="px-3 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 transition-colors"
-                          >
-                            Test PDF
-                          </button>
-                        </div>
-                      </div>
-                      
-                      {/* Visual Preview */}
-                      <div 
-                        className="p-6 text-xs"
-                        style={{ 
-                          backgroundColor: customTemplate.backgroundColor,
-                          color: customTemplate.textColor,
-                          fontFamily: customTemplate.fontFamily,
-                          fontSize: customTemplate.fontSize
-                        }}
-                      >
-                        {/* Header */}
-                        <div 
-                          className={`rounded mb-4 flex items-center px-3 py-2 ${
-                            customTemplate.headerHeight === 'small' ? 'h-8' :
-                            customTemplate.headerHeight === 'large' ? 'h-12' : 'h-10'
-                          }`}
-                          style={{ backgroundColor: customTemplate.primaryColor }}
-                        >
-                          <span className="text-white font-bold">INVOICE</span>
-                          {customTemplate.showInvoiceNumber && (
-                            <span className="text-white/80 ml-auto">#INV-001</span>
-                          )}
-                        </div>
-                        
-                        {/* Company Info */}
-                        {customTemplate.showCompanyAddress && (
-                          <div className="mb-4">
-                            <div 
-                              className="h-3 rounded mb-1"
-                              style={{ backgroundColor: customTemplate.secondaryColor, width: '70%' }}
-                            ></div>
-                            <div 
-                              className="h-2 rounded mb-1"
-                              style={{ backgroundColor: customTemplate.accentColor, width: '50%' }}
-                            ></div>
-                          </div>
-                        )}
-                        
-                        {/* Invoice Details */}
-                        <div className="mb-4 flex justify-between text-xs">
-                          {customTemplate.showInvoiceDate && (
-                            <div>
-                              <span style={{ color: customTemplate.primaryColor }}>Date: </span>
-                              <span>2025-01-15</span>
-                            </div>
-                          )}
-                          {customTemplate.showDueDate && (
-                            <div>
-                              <span style={{ color: customTemplate.primaryColor }}>Due: </span>
-                              <span>2025-01-30</span>
-                            </div>
-                          )}
-                        </div>
-                        
-                        {/* Client Info */}
-                        {customTemplate.showClientAddress && (
-                          <div className="mb-4">
-                            <div 
-                              className="h-2 rounded mb-1"
-                              style={{ backgroundColor: customTemplate.secondaryColor, width: '60%' }}
-                            ></div>
-                            <div 
-                              className="h-2 rounded"
-                              style={{ backgroundColor: customTemplate.accentColor, width: '40%' }}
-                            ></div>
-                          </div>
-                        )}
-                        
-                        {/* Items Table */}
-                        <div className="mb-4">
-                          <div 
-                            className="h-2 rounded mb-1"
-                            style={{ backgroundColor: customTemplate.primaryColor, width: '100%' }}
-                          ></div>
-                          <div 
-                            className="h-2 rounded mb-1"
-                            style={{ backgroundColor: customTemplate.secondaryColor, width: '80%' }}
-                          ></div>
-                          <div 
-                            className="h-2 rounded"
-                            style={{ backgroundColor: customTemplate.accentColor, width: '60%' }}
-                          ></div>
-                        </div>
-                        
-                        {/* Total */}
-                        <div 
-                          className="h-4 rounded flex items-center justify-between px-2"
-                          style={{ backgroundColor: customTemplate.primaryColor }}
-                        >
-                          <span className="text-white font-bold">Total: $220.00</span>
-                        </div>
-                        
-                        {/* Notes */}
-                        {customTemplate.showNotes && (
-                          <div className="mt-4 p-2 rounded" style={{ backgroundColor: customTemplate.accentColor + '20' }}>
-                            <div 
-                              className="h-2 rounded mb-1"
-                              style={{ backgroundColor: customTemplate.accentColor, width: '80%' }}
-                            ></div>
-                            <div 
-                              className="h-2 rounded"
-                              style={{ backgroundColor: customTemplate.accentColor, width: '60%' }}
-                            ></div>
-                          </div>
-                        )}
-                        
-                        {/* Thank You */}
-                        {customTemplate.showThankYouMessage && (
-                          <div className="mt-4 text-center">
-                            <span 
-                              className="font-bold"
-                              style={{ color: customTemplate.primaryColor }}
-                            >
-                              Thank you for your business!
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between mt-8 pt-6 border-t border-white/20">
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => {
-                      // Reset to default template
-                      setCustomTemplate({
-                        name: 'My Custom Template',
-                        primaryColor: '#7C3AED',
-                        secondaryColor: '#8B5CF6',
-                        accentColor: '#A78BFA',
-                        backgroundColor: '#ffffff',
-                        textColor: '#1a1a2e',
-                        fontFamily: 'Inter',
-                        fontSize: '14px',
-                        fontWeight: '400',
-                        layout: 'standard',
-                        headerStyle: 'full-width',
-                        logoPosition: 'left',
-                        showLogo: true,
-                        showWatermark: false,
-                        showSignature: true,
-                        showTerms: true,
-                        spacing: 'normal',
-                        borderStyle: 'none',
-                        sectionOrder: ['header', 'company', 'client', 'items', 'totals', 'notes', 'footer'],
-                        headerHeight: 'medium',
-                        footerHeight: 'medium',
-                        showPageNumbers: true,
-                        showInvoiceDate: true,
-                        showDueDate: true,
-                        showInvoiceNumber: true,
-                        showClientAddress: true,
-                        showCompanyAddress: true,
-                        showTaxBreakdown: true,
-                        showDiscounts: true,
-                        showPaymentInfo: true,
-                        showNotes: true,
-                        showThankYouMessage: true,
-                        tableStyle: 'bordered',
-                        headerBackground: 'transparent',
-                        footerBackground: 'transparent',
-                        accentStyle: 'subtle',
-                        shadowStyle: 'none',
-                        cornerRadius: 'medium'
-                      });
-                    }}
-                    className="px-4 py-2 text-white/60 hover:text-white transition-colors text-sm"
-                  >
-                    Reset to Default
+                  Sign Up for Free
                   </button>
+                
                   <button
-                    onClick={() => setShowCustomBuilder(false)}
-                    className="px-6 py-2 text-white/60 hover:text-white transition-colors"
+                  onClick={() => setShowGuestLimitModal(false)}
+                  className="w-full bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 border border-white/20 hover:border-white/30"
                   >
-                    Cancel
+                  Continue as Guest
                   </button>
                 </div>
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => {
-                      // Save template to localStorage
-                      const savedTemplates = JSON.parse(localStorage.getItem('savedTemplates') || '[]');
-                      savedTemplates.push({
-                        ...customTemplate,
-                        id: Date.now(),
-                        savedAt: new Date().toISOString()
-                      });
-                      localStorage.setItem('savedTemplates', JSON.stringify(savedTemplates));
-                      alert('Template saved successfully!');
-                    }}
-                    className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white font-medium rounded-lg transition-colors text-sm"
-                  >
-                    Save Template
-                  </button>
-                  <button
-                    onClick={() => {
-                      // Save custom template to localStorage
-                      console.log('Saving custom template:', customTemplate);
-                      localStorage.setItem('customTemplate', JSON.stringify(customTemplate));
-                      setSelectedTemplate('custom');
-                      setShowCustomBuilder(false);
-                      console.log('Custom template saved and applied');
-                    }}
-                    className="px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-medium rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all"
-                  >
-                    Use This Template
-                  </button>
-                </div>
+              
+              <div className="mt-4 text-center">
+                <p className="text-white/50 text-sm">
+                  Free accounts get 3 invoices/month, Pro accounts get unlimited!
+                </p>
               </div>
             </div>
           </div>
         </div>
       )}
+
+      {/* Payment Gate Modal */}
+      <PaymentGateModal
+        isOpen={showPaymentGate}
+        onClose={() => setShowPaymentGate(false)}
+        onPaymentSuccess={handlePaymentSuccess}
+        isGuest={paymentGateStatus.isGuest}
+        remainingFreeInvoices={paymentGateStatus.remainingFreeInvoices}
+      />
     </div>
   );
 }

@@ -80,13 +80,20 @@ export const processPayment = async (paymentData: PaymentData): Promise<boolean>
   }
 };
 
-export const createSubscription = async (subscriptionData: SubscriptionData): Promise<boolean> => {
+export const createSubscription = async (subscriptionData: SubscriptionData, returnUrl?: string): Promise<boolean> => {
   try {
+    // Save current invoice state before payment
+    if (typeof window !== 'undefined') {
+      const currentUrl = returnUrl || window.location.href;
+      localStorage.setItem('paymentReturnUrl', currentUrl);
+      localStorage.setItem('paymentTimestamp', Date.now().toString());
+    }
+
     const paymentData: PaymentData = {
       priceId: subscriptionData.priceId,
       mode: 'subscription',
-      successUrl: `${window.location.origin}/?subscription=success`,
-      cancelUrl: `${window.location.origin}/?subscription=cancelled`,
+      successUrl: `${window.location.origin}/?subscription=success&return=${encodeURIComponent(returnUrl || window.location.href)}`,
+      cancelUrl: `${window.location.origin}/?subscription=cancelled&return=${encodeURIComponent(returnUrl || window.location.href)}`,
       customerEmail: subscriptionData.customerEmail,
       metadata: subscriptionData.metadata,
     };
@@ -98,13 +105,20 @@ export const createSubscription = async (subscriptionData: SubscriptionData): Pr
   }
 };
 
-export const createOneTimePayment = async (priceId: string, customerEmail?: string): Promise<boolean> => {
+export const createOneTimePayment = async (priceId: string, customerEmail?: string, returnUrl?: string): Promise<boolean> => {
   try {
+    // Save current invoice state before payment
+    if (typeof window !== 'undefined') {
+      const currentUrl = returnUrl || window.location.href;
+      localStorage.setItem('paymentReturnUrl', currentUrl);
+      localStorage.setItem('paymentTimestamp', Date.now().toString());
+    }
+
     const paymentData: PaymentData = {
       priceId,
       mode: 'payment',
-      successUrl: `${window.location.origin}/?payment=success`,
-      cancelUrl: `${window.location.origin}/?payment=cancelled`,
+      successUrl: `${window.location.origin}/?payment=success&return=${encodeURIComponent(returnUrl || window.location.href)}`,
+      cancelUrl: `${window.location.origin}/?payment=cancelled&return=${encodeURIComponent(returnUrl || window.location.href)}`,
       customerEmail,
     };
 

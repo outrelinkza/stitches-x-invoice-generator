@@ -1,0 +1,18 @@
+[2025-09-17 03:37:30] Starting security check...
+[2025-09-17 03:37:30] OK: Server is running normally
+[2025-09-17 03:37:30] WARNING: API http://localhost issue! Expected: 3000/api/contact, Got: 000
+[2025-09-17 03:37:30] WARNING: API http://localhost issue! Expected: 3000/api/create-checkout-session, Got: 000
+[2025-09-17 03:37:30] WARNING: API http://localhost issue! Expected: 3000/api/webhooks/stripe, Got: 000
+[2025-09-17 03:37:30] WARNING: API http://localhost issue! Expected: 3000/api/feedback, Got: 000
+[2025-09-17 03:37:30] WARNING: API http://localhost issue! Expected: 3000/api/export-data, Got: 000
+[2025-09-17 03:37:30] WARNING: API http://localhost issue! Expected: 3000/api/delete-user-data, Got: 000
+[2025-09-17 03:37:30] OK: Dashboard accessible (Status: 200)
+[2025-09-17 03:37:30] OK: Templates page accessible (Status: 200)
+[2025-09-17 03:37:30] OK: No high severity vulnerabilities found
+[2025-09-17 03:37:30] OK: Environment file exists
+[2025-09-17 03:37:30] OK: Supabase environment variables configured
+[2025-09-17 03:37:30] OK: Stripe environment variables configured
+[2025-09-17 03:37:30] OK: Application builds successfully
+[2025-09-17 03:37:30] CRITICAL: Disk usage is critical (92%)
+[2025-09-17 03:37:30] WARNING: free command not available, skipping memory check
+[2025-09-17 03:37:30] OK: Development server is running

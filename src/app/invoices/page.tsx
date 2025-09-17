@@ -14,6 +14,8 @@ export default function Invoices() {
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingInvoice, setEditingInvoice] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
@@ -132,6 +134,63 @@ export default function Invoices() {
     }
   };
 
+  const handleEditInvoice = (invoice: any) => {
+    setEditingInvoice(invoice);
+    setShowEditModal(true);
+  };
+
+  const handleUpdateInvoiceStatus = async (newStatus: string) => {
+    if (!editingInvoice) return;
+    
+    try {
+      // Update the invoice status
+      const updatedInvoice = { ...editingInvoice, status: newStatus };
+      await InvoiceService.updateInvoice(editingInvoice.id, updatedInvoice);
+      
+      // Update local state
+      setInvoices(invoices.map(inv => 
+        inv.id === editingInvoice.id ? updatedInvoice : inv
+      ));
+      
+      setShowEditModal(false);
+      setEditingInvoice(null);
+      
+      // Show success notification
+      const successMsg = document.createElement('div');
+      successMsg.className = 'fixed top-20 right-4 bg-green-500/90 backdrop-blur-md text-white px-6 py-4 rounded-xl shadow-lg z-50 transition-all border border-green-400/20';
+      successMsg.innerHTML = `
+        <div class="flex items-center gap-3">
+          <div class="text-2xl">✓</div>
+          <div>
+            <div class="font-semibold">Success!</div>
+            <div class="text-sm opacity-90">Invoice status updated to ${newStatus}</div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(successMsg);
+      setTimeout(() => {
+        successMsg.remove();
+      }, 3000);
+    } catch (error) {
+      console.error('Failed to update invoice status:', error);
+      const errorMsg = document.createElement('div');
+      errorMsg.className = 'fixed top-20 right-4 bg-red-500/90 backdrop-blur-md text-white px-6 py-4 rounded-xl shadow-lg z-50 transition-all border border-red-400/20';
+      errorMsg.innerHTML = `
+        <div class="flex items-center gap-3">
+          <div class="text-2xl">✗</div>
+          <div>
+            <div class="font-semibold">Error!</div>
+            <div class="text-sm opacity-90">Failed to update invoice status</div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(errorMsg);
+      setTimeout(() => {
+        errorMsg.remove();
+      }, 3000);
+    }
+  };
+
   if (loading) {
     return (
       <AuthGuard>
@@ -147,7 +206,7 @@ export default function Invoices() {
   }
 
   return (
-    <AuthGuard requireAuth={false}>
+    <AuthGuard requireAuth={true}>
       <div className="min-h-screen">
         <NavHeader currentPage="/invoices" />
         {/* Main Content */}
@@ -159,7 +218,7 @@ export default function Invoices() {
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white">Invoices</h1>
                 <p className="mt-1 text-sm sm:text-base lg:text-lg text-white/70">Manage and track your invoices.</p>
               </div>
-              <a href="/" className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-[var(--primary-color)] text-white text-xs sm:text-sm font-medium rounded-lg hover:bg-[var(--primary-color)]/80 transition-colors w-full sm:w-auto justify-center">
+              <a href="/templates" className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-[var(--primary-color)] text-white text-xs sm:text-sm font-medium rounded-lg hover:bg-[var(--primary-color)]/80 transition-colors w-full sm:w-auto justify-center">
                 <span className="material-symbols-outlined text-sm sm:text-base">add</span>
                 <span>Create Invoice</span>
               </a>
@@ -370,6 +429,13 @@ export default function Invoices() {
                               >
                                 Edit
                               </button>
+                              <button 
+                                className="text-green-400 hover:text-green-300 text-sm font-medium"
+                                onClick={() => handleEditInvoice(invoice)}
+                                title="Edit Payment Status"
+                              >
+                                <span className="material-symbols-outlined text-base">edit</span>
+                              </button>
                             </div>
                           </td>
                         </tr>
@@ -429,6 +495,106 @@ export default function Invoices() {
                   ) : (
                     'Delete All'
                   )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Invoice Status Modal */}
+        {showEditModal && editingInvoice && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+            <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 w-full max-w-md">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-semibold text-white">Edit Invoice Status</h3>
+                <button 
+                  className="text-white/70 hover:text-white transition-colors"
+                  onClick={() => {
+                    setShowEditModal(false);
+                    setEditingInvoice(null);
+                  }}
+                >
+                  <span className="material-symbols-outlined text-2xl">close</span>
+                </button>
+              </div>
+
+              <div className="mb-6">
+                <div className="bg-white/5 rounded-lg p-4 mb-4">
+                  <h4 className="text-white font-medium mb-2">Invoice Details</h4>
+                  <div className="text-sm text-white/70 space-y-1">
+                    <p><strong>Number:</strong> #{editingInvoice.invoiceNumber || 'INV-001'}</p>
+                    <p><strong>Client:</strong> {editingInvoice.clientName || 'Unknown Client'}</p>
+                    <p><strong>Amount:</strong> {formatCurrency(editingInvoice.total || 0)}</p>
+                    <p><strong>Current Status:</strong> <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(editingInvoice.status)}`}>{getStatusText(editingInvoice.status)}</span></p>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-white font-medium mb-3">Update Status To:</label>
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => handleUpdateInvoiceStatus('draft')}
+                      className={`w-full text-left px-4 py-3 rounded-lg border transition-colors ${
+                        editingInvoice.status === 'draft' 
+                          ? 'bg-yellow-500/20 border-yellow-400/50 text-yellow-400' 
+                          : 'bg-white/5 border-white/20 text-white hover:bg-white/10'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="material-symbols-outlined">edit</span>
+                        <div>
+                          <div className="font-medium">Draft</div>
+                          <div className="text-sm opacity-70">Save as draft for later editing</div>
+                        </div>
+                      </div>
+                    </button>
+
+                    <button
+                      onClick={() => handleUpdateInvoiceStatus('sent')}
+                      className={`w-full text-left px-4 py-3 rounded-lg border transition-colors ${
+                        editingInvoice.status === 'sent' 
+                          ? 'bg-blue-500/20 border-blue-400/50 text-blue-400' 
+                          : 'bg-white/5 border-white/20 text-white hover:bg-white/10'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="material-symbols-outlined">send</span>
+                        <div>
+                          <div className="font-medium">Sent</div>
+                          <div className="text-sm opacity-70">Invoice has been sent to client</div>
+                        </div>
+                      </div>
+                    </button>
+
+                    <button
+                      onClick={() => handleUpdateInvoiceStatus('paid')}
+                      className={`w-full text-left px-4 py-3 rounded-lg border transition-colors ${
+                        editingInvoice.status === 'paid' 
+                          ? 'bg-green-500/20 border-green-400/50 text-green-400' 
+                          : 'bg-white/5 border-white/20 text-white hover:bg-white/10'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="material-symbols-outlined">check_circle</span>
+                        <div>
+                          <div className="font-medium">Paid</div>
+                          <div className="text-sm opacity-70">Payment has been received</div>
+                        </div>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowEditModal(false);
+                    setEditingInvoice(null);
+                  }}
+                  className="flex-1 bg-white/10 hover:bg-white/20 text-white font-medium py-3 px-6 rounded-lg transition-colors"
+                >
+                  Cancel
                 </button>
               </div>
             </div>

@@ -117,17 +117,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { error };
       }
 
-      // Show success message
+      // Show success message - no email verification required
       const successMsg = document.createElement('div');
       successMsg.className = 'fixed top-20 right-4 bg-white/10 backdrop-blur-xl border border-white/20 text-white px-6 py-4 rounded-xl shadow-2xl z-50 transition-all';
-      successMsg.innerHTML = 'Account created! Please check your email to verify your account.';
+      successMsg.innerHTML = 'Account created successfully! You can now access all features.';
       document.body.appendChild(successMsg);
       
       setTimeout(() => {
         if (document.body.contains(successMsg)) {
           document.body.removeChild(successMsg);
         }
-      }, 5000);
+      }, 3000);
 
       return { error: null };
     } catch (error) {

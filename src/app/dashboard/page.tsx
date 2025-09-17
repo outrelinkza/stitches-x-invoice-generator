@@ -118,7 +118,7 @@ export default function Dashboard() {
   }
 
   return (
-    <AuthGuard requireAuth={false}>
+    <AuthGuard requireAuth={true}>
       <div className="min-h-screen">
         <NavHeader currentPage="/dashboard" />
         {/* Main Content */}
@@ -243,6 +243,73 @@ export default function Dashboard() {
                 </div>
               </div>
           </div>
+
+          {/* Recent Invoices Section */}
+          {invoices.length > 0 && (
+            <div className="mt-8 animate-enter" style={{animationDelay: '900ms'}}>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-white">Recent Invoices</h2>
+                <a 
+                  href="/invoices" 
+                  className="text-[var(--primary-color)] hover:text-[var(--primary-color)]/80 text-sm font-medium flex items-center gap-1"
+                >
+                  View All
+                  <span className="material-symbols-outlined text-base">arrow_forward</span>
+                </a>
+              </div>
+              
+              <div className="glass-effect bg-white/10 rounded-2xl overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-white/5">
+                      <tr>
+                        <th className="text-left py-4 px-6 font-medium text-white/70">Invoice</th>
+                        <th className="text-left py-4 px-6 font-medium text-white/70">Client</th>
+                        <th className="text-left py-4 px-6 font-medium text-white/70">Amount</th>
+                        <th className="text-left py-4 px-6 font-medium text-white/70">Status</th>
+                        <th className="text-left py-4 px-6 font-medium text-white/70">Date</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/10">
+                      {invoices.slice(0, 5).map((invoice) => (
+                        <tr key={invoice.id} className="hover:bg-white/5 transition-colors">
+                          <td className="py-4 px-6">
+                            <div>
+                              <p className="font-medium text-white">#{invoice.invoice_number || 'INV-001'}</p>
+                              <p className="text-sm text-white/60">{invoice.template || 'Standard'}</p>
+                            </div>
+                          </td>
+                          <td className="py-4 px-6">
+                            <p className="text-white">{invoice.client_name || 'Unknown Client'}</p>
+                          </td>
+                          <td className="py-4 px-6">
+                            <p className="font-medium text-white">{formatCurrency(invoice.total || 0)}</p>
+                          </td>
+                          <td className="py-4 px-6">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
+                              invoice.status === 'paid' ? 'bg-green-500/20 text-green-400 border-green-400/30' :
+                              invoice.status === 'sent' ? 'bg-blue-500/20 text-blue-400 border-blue-400/30' :
+                              invoice.status === 'draft' ? 'bg-yellow-500/20 text-yellow-400 border-yellow-400/30' :
+                              'bg-gray-500/20 text-gray-400 border-gray-400/30'
+                            }`}>
+                              {invoice.status === 'paid' ? 'Paid' :
+                               invoice.status === 'sent' ? 'Sent' :
+                               invoice.status === 'draft' ? 'Draft' : 'Unknown'}
+                            </span>
+                          </td>
+                          <td className="py-4 px-6">
+                            <p className="text-white/70 text-sm">
+                              {invoice.created_at ? new Date(invoice.created_at).toLocaleDateString() : 'N/A'}
+                            </p>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </main>
       

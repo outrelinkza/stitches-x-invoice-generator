@@ -18,7 +18,8 @@ export class TemplateService {
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
-      throw new Error('User must be authenticated to fetch templates');
+      console.log('No user found, returning empty templates');
+      return []; // Return empty array instead of throwing error
     }
 
     const { data, error } = await supabase
@@ -28,7 +29,8 @@ export class TemplateService {
       .order('created_at', { ascending: false });
 
     if (error) {
-      throw new Error(`Failed to fetch templates: ${error.message}`);
+      console.log('Failed to fetch templates:', error.message);
+      return []; // Return empty array instead of throwing error
     }
 
     return data || [];
@@ -54,7 +56,15 @@ export class TemplateService {
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
+      console.log('No user found, cannot create template');
       throw new Error('User must be authenticated to create templates');
+    }
+
+    // Double-check user authentication with session
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      console.log('No active session found, cannot create template');
+      throw new Error('No active session found. Please log in again.');
     }
 
     const { data, error } = await supabase
@@ -67,6 +77,13 @@ export class TemplateService {
       .single();
 
     if (error) {
+      console.error('Template creation error:', error);
+      if (error.message.includes('row-level security policy') || error.message.includes('permission denied')) {
+        throw new Error('Permission denied: Please make sure you are logged in and try again.');
+      }
+      if (error.message.includes('duplicate key') || error.message.includes('unique constraint')) {
+        throw new Error('A template with this name already exists. Please choose a different name.');
+      }
       throw new Error(`Failed to create template: ${error.message}`);
     }
 
@@ -155,7 +172,27 @@ export class TemplateService {
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
-      throw new Error('User must be authenticated to create default templates');
+      console.log('No user found, skipping default template creation');
+      return; // Don't throw error, just return silently
+    }
+
+    // Double-check user authentication
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      console.log('No active session found, skipping default template creation');
+      return; // Don't throw error, just return silently
+    }
+
+    // Check if user already has templates to avoid unnecessary creation
+    try {
+      const existingTemplates = await this.getUserTemplates();
+      if (existingTemplates.length > 0) {
+        console.log('User already has templates, skipping default template creation');
+        return; // User already has templates
+      }
+    } catch (error) {
+      console.error('Error checking existing templates:', error);
+      // Continue with creation if we can't check existing templates
     }
 
     const defaultTemplates = [
@@ -193,12 +230,6 @@ export class TemplateService {
         is_public: false
       }
     ];
-
-    // Check if user already has templates
-    const existingTemplates = await this.getUserTemplates();
-    if (existingTemplates.length > 0) {
-      return; // User already has templates
-    }
 
     // Create default templates
     for (const template of defaultTemplates) {

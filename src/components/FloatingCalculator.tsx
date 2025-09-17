@@ -7,11 +7,14 @@ const FloatingCalculator = React.memo(function FloatingCalculator() {
   const [position, setPosition] = useState({ x: 20, y: 80 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [hasDragged, setHasDragged] = useState(false);
   const [results, setResults] = useState<{[key: string]: any}>({});
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     setIsDragging(true);
+    setHasDragged(false);
     setDragStart({
       x: e.clientX - position.x,
       y: e.clientY - position.y
@@ -20,7 +23,9 @@ const FloatingCalculator = React.memo(function FloatingCalculator() {
 
   const handleTouchStart = (e: React.TouchEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     setIsDragging(true);
+    setHasDragged(false);
     const touch = e.touches[0];
     setDragStart({
       x: touch.clientX - position.x,
@@ -31,30 +36,36 @@ const FloatingCalculator = React.memo(function FloatingCalculator() {
   const handleMouseMove = (e: MouseEvent) => {
     if (isDragging) {
       e.preventDefault();
-      setPosition({
-        x: e.clientX - dragStart.x,
-        y: e.clientY - dragStart.y
-      });
+      setHasDragged(true);
+      const buttonSize = window.innerWidth < 640 ? 48 : 56; // 12*4 = 48px on mobile, 14*4 = 56px on desktop
+      const newX = Math.max(0, Math.min(window.innerWidth - buttonSize, e.clientX - dragStart.x));
+      const newY = Math.max(0, Math.min(window.innerHeight - buttonSize, e.clientY - dragStart.y));
+      setPosition({ x: newX, y: newY });
     }
   };
 
   const handleTouchMove = (e: TouchEvent) => {
     if (isDragging) {
       e.preventDefault();
+      setHasDragged(true);
       const touch = e.touches[0];
-      setPosition({
-        x: touch.clientX - dragStart.x,
-        y: touch.clientY - dragStart.y
-      });
+      const buttonSize = window.innerWidth < 640 ? 48 : 56; // 12*4 = 48px on mobile, 14*4 = 56px on desktop
+      const newX = Math.max(0, Math.min(window.innerWidth - buttonSize, touch.clientX - dragStart.x));
+      const newY = Math.max(0, Math.min(window.innerHeight - buttonSize, touch.clientY - dragStart.y));
+      setPosition({ x: newX, y: newY });
     }
   };
 
   const handleMouseUp = () => {
     setIsDragging(false);
+    // Reset hasDragged after a short delay
+    setTimeout(() => setHasDragged(false), 100);
   };
 
   const handleTouchEnd = () => {
     setIsDragging(false);
+    // Reset hasDragged after a short delay
+    setTimeout(() => setHasDragged(false), 100);
   };
 
   // Add global mouse and touch event listeners for better dragging
@@ -136,29 +147,25 @@ const FloatingCalculator = React.memo(function FloatingCalculator() {
         style={{ left: position.x, top: position.y }}
       >
         <div
-          className="w-14 h-14 bg-gray-500/20 hover:bg-gray-500/30 backdrop-blur-sm border border-gray-400/30 rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110 cursor-pointer relative"
-          title="Quick Calculator"
+          className="w-12 h-12 sm:w-14 sm:h-14 bg-gray-500/20 hover:bg-gray-500/30 backdrop-blur-sm border border-gray-400/30 rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110 cursor-move relative touch-manipulation"
+          title="Quick Calculator - Drag to move, click to open"
+          onMouseDown={handleMouseDown}
+          onTouchStart={handleTouchStart}
+          onClick={(e) => {
+            // Only open if we haven't dragged
+            if (!hasDragged) {
+              setIsOpen(!isOpen);
+            }
+          }}
         >
-          {/* Drag Handle */}
-          <div
-            className="absolute inset-0 cursor-move"
-            onMouseDown={handleMouseDown}
-            onTouchStart={handleTouchStart}
-          />
-          {/* Click Button */}
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="relative z-10 w-full h-full flex items-center justify-center"
-          >
-            <span className="material-symbols-outlined text-white text-xl">calculate</span>
-          </button>
+          <span className="material-symbols-outlined text-white text-xl pointer-events-none">calculate</span>
         </div>
       </div>
 
       {/* Calculator Popup */}
       {isOpen && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="glass-effect rounded-2xl shadow-lg p-6 w-full max-w-md mx-4 border border-white/20">
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="glass-effect rounded-2xl shadow-lg p-4 sm:p-6 w-full max-w-md border border-white/20 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-white">Quick Calculator</h3>
               <button
@@ -173,16 +180,16 @@ const FloatingCalculator = React.memo(function FloatingCalculator() {
               {/* Tax Calculator */}
               <div className="space-y-2">
                 <h4 className="text-sm font-medium text-white/90">Tax Calculator</h4>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <input
                     type="number"
                     placeholder="Subtotal"
-                    className="px-3 py-2 rounded-md border-white/20 bg-white/10 text-white placeholder-white/60 text-sm"
+                    className="px-3 py-2 rounded-md border-white/20 bg-white/10 text-white placeholder-white/60 text-sm w-full"
                   />
                   <input
                     type="number"
                     placeholder="Tax Rate %"
-                    className="px-3 py-2 rounded-md border-white/20 bg-white/10 text-white placeholder-white/60 text-sm"
+                    className="px-3 py-2 rounded-md border-white/20 bg-white/10 text-white placeholder-white/60 text-sm w-full"
                   />
                 </div>
                 <button
@@ -196,16 +203,16 @@ const FloatingCalculator = React.memo(function FloatingCalculator() {
               {/* Late Fee Calculator */}
               <div className="space-y-2">
                 <h4 className="text-sm font-medium text-white/90">Late Fee Calculator</h4>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <input
                     type="number"
                     placeholder="Invoice Amount"
-                    className="px-3 py-2 rounded-md border-white/20 bg-white/10 text-white placeholder-white/60 text-sm"
+                    className="px-3 py-2 rounded-md border-white/20 bg-white/10 text-white placeholder-white/60 text-sm w-full"
                   />
                   <input
                     type="number"
                     placeholder="Late Fee %"
-                    className="px-3 py-2 rounded-md border-white/20 bg-white/10 text-white placeholder-white/60 text-sm"
+                    className="px-3 py-2 rounded-md border-white/20 bg-white/10 text-white placeholder-white/60 text-sm w-full"
                   />
                 </div>
                 <button
@@ -219,14 +226,14 @@ const FloatingCalculator = React.memo(function FloatingCalculator() {
               {/* Time Calculator */}
               <div className="space-y-2">
                 <h4 className="text-sm font-medium text-white/90">Time Calculator</h4>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <input
                     type="time"
-                    className="px-3 py-2 rounded-md border-white/20 bg-white/10 text-white text-sm"
+                    className="px-3 py-2 rounded-md border-white/20 bg-white/10 text-white text-sm w-full"
                   />
                   <input
                     type="time"
-                    className="px-3 py-2 rounded-md border-white/20 bg-white/10 text-white text-sm"
+                    className="px-3 py-2 rounded-md border-white/20 bg-white/10 text-white text-sm w-full"
                   />
                 </div>
                 <input

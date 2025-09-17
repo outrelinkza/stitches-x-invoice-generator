@@ -22,17 +22,16 @@ export default function NavHeader({ currentPage }: NavHeaderProps) {
 
   return (
     <header className="fixed top-0 w-full bg-black/20 backdrop-blur-xl border-b border-white/10 z-40 animate-enter" style={{animationDelay: '50ms'}}>
-      <div className="container mx-auto px-0 sm:px-1 lg:px-2">
-        <div className="flex items-center justify-between py-4">
-          <a href="/" className="flex items-center gap-2 sm:gap-3 text-white hover:opacity-80 transition-opacity -ml-6 sm:-ml-5">
+      <div className="flex items-center justify-between py-4 px-4 sm:px-6 lg:px-8">
+        <a href="/" className="flex items-center gap-2 sm:gap-3 text-white hover:opacity-80 transition-opacity">
             <svg className="h-6 w-6 sm:h-8 sm:w-8 text-white" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
               <path clipRule="evenodd" d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z" fill="currentColor" fillRule="evenodd"></path>
             </svg>
             <h2 className="text-lg sm:text-xl font-bold tracking-tight text-white">StitchInvoice</h2>
-          </a>
-          
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-6 text-sm font-medium">
+        </a>
+        
+        {/* Desktop Navigation */}
+        <nav className="hidden lg:flex items-center gap-6 text-sm font-medium">
             {navItems.map((item) => (
               <a 
                 key={item.href}
@@ -57,6 +56,9 @@ export default function NavHeader({ currentPage }: NavHeaderProps) {
           <div className="hidden lg:flex items-center gap-4">
             {user ? (
               <div className="flex items-center gap-4">
+                <span className="text-white/80 text-sm">
+                  Welcome, {user.user_metadata?.full_name || user.email}
+                </span>
                 <button 
                   onClick={() => signOut()}
                   className="text-white/80 hover:text-white transition-colors text-sm font-medium"
@@ -96,8 +98,7 @@ export default function NavHeader({ currentPage }: NavHeaderProps) {
             <span className="material-symbols-outlined text-2xl">
               {mobileMenuOpen ? 'close' : 'menu'}
             </span>
-          </button>
-        </div>
+        </button>
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
@@ -123,6 +124,9 @@ export default function NavHeader({ currentPage }: NavHeaderProps) {
               <div className="border-t border-white/10 pt-4 mt-4">
                 {user ? (
                   <div className="px-4 py-2">
+                    <div className="text-white/80 text-sm mb-2">
+                      Welcome, {user.user_metadata?.full_name || user.email}
+                    </div>
                     <button 
                       onClick={() => {
                         signOut();
@@ -168,7 +172,6 @@ export default function NavHeader({ currentPage }: NavHeaderProps) {
         isOpen={authModalOpen}
         onClose={() => setAuthModalOpen(false)}
         mode={authMode}
-        onModeChange={setAuthMode}
       />
     </header>
   );

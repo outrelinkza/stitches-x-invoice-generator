@@ -37,8 +37,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode }) =
         await signUp(email, password, fullName);
         // Show success message for signup
         const successMsg = document.createElement('div');
-        successMsg.className = 'fixed top-20 right-4 bg-white/10 backdrop-blur-xl border border-white/20 text-white px-6 py-4 rounded-xl shadow-2xl z-50 transition-all';
-        successMsg.innerHTML = 'Account created successfully! Please check your email to verify your account.';
+        successMsg.className = 'fixed top-4 right-4 bg-green-500/90 text-white px-6 py-3 rounded-lg shadow-lg z-[10000] transition-all';
+        successMsg.innerHTML = 'Account created! Please check your email to verify your account.';
         document.body.appendChild(successMsg);
         
         setTimeout(() => {
@@ -63,43 +63,99 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode }) =
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="glass-effect bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 w-full max-w-md relative shadow-2xl">
+    <>
+      <style jsx>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        
+        /* Ensure modal is always visible */
+        .auth-modal-overlay {
+          position: fixed !important;
+          top: 0 !important;
+          left: 0 !important;
+          width: 100vw !important;
+          height: 100vh !important;
+          z-index: 10000 !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          background-color: rgba(0, 0, 0, 0.6) !important;
+          padding: 16px !important;
+        }
+        
+        .auth-modal-content {
+          background-color: white !important;
+          border-radius: 12px !important;
+          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+          width: 100% !important;
+          max-width: 448px !important;
+          padding: 32px !important;
+          position: relative !important;
+          max-height: 90vh !important;
+          overflow-y: auto !important;
+          margin: auto !important;
+        }
+      `}</style>
+    <div 
+      className="auth-modal-overlay"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+    >
+      <div 
+        className="auth-modal-content"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors"
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
 
-        <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold text-white mb-2">
+        {/* Header */}
+        <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+          <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#111827', marginBottom: '8px' }}>
             {isSignUp ? 'Create Account' : 'Sign In'}
           </h2>
-          <p className="text-white/70">
+          <p style={{ color: '#6B7280' }}>
             {isSignUp ? 'Join StitchInvoice to get started' : 'Welcome back to StitchInvoice'}
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Form */}
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {error && (
-            <div className="bg-red-500/20 border border-red-500/30 rounded-lg p-3">
-              <p className="text-red-400 text-sm">{error}</p>
+            <div style={{ backgroundColor: '#FEF2F2', border: '1px solid #FECACA', borderRadius: '8px', padding: '12px', marginBottom: '16px' }}>
+              <p style={{ color: '#DC2626', fontSize: '14px', fontWeight: '500' }}>{error}</p>
             </div>
           )}
           
           {isSignUp && (
             <div>
-              <label className="block text-sm font-medium text-white/90 mb-1">
+              <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '4px' }}>
                 Full Name
               </label>
               <input
                 type="text"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full px-4 py-3 border border-white/20 bg-white/10 backdrop-blur-sm rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400 text-white placeholder-white/60 transition-all"
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  border: '1px solid #D1D5DB',
+                  borderRadius: '8px',
+                  fontSize: '16px',
+                  color: '#111827',
+                  backgroundColor: 'white'
+                }}
                 placeholder="Enter your full name"
                 required={isSignUp}
               />
@@ -107,28 +163,44 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode }) =
           )}
 
           <div>
-            <label className="block text-sm font-medium text-white/90 mb-1">
+            <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '4px' }}>
               Email Address
             </label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 border border-white/20 bg-white/10 backdrop-blur-sm rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400 text-white placeholder-white/60 transition-all"
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                border: '1px solid #D1D5DB',
+                borderRadius: '8px',
+                fontSize: '16px',
+                color: '#111827',
+                backgroundColor: 'white'
+              }}
               placeholder="Enter your email"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/90 mb-1">
+            <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '4px' }}>
               Password
             </label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 border border-white/20 bg-white/10 backdrop-blur-sm rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400 text-white placeholder-white/60 transition-all"
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                border: '1px solid #D1D5DB',
+                borderRadius: '8px',
+                fontSize: '16px',
+                color: '#111827',
+                backgroundColor: 'white'
+              }}
               placeholder="Enter your password"
               required
               minLength={6}
@@ -138,11 +210,31 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode }) =
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-lg hover:shadow-blue-500/25"
+            style={{
+              width: '100%',
+              backgroundColor: isLoading ? '#9CA3AF' : '#2563EB',
+              color: 'white',
+              padding: '12px 16px',
+              borderRadius: '8px',
+              border: 'none',
+              fontSize: '16px',
+              fontWeight: '500',
+              cursor: isLoading ? 'not-allowed' : 'pointer',
+              opacity: isLoading ? 0.5 : 1,
+              transition: 'all 0.2s ease'
+            }}
           >
             {isLoading ? (
-              <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{
+                  width: '16px',
+                  height: '16px',
+                  border: '2px solid transparent',
+                  borderTop: '2px solid white',
+                  borderRadius: '50%',
+                  animation: 'spin 1s linear infinite',
+                  marginRight: '8px'
+                }}></div>
                 Processing...
               </div>
             ) : (
@@ -151,19 +243,28 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode }) =
           </button>
         </form>
 
-        <div className="mt-6 text-center">
+        {/* Toggle Mode */}
+        <div style={{ marginTop: '24px', textAlign: 'center' }}>
           <button
             onClick={() => {
               setIsSignUp(!isSignUp);
               setError('');
             }}
-            className="text-blue-400 hover:text-blue-300 text-sm transition-colors"
+            style={{
+              color: '#2563EB',
+              fontSize: '14px',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              textDecoration: 'underline'
+            }}
           >
             {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
           </button>
         </div>
 
-        <div className="mt-4 text-center">
+        {/* Forgot Password */}
+        <div style={{ marginTop: '16px', textAlign: 'center' }}>
           <button
             onClick={async () => {
               if (!email) {
@@ -182,7 +283,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode }) =
                   setError('');
                   // Show success message
                   const successMsg = document.createElement('div');
-                  successMsg.className = 'fixed top-20 right-4 bg-white/10 backdrop-blur-xl border border-white/20 text-white px-6 py-4 rounded-xl shadow-2xl z-50 transition-all';
+                  successMsg.style.cssText = 'position: fixed; top: 16px; right: 16px; background: rgba(34, 197, 94, 0.9); color: white; padding: 12px 24px; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); z-index: 10001;';
                   successMsg.innerHTML = 'Password reset email sent! Check your inbox.';
                   document.body.appendChild(successMsg);
                   
@@ -199,12 +300,46 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode }) =
               }
             }}
             disabled={isResetting}
-            className="text-white/60 hover:text-white/80 text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+              color: isResetting ? '#9CA3AF' : '#6B7280',
+              fontSize: '14px',
+              background: 'none',
+              border: 'none',
+              cursor: isResetting ? 'not-allowed' : 'pointer',
+              opacity: isResetting ? 0.5 : 1
+            }}
           >
             {isResetting ? 'Sending...' : 'Forgot your password?'}
           </button>
         </div>
+
+        {/* Guest Option */}
+        <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid #E5E7EB', textAlign: 'center' }}>
+          <p style={{ color: '#6B7280', fontSize: '14px', marginBottom: '12px' }}>
+            Want to try without an account?
+          </p>
+          <button
+            onClick={() => {
+              onClose();
+              // Trigger guest mode
+              const event = new CustomEvent('enableGuestMode');
+              window.dispatchEvent(event);
+            }}
+            style={{
+              color: '#2563EB',
+              fontSize: '14px',
+              fontWeight: '500',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              textDecoration: 'underline'
+            }}
+          >
+            Continue as Guest
+          </button>
+        </div>
       </div>
     </div>
+    </>
   );
 };

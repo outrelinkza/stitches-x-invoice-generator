@@ -62,7 +62,9 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
             <div className="text-center mb-8">
               <div className="flex items-center justify-center mb-6">
                 <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <span className="text-2xl font-bold text-white">S</span>
+                  <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                    <path clipRule="evenodd" d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z" fill="currentColor" fillRule="evenodd"></path>
+                  </svg>
                 </div>
                 <div className="ml-3">
                   <h1 className="text-2xl font-bold text-white">StitchInvoice</h1>
@@ -74,7 +76,9 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
             {/* Email Icon */}
             <div className="text-center mb-6">
               <div className="w-20 h-20 bg-gradient-to-br from-yellow-400/20 to-orange-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-yellow-400/30">
-                <span className="text-3xl">📧</span>
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
               </div>
             </div>
 
@@ -106,7 +110,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
                 onClick={() => window.location.href = '/'}
                 className="w-full bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 border border-white/20 hover:border-white/30"
               >
-                🏠 Go to Home
+                Go to Home
               </button>
             </div>
 
@@ -140,54 +144,45 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
 
             <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
               <div className="glass-effect bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 w-full max-w-lg shadow-2xl">
-                {/* Logo and Branding */}
+                {/* Header */}
                 <div className="text-center mb-8">
                   <div className="flex items-center justify-center mb-6">
-                    <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                      <span className="text-2xl font-bold text-white">S</span>
-                    </div>
-                    <div className="ml-3">
-                      <h1 className="text-2xl font-bold text-white">StitchInvoice</h1>
-                      <p className="text-white/60 text-sm">Invoice Generator</p>
-                    </div>
+                    <svg className="h-12 w-12 text-white" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                      <path clipRule="evenodd" d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z" fill="currentColor" fillRule="evenodd"></path>
+                    </svg>
                   </div>
-                </div>
-
-                {/* Lock Icon */}
-                <div className="text-center mb-6">
-                  <div className="w-20 h-20 bg-gradient-to-br from-blue-400/20 to-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-blue-400/30">
-                    <span className="text-3xl">🔐</span>
-                  </div>
+                  <h1 className="text-3xl font-bold text-white mb-2">StitchInvoice</h1>
+                  <p className="text-white/60 text-lg">Professional Invoice Generator</p>
                 </div>
 
                 {/* Content */}
                 <div className="text-center mb-8">
-                  <h2 className="text-2xl font-bold text-white mb-3">Authentication Required</h2>
-                  <p className="text-white/80 leading-relaxed">
+                  <h2 className="text-2xl font-bold text-white mb-4">Authentication Required</h2>
+                  <p className="text-white/80 leading-relaxed text-lg">
                     Please sign in to access this page and manage your invoices with StitchInvoice.
                   </p>
                 </div>
                 
                 {/* Action Buttons */}
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <button
                     onClick={() => setShowAuthModal(true)}
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-blue-500/25 transform hover:scale-[1.02]"
+                    className="w-full bg-white text-gray-900 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-all duration-200 shadow-lg transform hover:scale-[1.02]"
                   >
                     Sign In
                   </button>
                   
                   <button
                     onClick={() => window.location.href = '/'}
-                    className="w-full bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 border border-white/20 hover:border-white/30"
+                    className="w-full bg-white/10 hover:bg-white/20 text-white px-8 py-4 rounded-lg font-medium text-lg transition-all duration-200 border border-white/20 hover:border-white/30"
                   >
-                    🏠 Go to Home
+                    Go to Home
                   </button>
                 </div>
 
                 {/* Help Text */}
-                <div className="text-center mt-6">
-                  <p className="text-white/50 text-xs">
+                <div className="text-center mt-8">
+                  <p className="text-white/60 text-sm">
                     New to StitchInvoice? Sign up to create professional invoices in minutes.
                   </p>
                 </div>
@@ -196,11 +191,13 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
           </div>
         )}
         
-        <AuthModal
-          isOpen={showAuthModal}
-          onClose={() => setShowAuthModal(false)}
-          mode="signin"
-        />
+        {showAuthModal && (
+          <AuthModal
+            isOpen={showAuthModal}
+            onClose={() => setShowAuthModal(false)}
+            mode="signin"
+          />
+        )}
       </>
     );
   }
